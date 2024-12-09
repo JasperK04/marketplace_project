@@ -1,7 +1,7 @@
 from . import api
 
 
-@api.route("/users")
+@api.route("/users", methods=["GET"])
 def get_users():
     pass
 

@@ -1,6 +1,6 @@
 from . import api
 
-@api.route("/categories")
+@api.route("/categories", methods=["GET"])
 def get_categories():
     pass
 
