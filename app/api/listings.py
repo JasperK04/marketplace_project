@@ -1,7 +1,7 @@
 from . import api
 
 
-@api.route("/listings")
+@api.route("/listings", methods=["GET"])
 def get_listings():
     pass
 
