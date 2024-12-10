@@ -28,6 +28,9 @@ def create_user():
     data = request.get_json()
     if not all(name in data for name in ["name", "email", "password"]):
         return bad_request('must include a name, email and a password')
+    if db.session.scalar(sa.select(User).where(
+            User.email == data['email'])):
+        return bad_request('Email address already in use')
     user = User()
     user.from_dict(data, new_user=True)
     db.session.add(user)
