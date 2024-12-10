@@ -4,6 +4,7 @@ import sqlalchemy as sa
 from flask import request, url_for
 from app.api.errors import bad_request
 from app.models.User import User
+from app.api.auth import token_auth
 
 
 @api.route('/users/<int:id>', methods=['GET'])
@@ -41,3 +42,29 @@ def create_user():
 @api.route('/users/', methods=['POST'])
 def create_user2():
     return create_user()
+
+
+@api.route('/users', methods=['PUT'])
+@token_auth.login_required
+def update_user():
+    new_password = False
+    current_user: User = token_auth.current_user() # type: ignore
+    id = current_user.id
+    user = db.get_or_404(User, id)
+    data = request.get_json()
+    if 'name' in data and data['name'] != user.name and \
+        db.session.scalar(sa.select(User).where(
+            User.name == data['name'])):
+        return bad_request('please use a different name')
+    if 'password' in data and not user.check_password(data['password']):
+        if not user.check_password(data['password']):
+            return bad_request('New password can not be the same as previous')
+        new_password = True
+    user.from_dict(data, new_password)
+    db.session.commit()
+    return user.to_dict()
+
+@api.route('/users/', methods=['PUT'])
+@token_auth.login_required
+def update_user2():
+    return update_user()
