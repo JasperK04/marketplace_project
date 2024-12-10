@@ -11,7 +11,7 @@ from app.api.auth import token_auth
 def get_user(id):
     return db.get_or_404(User, id).to_dict()
 
-
+@api.route('/users/', methods=['GET'])
 @api.route('/users', methods=['GET'])
 def get_users():
     page = request.args.get('page', 1, type=int)
@@ -19,11 +19,8 @@ def get_users():
     return User.to_collection_dict(sa.select(User), page, per_page,
                                    'api.get_users')
 
-@api.route('/users/', methods=['GET'])
-def get_users2():
-   return get_users()
 
-
+@api.route('/users/', methods=['POST'])
 @api.route('/users', methods=['POST'])
 def create_user():
     data = request.get_json()
@@ -39,12 +36,9 @@ def create_user():
     return user.to_dict(), 201, {'Location': url_for('api.get_users',
                                                      id=user.id)}
 
-@api.route('/users/', methods=['POST'])
-def create_user2():
-    return create_user()
 
-
-@api.route('/users', methods=['PUT'])
+@api.route('/users/', methods=['PATCH'])
+@api.route('/users', methods=['PATCH'])
 @token_auth.login_required
 def update_user():
     new_password = False
@@ -52,30 +46,21 @@ def update_user():
     id = current_user.id
     user = db.get_or_404(User, id)
     data = request.get_json()
-    if 'name' in data and data['name'] != user.name and \
-        db.session.scalar(sa.select(User).where(
-            User.name == data['name'])):        
-        return bad_request('please use a different name')
+    if 'name' in data and data['name'] == user.name:
+        return bad_request('New name can not be the same as previous')
     if 'password' in data:
         if not user.check_password(data['password']):
             return bad_request('New password can not be the same as previous')
         new_password = True
     if 'email' in data:
-        if data['email'] != user.email and \
-            db.session.scalar(sa.select(User).where(
-                User.email == data['email'])):
-            return bad_request('please use a different email')
+        if data['email'] == user.email:
+            return bad_request('New email can not be the same as previous')
         elif db.session.scalar(sa.select(User).where(
                 User.email == data['email'])):
             return bad_request('Email address already in use')
     user.from_dict(data, new_password)
     db.session.commit()
     return user.to_dict()
-
-@api.route('/users/', methods=['PUT'])
-@token_auth.login_required
-def update_user2():
-    return update_user()
 
 
 @api.route('/users', methods=['DELETE'])
