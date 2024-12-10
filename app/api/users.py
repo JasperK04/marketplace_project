@@ -16,3 +16,7 @@ def get_users():
     per_page = min(request.args.get('per_page', 10, type=int), 100)
     return User.to_collection_dict(sa.select(User), page, per_page,
                                    'api.get_users')
+
+@api.route('/users/', methods=['GET'])
+def get_users2():
+   return get_users()
