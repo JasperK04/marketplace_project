@@ -38,7 +38,7 @@ class User(PaginatedAPIMixin, db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    token: Mapped[str] = mapped_column(String(32), index=True, unique=True)
+    token: Mapped[Optional[str]] = mapped_column(String(32), index=True, unique=True)
     token_expiration: Mapped[Optional[datetime]]
 
     def set_password(self, password:str):
