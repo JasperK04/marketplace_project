@@ -1,7 +1,8 @@
 from . import api
 from app import db
 import sqlalchemy as sa
-from flask import request
+from flask import request, url_for
+from app.api.errors import bad_request
 from app.models.User import User
 
 
@@ -20,3 +21,20 @@ def get_users():
 @api.route('/users/', methods=['GET'])
 def get_users2():
    return get_users()
+
+
+@api.route('/users', methods=['POST'])
+def create_user():
+    data = request.get_json()
+    if not all(name in data for name in ["name", "email", "password"]):
+        return bad_request('must include a name, email and a password')
+    user = User()
+    user.from_dict(data, new_user=True)
+    db.session.add(user)
+    db.session.commit()
+    return user.to_dict(), 201, {'Location': url_for('api.get_user',
+                                                     id=user.id)}
+
+@api.route('/users/', methods=['POST'])
+def create_user2():
+    return create_user()

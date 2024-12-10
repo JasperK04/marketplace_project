@@ -36,11 +36,6 @@ class User(PaginatedAPIMixin, db.Model):
     password_hash: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
 
-    def __init__(self, name:str, email:str):
-        self.name = name
-        self.email = email
-        self.email = email
-
     def set_password(self, password:str):
         self.password_hash = generate_password_hash(password)
 
@@ -50,6 +45,13 @@ class User(PaginatedAPIMixin, db.Model):
     def to_dict(self):
         data = {
             'id': self.id,
-            'username': self.name
+            'name': self.name
         }
         return data
+    
+    def from_dict(self, data, new_user=False):
+        for field in ['name', 'email']:
+            if field in data:
+                setattr(self, field, data[field])
+        if new_user and 'password' in data:
+            self.set_password(data['password'])
