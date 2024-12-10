@@ -36,7 +36,7 @@ def create_user():
     user.from_dict(data, new_user=True)
     db.session.add(user)
     db.session.commit()
-    return user.to_dict(), 201, {'Location': url_for('api.get_user',
+    return user.to_dict(), 201, {'Location': url_for('api.get_users',
                                                      id=user.id)}
 
 @api.route('/users/', methods=['POST'])
@@ -54,12 +54,20 @@ def update_user():
     data = request.get_json()
     if 'name' in data and data['name'] != user.name and \
         db.session.scalar(sa.select(User).where(
-            User.name == data['name'])):
+            User.name == data['name'])):        
         return bad_request('please use a different name')
-    if 'password' in data and not user.check_password(data['password']):
+    if 'password' in data:
         if not user.check_password(data['password']):
             return bad_request('New password can not be the same as previous')
         new_password = True
+    if 'email' in data:
+        if data['email'] != user.email and \
+            db.session.scalar(sa.select(User).where(
+                User.email == data['email'])):
+            return bad_request('please use a different email')
+        elif db.session.scalar(sa.select(User).where(
+                User.email == data['email'])):
+            return bad_request('Email address already in use')
     user.from_dict(data, new_password)
     db.session.commit()
     return user.to_dict()
@@ -68,3 +76,17 @@ def update_user():
 @token_auth.login_required
 def update_user2():
     return update_user()
+
+
+@api.route('/users', methods=['DELETE'])
+@token_auth.login_required
+def delete_user():
+    current_user: User = token_auth.current_user() # type: ignore
+    id = current_user.id
+    user = User.query.get(id)
+    if user:
+        db.session.delete(user)
+        db.session.commit()
+        return f"successfully deleted:\n{user.to_dict()}"
+    else:
+        return bad_request('cannot delete a user that does not exist')
