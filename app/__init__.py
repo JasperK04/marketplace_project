@@ -23,6 +23,8 @@ migrate = Migrate(app, db)
 # Imports to make the app work
 from . import models, routes, api
 
+app.register_blueprint(api.api, url_prefix='/api')
+
 
 # Create database
 with app.app_context():
