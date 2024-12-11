@@ -31,21 +31,27 @@ def create_listing():
     data = request.get_json()
     current_user: User = token_auth.current_user() #type: ignore
     data['userID'] = current_user.id
-    if not (all(field in data for field in fields) and ('category' in data or 'categoryID' in data)):
+
+    if not (all(field in data for field in fields) and # check required fields
+           ('category' in data ^ 'categoryID' in data)):  # category XOR categoryID
         return bad_request(f'must include: {", ".join(fields)} and category')
-    if not db.session.scalar(sa.select(User).where(
+
+    if not db.session.scalar(sa.select(User).where( # check if the user exists
             User.id == data['userID'])):
         return bad_request('This user does not exist')
-    if 'category' in data:
+
+    if 'category' in data: # get categoryID from category name 
         if categoryID := db.session.scalar(sa.select(Category.id).where(
                 Category.name == data['category'])):
             data['categoryID'] = categoryID
         else:
             return bad_request('This category does not exist')
-    elif 'categoryID' in data and not db.session.scalar(sa.select(Category).where(
+
+    elif 'categoryID' in data and not db.session.scalar(sa.select(Category).where( # check if the category exists
             Category.id == data['categoryID'])):
         return bad_request('This category does not exist')
-    listing = Listing()
+    
+    listing = Listing() # create and commit new listing
     listing.from_dict(data)
     db.session.add(listing)
     db.session.commit()

@@ -5,8 +5,6 @@ from flask import request, url_for
 from app.api.errors import bad_request
 from app.api.auth import token_auth
 
-from app.models.User import User
-from app.models.Listing import Listing
 from app.models.Category import Category
 
 @api.route('/category/<int:id>', methods=['GET'])
@@ -19,7 +17,7 @@ def get_category(id):
 def get_categories():
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 10, type=int), 100)
-    return Listing.to_collection_dict(sa.select(Listing), page, per_page,
+    return Category.to_collection_dict(sa.select(Category), page, per_page,
                                    'api.get_listings')
 
 
@@ -28,12 +26,14 @@ def get_categories():
 @token_auth.login_required
 def create_category():
     data = request.get_json()
-    if "name" not in data:
+    if "name" not in data: # check if category name is specified
         return bad_request('must include a category name')
-    if db.session.scalar(sa.select(Category).where(
+
+    if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
             Category.name == data['name'])):
         return bad_request('this category already exists')
-    cat = Category()
+
+    cat = Category() # create and commit new category
     cat.from_dict(data)
     db.session.add(cat)
     db.session.commit()
@@ -48,12 +48,14 @@ def create_category():
 def change_category(id):
     data = request.get_json()
     cat = db.get_or_404(Category, id)
-    if "name" not in data:
+    if "name" not in data: # check if category name is specified
         return bad_request('can\'t change name if no name is specified')
-    if db.session.scalar(sa.select(Category).where(
+    
+    if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
             Category.name == data['name'])):
         return bad_request('this category already exists')
-    cat.from_dict(data)
+    
+    cat.from_dict(data) # change and commit changes of the category
     db.session.add(cat)
     db.session.commit()
     return cat.to_dict(), 201, {'Location': url_for('api.get_category',
