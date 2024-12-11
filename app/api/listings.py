@@ -58,6 +58,43 @@ def create_listing():
     return listing.to_dict(), 201, {'Location': url_for('api.get_listing',
                                                      id=listing.id)}
 
-# TODO: Add more Listing stuff, e.g. listing by id, by price above/below something,
-#  edit listings if logged in as the user who created them,
-#  create new listings if logged in, etc
+
+@api.route('/listings/<int:id>', methods=['PATCH'])
+@token_auth.login_required
+def change_listing(id):
+    data = request.get_json()
+    current_user: User = token_auth.current_user() #type: ignore
+    listing = db.get_or_404(Listing, id)
+    
+    if listing.userID != current_user.id: # check if the listing is made by the current user
+        return bad_request('You cannot change listings of another user')
+
+    if 'category' in data: # get categoryID from category name 
+        if categoryID := db.session.scalar(sa.select(Category.id).where(
+                Category.name == data['category'])):
+            data['categoryID'] = categoryID
+        else:
+            return bad_request('This category does not exist')
+
+    elif 'categoryID' in data and not db.session.scalar(sa.select(Category).where( # check if the category exists
+            Category.id == data['categoryID'])):
+        return bad_request('This category does not exist')
+    
+    listing.from_dict(data) # change and commit the listing
+    db.session.add(listing)
+    db.session.commit()
+    return listing.to_dict(), 201, {'Location': url_for('api.get_listing',
+                                                     id=listing.id)}
+
+
+@api.route('/listings/<int:id>', methods=['DELETE'])
+@token_auth.login_required
+def delete_listing(id):
+    current_user: User = token_auth.current_user() #type: ignore
+    listing = db.get_or_404(Listing, id)
+    
+    if listing.userID != current_user.id: # check if the listing is made by the current user
+        return bad_request('You cannot change listings of another user')
+    db.session.delete(listing)
+    db.session.commit()
+    return f"successfully deleted:\n{listing.to_dict()}"
