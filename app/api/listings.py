@@ -33,7 +33,7 @@ def create_listing():
     data['userID'] = current_user.id
 
     if not (all(field in data for field in fields) and # check required fields
-           ('category' in data ^ 'categoryID' in data)):  # category XOR categoryID
+           (('category' in data) ^ ('categoryID' in data))):  # category XOR categoryID
         return bad_request(f'must include: {", ".join(fields)} and category')
 
     if not db.session.scalar(sa.select(User).where( # check if the user exists
