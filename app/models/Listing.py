@@ -37,8 +37,8 @@ class Listing(PaginatedAPIMixin, db.Model):
     categoryID: Mapped[int] = mapped_column(ForeignKey("category.id"))
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
-    price: Mapped[int] = mapped_column(nullable=False)
-
+    price: Mapped[float] = mapped_column(nullable=False)
+    sold: Mapped[bool] = mapped_column(nullable=False, insert_default=True)
 
     def to_dict(self):
         data = {
@@ -53,13 +53,16 @@ class Listing(PaginatedAPIMixin, db.Model):
             "category": {
                 "id": self.categoryID,
                 "name": db.session.scalar(select(Category.name).where(Category.id == self.categoryID))
-            }
+            },
+            "sold": self.sold
         }
         return data
     
-    def from_dict(self, data, new_user=False):
+    def from_dict(self, data, sold=False):
         for field in ['id', 'userID', 'categoryID', 'title', 'price', 'description']:
             if field in data:
                 setattr(self, field, data[field])
+        setattr(self, "sold", sold)
+
 
     
