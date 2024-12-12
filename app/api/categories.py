@@ -43,29 +43,29 @@ def create_category():
 # optional TODO: add authentication levels e.g. admin, 
 # such that only admins can change or delete categories
 
-@api.route('/category/<int:id>', methods=['PATCH'])
-@token_auth.login_required
-def change_category(id):
-    data = request.get_json()
-    cat = db.get_or_404(Category, id)
-    if "name" not in data: # check if category name is specified
-        return bad_request('can\'t change name if no name is specified')
+# @api.route('/category/<int:id>', methods=['PATCH'])
+# @token_auth.login_required
+# def change_category(id):
+#     data = request.get_json()
+#     cat = db.get_or_404(Category, id)
+#     if "name" not in data: # check if category name is specified
+#         return bad_request('can\'t change name if no name is specified')
     
-    if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
-            Category.name == data['name'])):
-        return bad_request('this category already exists')
+#     if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
+#             Category.name == data['name'])):
+#         return bad_request('this category already exists')
     
-    cat.from_dict(data) # change and commit changes of the category
-    db.session.add(cat)
-    db.session.commit()
-    return cat.to_dict(), 201, {'Location': url_for('api.get_category',
-                                                     id=cat.id)}
+#     cat.from_dict(data) # change and commit changes of the category
+#     db.session.add(cat)
+#     db.session.commit()
+#     return cat.to_dict(), 201, {'Location': url_for('api.get_category',
+#                                                      id=cat.id)}
 
 
-@api.route('/category/<int:id>', methods=['DELETE'])
-@token_auth.login_required
-def delete_category(id):
-    cat = db.get_or_404(Category, id)
-    db.session.delete(cat)
-    db.session.commit()
-    return f"successfully deleted:\n{cat.to_dict()}"
+# @api.route('/category/<int:id>', methods=['DELETE'])
+# @token_auth.login_required
+# def delete_category(id):
+#     cat = db.get_or_404(Category, id)
+#     db.session.delete(cat)
+#     db.session.commit()
+#     return f"successfully deleted:\n{cat.to_dict()}"
