@@ -11,6 +11,7 @@ from app.models.Category import Category
 
 
 @api.route('/listings/<int:id>', methods=['GET'])
+@api.route('/listings/<int:id>/', methods=['GET'])
 def get_listing(id):
     return db.get_or_404(Listing, id).to_dict()
 
@@ -23,8 +24,8 @@ def get_listings():
                                    'api.get_listings')
 
 
-@api.route('/listings/', methods=['POST'])
-@api.route('/listings', methods=['POST'])
+@api.route('/listings/', methods=['POST', 'PUT'])
+@api.route('/listings', methods=['POST', 'PUT'])
 @token_auth.login_required
 def create_listing():
     fields = ["title", "price", "description"]
@@ -59,7 +60,28 @@ def create_listing():
                                                      id=listing.id)}
 
 
-@api.route('/listings/<int:id>', methods=['PATCH'])
+@api.route('/listings/<int:id>/buy', methods=['POST', 'PATCH'])
+@api.route('/listings/<int:id>/buy/', methods=['POST', 'PATCH'])
+@token_auth.login_required
+def buy_listing(id):
+    current_user: User = token_auth.current_user() #type: ignore
+    listing = db.get_or_404(Listing, id)
+
+    if listing.userID == current_user.id: # check if the listing is made by the current user
+        return bad_request('You cannot buy your own listing')
+    
+    if listing.sold == True:
+        return bad_request('unfortunately for you, this listing was already bought')
+    
+    listing.from_dict(data=[], sold=True)
+    db.session.add(listing)
+    db.session.commit()    
+    return listing.to_dict(), 201, {'Location': url_for('api.get_listing', id=listing.id)}
+
+
+
+@api.route('/listings/<int:id>/edit', methods=['PATCH'])
+@api.route('/listings/<int:id>/edit/', methods=['PATCH'])
 @token_auth.login_required
 def change_listing(id):
     data = request.get_json()
@@ -88,6 +110,7 @@ def change_listing(id):
 
 
 @api.route('/listings/<int:id>', methods=['DELETE'])
+@api.route('/listings/<int:id>/', methods=['DELETE'])
 @token_auth.login_required
 def delete_listing(id):
     current_user: User = token_auth.current_user() #type: ignore
