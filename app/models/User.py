@@ -5,7 +5,7 @@ from app import db
 from datetime import timedelta, datetime, timezone
 import secrets
 from typing import Optional
-from mixin import PaginatedAPIMixin
+from .mixin import PaginatedAPIMixin
 
 
 class User(PaginatedAPIMixin, db.Model):

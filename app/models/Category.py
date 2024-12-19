@@ -2,7 +2,7 @@ from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from app import db
 
-from mixin import PaginatedAPIMixin
+from .mixin import PaginatedAPIMixin
 
 
 class Category(PaginatedAPIMixin, db.Model):

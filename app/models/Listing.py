@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column
 from app import db
-from mixin import PaginatedAPIMixin
+from .mixin import PaginatedAPIMixin
 
 from app.models.User import User
 from app.models.Category import Category
