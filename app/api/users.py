@@ -49,17 +49,20 @@ def update_user():
     id = current_user.id
     user = db.get_or_404(User, id)
     data = request.get_json()
+    
     if 'name' in data:
         if data['name'] == user.name:
             return bad_request('New name can not be the same as previous')
         elif not User.valid_username(data['name']):
             return bad_request('Username does not meet requirements')
+    
     if 'password' in data:
         if not user.check_password(data['password']):
             return bad_request('New password can not be the same as previous')
         if not User.valid_password(data['password']):
             return bad_request('Password does not meet requirements')
         new_password = True
+    
     if 'email' in data:
         if data['email'] == user.email:
             return bad_request('New email can not be the same as previous')
@@ -68,6 +71,7 @@ def update_user():
         elif db.session.scalar(sa.select(User).where(
                 User.id != id and User.email == data['email'])):
             return bad_request('Email address already in use')
+    
     user.from_dict(data, new_password)
     db.session.commit()
     return user.to_dict()
