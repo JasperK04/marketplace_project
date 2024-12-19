@@ -27,7 +27,8 @@ def create_user():
     data = request.get_json()
     if not all(name in data for name in ["name", "email", "password"]):
         return bad_request('must include a name, email and a password')
-    elif not User.valid_email(data['email']):
+    data['email'] = data['email'].lower()
+    if not User.valid_email(data['email']):
         return bad_request('This is not a valid email address')
     if db.session.scalar(sa.select(User).where(
             User.email == data['email'])):
@@ -64,6 +65,7 @@ def update_user():
         new_password = True
     
     if 'email' in data:
+        data['email'] = data['email'].lower()
         if data['email'] == user.email:
             return bad_request('New email can not be the same as previous')
         elif not User.valid_email(data['email']):
