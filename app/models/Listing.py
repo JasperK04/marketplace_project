@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import Integer, String, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column
 from app import db
@@ -24,7 +25,7 @@ class Listing(PaginatedAPIMixin, db.Model):
                 "name": db.session.scalar(select(User.name).where(User.id == self.userID))
             },
             "title": self.title,
-            "price": self.price,
+            "price": self.price / 100,
             "description": self.description,
             "category": {
                 "id": self.categoryID,
@@ -40,5 +41,22 @@ class Listing(PaginatedAPIMixin, db.Model):
                 setattr(self, field, data[field])
         setattr(self, "sold", sold)
 
-
+    @staticmethod
+    def normalize_title(title):
+        return title.title()
     
+    @staticmethod
+    def normalize_price(price):
+        price = price.replace(',', '.')
+        price = re.sub(r'[^\d.]', '', price)
+        price_float = float(price)
+        return round(price_float * 100)
+    
+    @staticmethod
+    def normalize_description(text: str):
+        normalized = ''
+        for line in text.split('\n'):
+            line = line.strip()
+            if line:
+                normalized += line[0].upper() + line[1:] + '\n'
+        return normalized
