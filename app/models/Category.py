@@ -1,3 +1,4 @@
+import re
 from sqlalchemy import Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 from app import db
@@ -20,3 +21,12 @@ class Category(PaginatedAPIMixin, db.Model):
         for field in ['name']:
             if field in data:
                 setattr(self, field, data[field])
+
+    @staticmethod
+    def normalize_name(name):
+        return name.title()
+    
+    @staticmethod
+    def valid_name(name):
+        return re.match(r'[a-zA-Z]{3,}', name) is not None
+
