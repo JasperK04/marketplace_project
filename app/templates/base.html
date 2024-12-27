@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{title or 'Marketplace'}}</title>
     <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='css/' + request.path.split('/')[-1] if request.path.split('/')[-1] != '' else 'index' + '.css') }}">
+    <link rel="stylesheet" href="{{url_for('static', filename='css/' + request.path.split('/')[-1] if request.path.split('/')[-1] != '' else 'css/index' + '.css') }}">
 </head>
 <body>
     {% block content %}

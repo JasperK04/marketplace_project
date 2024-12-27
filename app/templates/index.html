@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>Hello World</h1>
+    <div class="listings">
+        {% for listing in listings %}
+            {% include 'components/listing_card.html' %}
+        {% endfor %}
+    </div>
 {% endblock %}
