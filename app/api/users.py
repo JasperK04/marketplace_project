@@ -55,13 +55,13 @@ def update_user():
         if data['name'] == user.name:
             return bad_request('New name can not be the same as previous')
         elif not User.valid_username(data['name']):
-            return bad_request('Username does not meet requirements')
+            return bad_request('Username does not meet requirements.\nUsername must only cantain alpha-numeric characters.')
     
     if 'password' in data:
         if not user.check_password(data['password']):
             return bad_request('New password can not be the same as previous')
         if not User.valid_password(data['password']):
-            return bad_request('Password does not meet requirements')
+            return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
         new_password = True
     
     if 'email' in data:
