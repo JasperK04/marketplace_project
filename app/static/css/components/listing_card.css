@@ -1,0 +1,8 @@
+.listing-card {
+    margin:1em;
+
+    .listing-content {
+        display:flex;
+        justify-content:space-between;
+    }
+}
