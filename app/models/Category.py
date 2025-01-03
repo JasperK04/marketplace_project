@@ -24,9 +24,9 @@ class Category(PaginatedAPIMixin, db.Model):
 
     @staticmethod
     def normalize_name(name):
-        return name.title()
+        return name.replace('_', ' ').title()
     
     @staticmethod
     def valid_name(name):
-        return re.match(r'[a-zA-Z]{3,}', name) is not None
+        return re.match(r'[a-zA-Z ]{3,}', name) is not None
 
