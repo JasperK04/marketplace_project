@@ -20,3 +20,4 @@ class Category(PaginatedAPIMixin, db.Model):
         for field in ['name']:
             if field in data:
                 setattr(self, field, data[field])
+        return self

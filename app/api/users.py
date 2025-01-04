@@ -29,8 +29,7 @@ def create_user():
     if db.session.scalar(sa.select(User).where(
             User.email == data['email'])):
         return bad_request('Email address already in use')
-    user = User()
-    user.from_dict(data, new_user=True)
+    user = User().from_dict(data, new_user=True)
     db.session.add(user)
     db.session.commit()
     return user.to_dict(), 201, {'Location': url_for('api.get_users',
