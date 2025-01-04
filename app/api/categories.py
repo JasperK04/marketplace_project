@@ -21,17 +21,20 @@ def get_categories():
                                    'api.get_listings')
 
 
-@api.route('/category/', methods=['POST'])
-@api.route('/category', methods=['POST'])
+@api.route('/category/', methods=['POST', 'PUT'])
+@api.route('/category', methods=['POST', 'PUT'])
 @token_auth.login_required
 def create_category():
     data = request.get_json()
     if "name" not in data: # check if category name is specified
-        return bad_request('must include a category name')
-
+        return bad_request('Must include a category name')
+    
+    data['name'] = Category.normalize_name(data['name'])
+    if not Category.valid_name(data['name']):
+        return bad_request('This is not a valid category name')
     if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
             Category.name == data['name'])):
-        return bad_request('this category already exists')
+        return bad_request('This category already exists')
 
     cat = Category() # create and commit new category
     cat.from_dict(data)

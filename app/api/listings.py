@@ -36,12 +36,13 @@ def create_listing():
     if not (all(field in data for field in fields) and # check required fields
            (('category' in data) ^ ('categoryID' in data))):  # category XOR categoryID
         return bad_request(f'must include: {", ".join(fields)} and category')
-
-    if not db.session.scalar(sa.select(User).where( # check if the user exists
-            User.id == data['userID'])):
-        return bad_request('This user does not exist')
+    
+    data['title'] = Listing.normalize_title(data['title'])
+    data['price'] = Listing.normalize_price(data['price'])
+    data['description'] = Listing.normalize_description(data['description'])
 
     if 'category' in data: # get categoryID from category name 
+        data['category'] = Category.normalize_name(data['category'])
         if categoryID := db.session.scalar(sa.select(Category.id).where(
                 Category.name == data['category'])):
             data['categoryID'] = categoryID
@@ -79,7 +80,6 @@ def buy_listing(id):
     return listing.to_dict(), 201, {'Location': url_for('api.get_listing', id=listing.id)}
 
 
-
 @api.route('/listings/<int:id>/edit', methods=['PATCH'])
 @api.route('/listings/<int:id>/edit/', methods=['PATCH'])
 @token_auth.login_required
@@ -90,8 +90,13 @@ def change_listing(id):
     
     if listing.userID != current_user.id: # check if the listing is made by the current user
         return bad_request('You cannot change listings of another user')
+    
+    data['title'] = Listing.normalize_title(data['title'])
+    data['price'] = Listing.normalize_price(data['price'])
+    data['description'] = Listing.normalize_description(data['description'])
 
     if 'category' in data: # get categoryID from category name 
+        data['category'] = Category.normalize_name(data['category'])
         if categoryID := db.session.scalar(sa.select(Category.id).where(
                 Category.name == data['category'])):
             data['categoryID'] = categoryID
