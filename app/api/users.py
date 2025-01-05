@@ -62,7 +62,7 @@ def update_user():
             return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
     
     if 'password' in data:
-        if not user.check_password(data['password']):
+        if user.check_password(data['password']):
             return bad_request('New password can not be the same as previous')
         if not User.valid_password(data['password']):
             return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
@@ -94,6 +94,6 @@ def delete_user():
             db.session.delete(listing)
         db.session.delete(user)
         db.session.commit()
-        return f"successfully deleted:\n{user.to_dict()}"
+        return f"successfully deleted:\n{user.to_dict()}", 204
     else:
         return bad_request('cannot delete a user that does not exist')
