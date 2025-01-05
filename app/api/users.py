@@ -28,11 +28,15 @@ def create_user():
     if not all(name in data for name in ["name", "email", "password"]):
         return bad_request('must include a name, email and a password')
     data['email'] = data['email'].lower()
+    if not User.valid_username(data['name']):
+        return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
     if not User.valid_email(data['email']):
         return bad_request('This is not a valid email address')
     if db.session.scalar(sa.select(User).where(
             User.email == data['email'])):
         return bad_request('Email address already in use')
+    if not User.valid_password(data['password']):
+        return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
     user = User()
     user.from_dict(data, new_user=True)
     db.session.add(user)
@@ -55,7 +59,7 @@ def update_user():
         if data['name'] == user.name:
             return bad_request('New name can not be the same as previous')
         elif not User.valid_username(data['name']):
-            return bad_request('Username does not meet requirements.\nUsername must only cantain alpha-numeric characters.')
+            return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
     
     if 'password' in data:
         if not user.check_password(data['password']):
