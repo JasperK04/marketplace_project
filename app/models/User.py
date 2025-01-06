@@ -36,6 +36,7 @@ class User(PaginatedAPIMixin, db.Model):
                 setattr(self, field, data[field])
         if new_user and 'password' in data:
             self.set_password(data['password'])
+        return self
 
     def get_token(self, expires_in=3600):
         now = datetime.now(timezone.utc)

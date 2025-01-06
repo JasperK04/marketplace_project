@@ -53,8 +53,7 @@ def create_listing():
             Category.id == data['categoryID'])):
         return bad_request('This category does not exist')
     
-    listing = Listing() # create and commit new listing
-    listing.from_dict(data)
+    listing = Listing().from_dict(data) # create and commit new listing
     db.session.add(listing)
     db.session.commit()
     return listing.to_dict(), 201, {'Location': url_for('api.get_listing',

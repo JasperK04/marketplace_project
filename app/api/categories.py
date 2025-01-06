@@ -36,8 +36,7 @@ def create_category():
             Category.name == data['name'])):
         return bad_request('This category already exists')
 
-    cat = Category() # create and commit new category
-    cat.from_dict(data)
+    cat = Category().from_dict(data) # create and commit new category
     db.session.add(cat)
     db.session.commit()
     return cat.to_dict(), 201, {'Location': url_for('api.get_category',

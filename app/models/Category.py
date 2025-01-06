@@ -21,6 +21,7 @@ class Category(PaginatedAPIMixin, db.Model):
         for field in ['name']:
             if field in data:
                 setattr(self, field, data[field])
+        return self
 
     @staticmethod
     def normalize_name(name):
