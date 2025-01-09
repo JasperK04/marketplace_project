@@ -21,7 +21,7 @@
             </ul>
         </div>
 
-        <!-- TODO: Add current user -->
+        {% if current_user.is_anonymous %}
         <div class="login">
             <a class="btn" href="{{ url_for('index') }}">Login</a>
         </div>
@@ -30,15 +30,15 @@
             <a class="btn" href="{{ url_for('index' )}}">Sign Up!</a>
         </div>
 
-        <!-- TODO: Add current user -->
+        {% else %}
         <div class="profile">
             <a href="{{ url_for('index') }}">Profile</a>
         </div>
 
         <div class="logout">
-            <a class="btn" href="{{ url_for('index' )}}">Logout</a>
+            <a class="btn" href="{{ url_for('index')}}">Logout</a>
         </div>
-        <!-- TODO: Add current user -->
+        {% endif %}
     </div>
     <div class="container">
         {% block content %}
