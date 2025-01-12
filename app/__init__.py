@@ -36,7 +36,3 @@ app.register_blueprint(api.api, url_prefix='/api')
 # Create database
 with app.app_context():
     db.create_all()
-
-@login.user_loader
-def load_user(id):
-    return db.session.get(User, int(id))
