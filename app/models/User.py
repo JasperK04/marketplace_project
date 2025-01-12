@@ -1,15 +1,16 @@
 import re
+from flask_login import UserMixin
 from sqlalchemy import Integer, String, Date, ForeignKey, select
 from sqlalchemy.orm import Mapped, mapped_column
 from werkzeug.security import generate_password_hash, check_password_hash
-from app import db
+from app import db, login
 from datetime import timedelta, datetime, timezone
 import secrets
 from typing import Optional
 from .mixin import PaginatedAPIMixin
 
 
-class User(PaginatedAPIMixin, db.Model):
+class User(PaginatedAPIMixin, UserMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
@@ -61,19 +62,24 @@ class User(PaginatedAPIMixin, db.Model):
         return user
     
     # Commented out for now, edited version of code moved to forms.py
+    # not commented out anymore, because api code needs these validators.
 
-    #@staticmethod
-    #def valid_username(name):
-    #    return re.match(r"^[a-zA-Z0-9_.-]{2,}$", name) is not None
+    @staticmethod
+    def valid_username(name):
+        return re.match(r"^[a-zA-Z0-9_.-]{2,}$", name) is not None
     
-    #@staticmethod
-    #def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver 
-    #    if 15 <= len(password) <= 64:
-    #        return False
-    #    if not password.strip():
-    #        return False
-    #    return True
+    @staticmethod
+    def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver 
+        if 15 <= len(password) <= 64:
+            return False
+        if not password.strip():
+            return False
+        return True
 
-    #@staticmethod
-    #def valid_email(email): # See https://stackoverflow.com/a/201378
-    #    return re.match(r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])", email) is not None
+    @staticmethod
+    def valid_email(email): # See https://stackoverflow.com/a/201378
+        return re.match(r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])", email) is not None
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
