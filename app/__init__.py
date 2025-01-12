@@ -1,5 +1,6 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
 from flask_migrate import Migrate
 from os import path, getenv
 
@@ -20,6 +21,9 @@ app.config["SECRET_KEY"] = getenv("SECRET_KEY") or "secret-key"
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 
+login = LoginManager(app)
+login.login_view = 'login'
+
 # Imports to make the app work
 from . import models, routes, api
 
@@ -29,3 +33,7 @@ app.register_blueprint(api.api, url_prefix='/api')
 # Create database
 with app.app_context():
     db.create_all()
+
+@login.user_loader
+def load_user(id):
+    return db.session.get(User, int(id))
