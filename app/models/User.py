@@ -70,7 +70,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     
     @staticmethod
     def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver 
-        if 15 <= len(password) <= 64:
+        if len(password) < 15 or len(password) >= 64:
             return False
         if not password.strip():
             return False

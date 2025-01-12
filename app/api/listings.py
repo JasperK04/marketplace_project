@@ -76,7 +76,7 @@ def buy_listing(id):
     listing.from_dict(data=[], sold=True)
     db.session.add(listing)
     db.session.commit()    
-    return listing.to_dict(), 201, {'Location': url_for('api.get_listing', id=listing.id)}
+    return listing.to_dict(), 200, {'Location': url_for('api.get_listing', id=listing.id)}
 
 
 @api.route('/listings/<int:id>/edit', methods=['PATCH'])
@@ -90,9 +90,12 @@ def change_listing(id):
     if listing.userID != current_user.id: # check if the listing is made by the current user
         return bad_request('You cannot change listings of another user')
     
-    data['title'] = Listing.normalize_title(data['title'])
-    data['price'] = Listing.normalize_price(data['price'])
-    data['description'] = Listing.normalize_description(data['description'])
+    if "title" in data:
+        data['title'] = Listing.normalize_title(data['title'])
+    if "price" in data:
+        data['price'] = Listing.normalize_price(data['price'])
+    if "description" in data:
+        data['description'] = Listing.normalize_description(data['description'])
 
     if 'category' in data: # get categoryID from category name 
         data['category'] = Category.normalize_name(data['category'])
@@ -109,7 +112,7 @@ def change_listing(id):
     listing.from_dict(data) # change and commit the listing
     db.session.add(listing)
     db.session.commit()
-    return listing.to_dict(), 201, {'Location': url_for('api.get_listing',
+    return listing.to_dict(), 200, {'Location': url_for('api.get_listing',
                                                      id=listing.id)}
 
 
@@ -124,4 +127,4 @@ def delete_listing(id):
         return bad_request('You cannot change listings of another user')
     db.session.delete(listing)
     db.session.commit()
-    return f"successfully deleted:\n{listing.to_dict()}"
+    return f"successfully deleted:\n{listing.to_dict()}", 204
