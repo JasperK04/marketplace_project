@@ -25,7 +25,7 @@ token_auth = HTTPTokenAuth()
 def get_token():
     token = basic_auth.current_user().get_token() #type: ignore
     db.session.commit()
-    return {'token': token}
+    return {'token': token}, 201
 
 
 @api.route('/tokens', methods=['DELETE'])
