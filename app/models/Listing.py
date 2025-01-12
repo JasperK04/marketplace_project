@@ -40,6 +40,7 @@ class Listing(PaginatedAPIMixin, db.Model):
             if field in data:
                 setattr(self, field, data[field])
         setattr(self, "sold", sold)
+        return self
 
     @staticmethod
     def normalize_title(title):

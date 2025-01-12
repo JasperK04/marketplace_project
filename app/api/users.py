@@ -37,8 +37,7 @@ def create_user():
         return bad_request('Email address already in use')
     if not User.valid_password(data['password']):
         return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
-    user = User()
-    user.from_dict(data, new_user=True)
+    user = User().from_dict(data, new_user=True)
     db.session.add(user)
     db.session.commit()
     return user.to_dict(), 201, {'Location': url_for('api.get_users',
