@@ -3,7 +3,7 @@ __pycache__/
 # virtual environments
 .flask/
 .venv/
-
+.flask_session/
 .idea/
 .vscode/
 .env

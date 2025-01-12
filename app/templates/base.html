@@ -23,11 +23,11 @@
 
         {% if current_user.is_anonymous %}
         <div class="login">
-            <a class="btn" href="{{ url_for('index') }}">Login</a>
+            <a class="btn" href="{{ url_for('login') }}">Login</a>
         </div>
 
         <div class="sign-up">
-            <a class="btn" href="{{ url_for('index' )}}">Sign Up!</a>
+            <a class="btn" href="{{ url_for('register' )}}">Sign Up!</a>
         </div>
 
         {% else %}
@@ -36,7 +36,7 @@
         </div>
 
         <div class="logout">
-            <a class="btn" href="{{ url_for('index')}}">Logout</a>
+            <a class="btn" href="{{ url_for('logout')}}">Logout</a>
         </div>
         {% endif %}
     </div>
