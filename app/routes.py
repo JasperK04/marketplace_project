@@ -60,4 +60,6 @@ def register():
 @app.route('/profile/<username>')
 def profile(username):
     user = db.first_or_404(sa.select(User).where(User.name == username))
-    return render_template('profile.html', user=user)
+    listings = db.session.execute(
+        sa.select(Listing).where(Listing.userID == user.id)).scalars()
+    return render_template('profile.html', user=user, listings=listings)
