@@ -18,6 +18,10 @@
             <ul>
                 <a href="{{ url_for('index') }}">Listings</a>
                 <a href="{{ url_for('index')}}"></a>
+                {% if not current_user.is_anonymous %}
+                    <a href="{{ url_for('profile', username=current_user.name) }}">My Profile</a>
+                {% endif %}
+                </div>
             </ul>
         </div>
 
@@ -31,10 +35,6 @@
         </div>
 
         {% else %}
-        <div class="profile">
-            <a href="{{ url_for('profile', username=current_user.name) }}">My Profile</a>
-        </div>
-
         <div class="logout">
             <a class="btn" href="{{ url_for('logout')}}">Logout</a>
         </div>
