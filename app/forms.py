@@ -1,5 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from flask_wtf.file import FileField,FileAllowed,FileRequired
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 import sqlalchemy as sa
 from app import db
@@ -31,3 +32,12 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired()])
     remember_me = BooleanField('Remember Me')
     submit = SubmitField('Sign In')
+
+
+class ListingForm(FlaskForm):
+    title = StringField('Title',validators=[DataRequired()])
+    category = StringField('Category',validators=[DataRequired()])
+    description = TextAreaField('Description',validators=[DataRequired()])
+    price = FloatField('Price',validators=[DataRequired()])
+    file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
+    submit = SubmitField('Add listing')
