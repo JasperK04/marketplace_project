@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="profile">
+        <h1>{{ user.name }}'s Profile</h1>
+
+        <h2 id="about_me">About me</h2>
+        <!-- TODO: Create 'about me' field in User table, migrate DB -->
+        <p>insert 'about me' text here</p>
+    
+        <h2 id="active_listings">Active Listings</h2>
+        <!-- TODO: Add listings to profile page
+        <div class="listings">
+            {% for listing in listings %}
+                {% include 'components/listing_card.html' %}
+            {% endfor %}
+        </div>
+        -->
+
+    </div>
+
+{% endblock %}

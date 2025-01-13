@@ -32,7 +32,7 @@
 
         {% else %}
         <div class="profile">
-            <a href="{{ url_for('index') }}">Profile</a>
+            <a href="{{ url_for('profile', username=current_user.name) }}">My Profile</a>
         </div>
 
         <div class="logout">

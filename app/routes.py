@@ -55,3 +55,9 @@ def register():
         #flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+@app.route('/profile/<username>')
+def profile(username):
+    user = db.first_or_404(sa.select(User).where(User.name == username))
+    return render_template('profile.html', user=user)
