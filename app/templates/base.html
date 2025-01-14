@@ -17,11 +17,10 @@
         <div class="ref-links">
             <ul>
                 <a href="{{ url_for('index') }}">Listings</a>
-                <a href="{{ url_for('index')}}"></a>
+                <a href="{{ url_for('add_listing')}}">Add listing</a>
                 {% if not current_user.is_anonymous %}
                     <a href="{{ url_for('profile', username=current_user.name) }}">My Profile</a>
                 {% endif %}
-                </div>
             </ul>
         </div>
 
