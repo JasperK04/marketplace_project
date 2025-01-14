@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField,FileAllowed,FileRequired
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, SelectField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, SelectField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 import sqlalchemy as sa
 from app import db
@@ -37,7 +37,7 @@ class LoginForm(FlaskForm):
 
 class ListingForm(FlaskForm):
     title = StringField('Title',validators=[DataRequired()])
-    category = SelectField('Category', choices=[category.name for category in db.session.query(Category).all()], validators=[DataRequired()])
+    category = RadioField('Category', validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
     price = FloatField('Price',validators=[DataRequired()])
     file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
