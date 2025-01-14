@@ -64,6 +64,7 @@ def register():
 @login_required
 def add_listing():
     form = ListingForm()
+    form.category.choices = [category.name for category in db.session.query(Category).all()]
     if form.validate_on_submit():
         file = request.files.get('file')
         cat_id = db.session.scalar(select(Category.id).where(Category.name == form.category.data))
