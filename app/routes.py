@@ -68,5 +68,4 @@ def listings():
 @app.route("/listings/<int:listing_id>", methods=["GET"])
 def listing(listing_id):
     listing = db.get_or_404(Listing, listing_id).to_dict()
-    print([category.name for category in db.session.query(Category).all()])
     return render_template("listing.html", listing=listing)
