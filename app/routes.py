@@ -62,4 +62,6 @@ def profile(username):
     user = db.first_or_404(sa.select(User).where(User.name == username))
     listings = db.session.execute(
         sa.select(Listing).where(Listing.userID == user.id)).scalars()
-    return render_template('profile.html', user=user, listings=listings)
+    profile_pic = db.session.execute(
+        sa.select(Image).where(Image.userID == user.id)).scalars()
+    return render_template('profile.html', user=user, listings=listings, profile_pic=profile_pic)
