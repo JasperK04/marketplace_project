@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{url_for('static', filename='/css/listing.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/components/buttons.css')}}">
+{% endblock %}
+{% block title %}
+{{ listing.title }} - Marketplace
+{% endblock %}
+{% block content %}
+<section>
+    <div class="listing">
+        <header>
+            <div class="listing-header">
+            <h1>{{listing.title}}</h1>
+            <button class="primary buy-button" id="buy-button" onclick="alert('This functionality hasn\'t been implemented yet')">Buy</button>
+            </div>
+            <div>
+                <p>Offered by: {{ listing.seller.name }}</p>
+                <p>{{ listing.created_at }}</p>
+            </div>
+        </header>
+        <div class="image-and-price">
+            <img class="listing-image" src="https://placehold.co/600x400/" alt="{{ listing.title }}">
+            <div>
+                <p>&euro; {{ listing.price }}</p>
+            </div>
+        </div>
+        <div>
+            <div class="social-links">
+                <h1>Share</h1>
+                <ul>
+                    <li class="social-link social-link-whatsapp">
+                        <a href="https://wa.me?text={{listing.title + ' - ' + request.url}}" target="_blank">
+                            <img src="{{url_for('static', filename='assets/images/socials/whatsapp.svg')}}" alt="Whatsapp">
+                        </a>
+                    </li>
+                    <li class="social-link social-link-facebook">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{request.url}}" target="_blank">
+                            <img src="{{url_for('static', filename='assets/images/socials/facebook.png')}}" alt="Facebook">
+                        </a>
+                    </li>
+                    <li class="social-link social-link-twitter">
+                        <a href="https://twitter.com/intent/tweet?text={{listing.title + ' - ' + request.url}}" target="_blank">
+                            <img src="{{url_for('static', filename='assets/images/socials/twitter.svg')}}" alt="Twitter">
+                        </a>
+                    </li>
+                    <li class="social-link social-link-email">
+                        <a href="mailto:?subject={{listing.title}}&body={{listing.description + ' - ' + request.url}}">
+                            <img src="{{url_for('static', filename='assets/images/socials/email.svg')}}" alt="Email">
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div>
+            <h2>Description</h1>
+            <p>{{ listing.description }}</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+
+
