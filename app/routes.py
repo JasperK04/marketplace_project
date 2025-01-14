@@ -1,7 +1,8 @@
 from flask import render_template, redirect,url_for, request, flash
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_required, login_user, logout_user
 from app.forms import LoginForm,RegistrationForm
 from app.models.User import User
+from app.models.Category import Category
 import sqlalchemy as sa
 from urllib.parse import urlsplit
 
@@ -55,3 +56,17 @@ def register():
         #flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
+
+
+# Listings
+@app.route("/listings", methods=["GET"])
+def listings():
+    listings = db.session.query(Listing).all()
+    return render_template("listings.html", listings=listings)
+
+
+@app.route("/listings/<int:listing_id>", methods=["GET"])
+def listing(listing_id):
+    listing = db.get_or_404(Listing, listing_id).to_dict()
+    print([category.name for category in db.session.query(Category).all()])
+    return render_template("listing.html", listing=listing)
