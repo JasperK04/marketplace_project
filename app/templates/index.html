@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
-
+{% block styles %}
+    <link rel="stylesheet" href="{{url_for('static', filename='/css/index.css')}}">
+{% endblock %}
+{% block title %}
+    Marketplace
+{% endblock %}
 {% block content %}
     <div class="listings">
         {% for listing in listings %}
