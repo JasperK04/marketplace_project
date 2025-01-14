@@ -36,7 +36,7 @@ class LoginForm(FlaskForm):
 
 class ListingForm(FlaskForm):
     title = StringField('Title',validators=[DataRequired()])
-    category = StringField('Category',validators=[DataRequired()])
+    category = SelectField('Category', choices=[category.name for category in db.session.query(Category).all()], validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
     price = FloatField('Price',validators=[DataRequired()])
     file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
