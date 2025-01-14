@@ -1,6 +1,6 @@
 <section class="listing-card">
     <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
-    <a href="#">
+    <a href="{{ url_for('listing', listing_id=listing.id) }}">
         <div class="listing-image">
             <img src="https://placehold.co/300x200" alt="">
         </div>
