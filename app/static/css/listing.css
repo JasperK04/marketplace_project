@@ -1,0 +1,74 @@
+.listing {
+    padding: 5em;
+    margin: 20em;
+
+    > div {
+        padding: 1em 0;
+        border-top: 1px solid black;
+    }
+
+    .image-and-price {
+        display: grid;
+        grid-template-columns: 3fr 2.5fr;
+        gap: 2em;
+
+        .listing-image {
+            img {
+                width: 100%;
+                height: 100%;
+                margin: auto 0;
+            }
+        }
+    }
+
+    header {
+
+        .listing-header {
+            display:flex;
+            justify-content: space-between;
+            margin:0 2em;
+
+            h1 {
+                font-size: 2em;
+                font-weight: 600;
+            }
+            .buy-button {
+                font-size: 2em;
+                font-weight: 600;
+                cursor: pointer;
+
+            }
+        }
+    }
+
+    .social-links {
+        display:grid;
+        grid-template-columns: 1fr 5fr;
+        ul {
+            display: flex;
+            list-style: none;
+            gap: 2em;
+            margin:auto 0;
+
+            li {
+                a {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+
+                    img {
+                        width: 30px;
+                        height: 30px;
+                    }
+                }
+            }
+
+            img {
+                width: 30px;
+                height: 30px;
+            }
+        }
+
+
+    }
+}
