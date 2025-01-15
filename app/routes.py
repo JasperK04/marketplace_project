@@ -1,15 +1,18 @@
 from flask import render_template, redirect,url_for, request, flash
-from flask_login import current_user, login_required, login_user, logout_user
-from app.forms import LoginForm,RegistrationForm
+from flask_login import current_user, login_user, logout_user, login_required
+from app.forms import LoginForm,RegistrationForm, ListingForm
 from app.models.User import User
 from app.models.Category import Category
 import sqlalchemy as sa
+from sqlalchemy import select
 from urllib.parse import urlsplit
+from werkzeug.utils import secure_filename
 
 
 from . import app, db
 from .models.Listing import Listing
-
+from .models.Category import Category
+from .models.Image import Image
 
 @app.route("/", methods=["GET"])
 @app.route("/index", methods=["GET"])
@@ -69,3 +72,23 @@ def listings():
 def listing(listing_id):
     listing = db.get_or_404(Listing, listing_id).to_dict()
     return render_template("listing.html", listing=listing)
+ 
+
+@app.route('/add_listing',methods=['GET','POST'])
+@login_required
+def add_listing():
+    form = ListingForm()
+    form.category.choices = [category.name for category in db.session.query(Category).all()]
+    if form.validate_on_submit():
+        file = request.files.get('file')
+        cat_id = db.session.scalar(select(Category.id).where(Category.name == form.category.data))
+        new_listing = Listing(title=form.title.data,categoryID=cat_id,description=form.description.data,
+                              price=form.price.data,userID=current_user.id)
+        db.session.add(new_listing)
+        db.session.flush()
+        new_image = Image(img=file.read(),filename=secure_filename(file.filename),mimetype=file.mimetype,
+                          type='listing',listingID=new_listing.id)
+        db.session.add(new_image)
+        db.session.commit()
+        return redirect(url_for('index'))
+    return render_template('add_listing.html',title='Add listing',form=form)
