@@ -22,3 +22,18 @@ source .venv/bin/activate
 ```bash
 pip install -r requirements.txt
 ```
+
+### Seed the database
+
+> [!WARNING]
+> This will delete all data in the database. Do not run this if you already have a database
+
+```bash
+flask cli recreate-db
+```
+
+### Run the server
+
+```bash
+flask run
+```

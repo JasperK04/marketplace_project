@@ -28,10 +28,10 @@ login = LoginManager(app)
 login.login_view = 'login'
 
 # Imports to make the app work
-from . import models, routes, api
+from . import models, routes, api, cli
 
 app.register_blueprint(api.api, url_prefix='/api')
-
+app.register_blueprint(cli.cli)
 
 # Create database
 with app.app_context():
