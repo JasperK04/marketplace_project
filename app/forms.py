@@ -15,12 +15,6 @@ class RegistrationForm(FlaskForm):
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Register')
 
-    def validate_username(self, name):
-        user = db.session.scalar(sa.select(User).where(
-            User.name == name.data))
-        if user is not None:
-            raise ValidationError('Username already exists.')
-
     def validate_email(self, email):
         user = db.session.scalar(sa.select(User).where(
             User.email == email.data))

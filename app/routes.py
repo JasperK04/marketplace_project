@@ -59,9 +59,9 @@ def register():
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
-@app.route('/profile/<username>')
-def profile(username):
-    user = db.first_or_404(sa.select(User).where(User.name == username))
+@app.route('/profile/<user_id>')
+def profile(user_id):
+    user = db.first_or_404(sa.select(User).where(User.id == user_id))
     listings = db.session.execute(
         sa.select(Listing).where(Listing.userID == user.id)).scalars()
     profile_pic = db.session.execute(
