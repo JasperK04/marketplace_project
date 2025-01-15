@@ -15,6 +15,12 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
+
+    # Need to migrate DB to add about_me and profile_picture columns
+
+    #about_me: Mapped[str] = mapped_column(String(140), nullable=True)
+
+
     token: Mapped[Optional[str]] = mapped_column(String(32), index=True, unique=True)
     token_expiration: Mapped[Optional[datetime]]
 
@@ -60,9 +66,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
                 tzinfo=timezone.utc) < datetime.now(timezone.utc):
             return None
         return user
-    
-    # Commented out for now, edited version of code moved to forms.py
-    # not commented out anymore, because api code needs these validators.
+
 
     @staticmethod
     def valid_username(name):

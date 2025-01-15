@@ -19,6 +19,9 @@
             <ul>
                 <a href="{{ url_for('index') }}">Listings</a>
                 <a href="{{ url_for('add_listing')}}">Add listing</a>
+                {% if not current_user.is_anonymous %}
+                    <a href="{{ url_for('profile', user_id=current_user.id) }}">My Profile</a>
+                {% endif %}
             </ul>
         </div>
 
@@ -32,10 +35,6 @@
         </div>
 
         {% else %}
-        <div class="profile">
-            <a href="{{ url_for('index') }}">Profile</a>
-        </div>
-
         <div class="logout">
             <a class="btn" href="{{ url_for('logout')}}">Logout</a>
         </div>

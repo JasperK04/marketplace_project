@@ -61,6 +61,16 @@ def register():
     return render_template('register.html', title='Register', form=form)
 
 
+@app.route('/profile/<user_id>')
+def profile(user_id):
+    user = db.get_or_404(sa.select(User).where(User.id == user_id))
+    listings = db.session.execute(
+        sa.select(Listing).where(Listing.userID == user.id)).scalars()
+    profile_pic = db.session.execute(
+        sa.select(Image).where(Image.userID == user.id)).scalars()
+    return render_template('profile.html', user=user, listings=listings, profile_pic=profile_pic)
+
+
 # Listings
 @app.route("/listings", methods=["GET"])
 def listings():
@@ -72,6 +82,7 @@ def listings():
 def listing(listing_id):
     listing = db.get_or_404(Listing, listing_id).to_dict()
     return render_template("listing.html", listing=listing)
+
  
 
 @app.route('/add_listing',methods=['GET','POST'])
