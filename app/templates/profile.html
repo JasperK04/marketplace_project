@@ -5,16 +5,18 @@
         <h1>{{ user.name }}'s Profile</h1>
 
         <h2 id="about_me">About me</h2>
-        <!-- TODO: Create 'about me' field in User table, migrate DB -->
-        <p>
-            <!-- {{ user.about_me }} -->
-        </p>
+        {% if user.about_me %}
+            <p>
+                {{ user.about_me }}
+            </p>
+        {% else %}
+            <p> 
+                This user has not written a custom description yet
+            </p>
+        {% endif %}
 
         <!-- TODO: Add possibility to add profile photo to user profile -->
 
-        <!-- 
-
-        -->
 
     
         <h2 id="current_listings">Current Listings</h2>
