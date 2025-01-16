@@ -2,7 +2,14 @@
 
 {% block content %}
     <div class="profile_page">
-        <h1>{{ user.name }}'s Profile</h1>
+        <h1>
+            {{ user.name }}'s Profile
+        </h1>
+
+        {% if user.id == current_user.id %}
+            <!-- TODO: Create edit profile page for this -->
+            <a href="{{ url_for('index') }}">Edit Your Profile</a>
+        {% endif %}
 
         <h2 id="about_me">About me</h2>
         {% if user.about_me %}
