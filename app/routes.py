@@ -1,6 +1,6 @@
 from flask import render_template, redirect,url_for, request, flash
 from flask_login import current_user, login_user, logout_user, login_required
-from app.forms import LoginForm,RegistrationForm, ListingForm
+from app.forms import LoginForm, RegistrationForm, ListingForm, EditProfileForm
 from app.models.User import User
 from app.models.Category import Category
 import sqlalchemy as sa
@@ -56,19 +56,43 @@ def register():
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
-        #flash('Congratulations, you are now a registered user!')
+        flash('Congratulations, you are now a registered user!')
         return redirect(url_for('login'))
     return render_template('register.html', title='Register', form=form)
 
 
+# Profile stuff
 @app.route('/profile/<user_id>')
 def profile(user_id):
     user = db.get_or_404(User,user_id)
     listings = db.session.execute(
         sa.select(Listing).where(Listing.userID == user.id)).scalars()
-    profile_pic = db.session.execute(
-        sa.select(Image).where(Image.userID == user.id)).scalars()
-    return render_template('profile.html', user=user, listings=listings, profile_pic=profile_pic)
+    # Will get this sorted out later, hopefully
+    #profile_pic = db.session.execute(
+    #    sa.select(Image).where(Image.userID == user.id)).scalars()
+    return render_template('profile.html', user=user, listings=listings)
+
+
+@app.route('/profile/<user_id>/edit', methods=['GET', 'POST'])
+@login_required
+def edit_profile(user_id):
+    user = db.get_or_404(User,user_id)
+    listings = db.session.execute(
+        sa.select(Listing).where(Listing.userID == user.id)).scalars()
+
+    if user.id != current_user.id:
+        flash("You are not allowed to edit this profile.")
+        return render_template("profile.html", user=user, listings=listings)
+    
+    form = EditProfileForm()
+    if form.validate_on_submit():
+        user.about_me = form.about_me.data
+        user.name = form.name.data
+        db.session.add(user)
+        db.session.commit()
+        return render_template('profile.html', user=user, listings=listings)
+
+    return render_template('edit_profile.html', user=user, form=form)
 
 
 # Listings
