@@ -16,12 +16,13 @@
                     onclick="alert('This functionality hasn\'t been implemented yet')">Buy</button>
             </div>
             <div class="listing-meta">
-                <span><a href="{{url_for('profile', user_id=listing.seller.id)}}">{{ listing.seller.name }}</a></span> &bullet; <span>{{ listing.created_at.strftime('%H:%M, %d %b %Y') }}</span>
+                <span><a href="{{url_for('profile', user_id=listing.seller.id)}}">{{ listing.seller.name }}</a></span>
+                &bullet; <span>{{ listing.created_at.strftime('%H:%M, %d %b %Y') }}</span>
             </div>
         </header>
         <div class="image-and-price">
             <div class="image">
-            <img src="https://placehold.co/600x400/" alt="{{ listing.title }}">
+                <img src="https://placehold.co/600x400/" alt="{{ listing.title }}">
             </div>
             <div class="price">
                 <p>&euro; {{ listing.price }}</p>
@@ -31,26 +32,29 @@
             <div class="social-links">
                 <ul>
                     <li class="social-link social-link-whatsapp">
-                        <a href="https://wa.me?text={{listing.title + ' - ' + request.url}}" target="_blank">
+                        <a href="https://wa.me?text={{listing.title + ' - ' + request.url}}" target="_blank"
+                            title="Share on Whatsapp">
                             <img src="{{url_for('static', filename='assets/images/socials/whatsapp.svg')}}"
                                 alt="Whatsapp">
                         </a>
                     </li>
                     <li class="social-link social-link-facebook">
-                        <a href="https://www.facebook.com/sharer/sharer.php?u={{request.url}}" target="_blank">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{request.url}}" target="_blank"
+                            title="Share on Facebook">
                             <img src="{{url_for('static', filename='assets/images/socials/facebook.png')}}"
                                 alt="Facebook">
                         </a>
                     </li>
                     <li class="social-link social-link-twitter">
                         <a href="https://twitter.com/intent/tweet?text={{listing.title + ' - ' + request.url}}"
-                            target="_blank">
+                            target="_blank" title="Share on Twitter">
                             <img src="{{url_for('static', filename='assets/images/socials/twitter.svg')}}"
                                 alt="Twitter">
                         </a>
                     </li>
                     <li class="social-link social-link-email">
-                        <a href="mailto:?subject={{listing.title}}&body={{listing.description + ' - ' + request.url}}">
+                        <a href="mailto:?subject={{listing.title}}&body={{listing.description + ' - ' + request.url}}"
+                            title="Share via email">
                             <img src="{{url_for('static', filename='assets/images/socials/email.svg')}}" alt="Email">
                         </a>
                     </li>
