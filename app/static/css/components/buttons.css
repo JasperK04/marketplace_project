@@ -1,11 +1,10 @@
 @import url(../colors.css);
 
 button {
-    border-radius: 15px;
+    border-radius: 5px;
     border:none;
     height: fit-content;
-    padding: 5px 30px;
-    margin: auto 0;
+    padding: 10px 20px;
 }
 
 button:focus {
@@ -17,12 +16,12 @@ button:focus {
 
 button.primary {
     background-color: var(--color-primary);
-    color: var(--color-text-primary);
+    color: #fff;
 }
 
 button.secondary {
     background-color: var(--color-secondary);
-    color: var(--color-text-primary);
+    color: #fff;
 }
 
 button.outline {

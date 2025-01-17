@@ -18,13 +18,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
     is_admin: Mapped[bool] = mapped_column(nullable=False, server_default="0")
     is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
-
-
-    # Need to migrate DB to add about_me and profile_picture columns
-
-    #about_me: Mapped[str] = mapped_column(String(140), nullable=True)
-
-
+    about_me: Mapped[str] = mapped_column(String(140), nullable=True)
     token: Mapped[Optional[str]] = mapped_column(String(32), index=True, unique=True)
     token_expiration: Mapped[Optional[datetime]]
 
