@@ -65,7 +65,7 @@ def register():
 
 @app.route('/profile/<user_id>')
 def profile(user_id):
-    user = db.get_or_404(User,user_id)
+    user = db.get_or_404(User, user_id)
     listings = db.session.execute(
         sa.select(Listing).where(Listing.userID == user.id)).scalars()
     profile_pic = db.session.execute(
