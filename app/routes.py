@@ -109,42 +109,43 @@ def add_listing():
                               price=form.price.data,userID=current_user.id)
         db.session.add(new_listing)
         db.session.flush()
-        new_images = resize_upload_image(file,new_listing)
-        db.session.add(new_images[0])
-        db.session.add(new_images[1])
+        img_org = resize_upload_image(file,(300,200),current_user.id,new_listing.id,'UPLOAD_FOLDER','listing','original')
+        img_resized = resize_upload_image(file,(600,400),current_user.id,new_listing.id,'RESIZED_FOLDER','listing','resized')
+        db.session.add(img_org)
+        db.session.add(img_resized)
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('add_listing.html',title='Add listing',form=form)
 
 
-def resize_upload_image(file, listing):
+def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
     image = IM.open(file)
-    target_sizes = [(300, 200), (600, 400)]
-    folder_names = ['UPLOAD_FOLDER', 'RESIZED_FOLDER']
-    file_prefixes = ['', 'resized_']
-    variants = ['original','resized']
-    images = []
+    img = image.copy()
 
-    for size, folder, prefix, variant in zip(target_sizes, folder_names, file_prefixes, variants):
-        img = image.copy()
-        # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used 
-        if img.width < size[0] or img.height < size[1]:
-            img = img.resize(size,resample=1) # 1=LANCZOS resampling leads to higher quality pictures
-        else:
-            img.thumbnail(size,resample=1) 
-
-        filename = prefix + secure_filename(file.filename)
-        filepath = os.path.join(app.config[folder], filename)
-        os.makedirs(app.config[folder], exist_ok=True)
-        img.save(filepath)
-
+    # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used 
+    if img.width < size[0] or img.height < size[1]:
+        img = img.resize(size,resample=1) # 1=LANCZOS resampling leads to higher quality pictures
+    else:
+        img.thumbnail(size,resample=1) 
+    filename = secure_filename(file.filename)
+    filepath = os.path.join(app.config[folder], filename)
+    os.makedirs(app.config[folder], exist_ok=True)
+    img.save(filepath)
+    if type == "listing":
         new_image = Image(
             filename=filename,
             filepath=filepath,
-            type='listing',
-            listingID=listing.id,
+            type=type,
+            listingID=listing_id,
             variant=variant
         )
-        images.append(new_image)
-
-    return images
+    else:
+        new_image = Image(
+            filename=filename,
+            filepath=filepath,
+            type=type,
+            userID=user_id,
+            variant=variant
+        )
+    
+    return new_image
