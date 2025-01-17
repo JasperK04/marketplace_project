@@ -1,3 +1,5 @@
+from flask import session
+
 from . import api
 from app import db
 import sqlalchemy as sa
@@ -20,7 +22,7 @@ def get_listing(id):
 def get_listings():
     page = request.args.get('page', 1, type=int)
     per_page = min(request.args.get('per_page', 10, type=int), 100)
-    return Listing.to_collection_dict(sa.select(Listing), page, per_page,
+    return Listing.to_collection_dict(sa.select(Listing).where(~Listing.sold, ~Listing.is_deactivated), page, per_page,
                                    'api.get_listings')
 
 
@@ -62,18 +64,30 @@ def create_listing():
 
 @api.route('/listings/<int:id>/buy', methods=['POST', 'PATCH'])
 @api.route('/listings/<int:id>/buy/', methods=['POST', 'PATCH'])
-@token_auth.login_required
-def buy_listing(id):
-    current_user: User = token_auth.current_user() #type: ignore
+@token_auth.login_required(optional=True) # type: ignore
+def buy_listing(id:int):
+    """
+    Buy the listing with id `id`
+
+    An user must either provide a token or be logged in to buy a listing
+    """
+    current_user = None
+    if token_auth.current_user():
+        current_user = token_auth.current_user() #type: ignore
+    elif session["_user_id"]:
+        current_user = db.session.get(User, session["_user_id"])
+    if current_user is None:
+        return bad_request("You must be logged in to buy a listing")
+
     listing = db.get_or_404(Listing, id)
 
     if listing.userID == current_user.id: # check if the listing is made by the current user
         return bad_request('You cannot buy your own listing')
 
-    if listing.sold == True:
+    if listing.sold:
         return bad_request('unfortunately for you, this listing was already bought')
 
-    listing.from_dict(data=[], sold=True)
+    listing.sold = True
     db.session.add(listing)
     db.session.commit()
     return listing.to_dict(), 200, {'Location': url_for('api.get_listing', id=listing.id)}
@@ -82,7 +96,7 @@ def buy_listing(id):
 @api.route('/listings/<int:id>/edit', methods=['PATCH'])
 @api.route('/listings/<int:id>/edit/', methods=['PATCH'])
 @token_auth.login_required
-def change_listing(id):
+def change_listing(id:int):
     data = request.get_json()
     current_user: User = token_auth.current_user() #type: ignore
     listing = db.get_or_404(Listing, id)
@@ -118,9 +132,16 @@ def change_listing(id):
 
 @api.route('/listings/<int:id>', methods=['DELETE'])
 @api.route('/listings/<int:id>/', methods=['DELETE'])
-@token_auth.login_required
-def delete_listing(id):
-    current_user: User = token_auth.current_user() #type: ignore
+@token_auth.login_required(optional=True) # type: ignore
+def delete_listing(id:int):
+    current_user = None
+    if token_auth.current_user():
+        current_user = token_auth.current_user() #type: ignore
+    elif session["_user_id"]:
+        current_user = db.session.get(User, session["_user_id"])
+    if current_user is None:
+        return bad_request("You must be logged in to buy a listing")
+
     listing = db.get_or_404(Listing, id)
 
     if listing.userID != current_user.id: # check if the listing is made by the current user

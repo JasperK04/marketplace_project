@@ -1,8 +1,13 @@
-from flask import Blueprint, request, url_for
+"""
+This module contains the admin routes for the API
+"""
+
+from flask import Blueprint, request, session, url_for
 import sqlalchemy as sa
 from app import db
 from app.api import api
 from app.api.auth import token_auth
+from app.api.errors import bad_request, unauthorized, not_found
 from app.models.User import User
 from app.models.Listing import Listing
 
@@ -10,30 +15,69 @@ from app.models.Listing import Listing
 admin = Blueprint("admin", __name__)
 api.register_blueprint(admin, url_prefix='/admin')
 
+def is_allowed_to_take_admin_action():
+    """
+    Helper function to check if the user is allowed to take admin actions
+    """
+    return (
+        (token_auth.current_user() is not None and token_auth.current_user().is_admin) or # type: ignore
+        (session.get("_user_id") is not None and User.query.get(session["_user_id"]).is_admin) # type: ignore
+    )
 
 @admin.route('/users/<int:id>/deactivate', methods=['POST'])
-@token_auth.login_required
-def deactivate_user(id):
-    current_user = token_auth.current_user()
-    print(current_user)
-    if not current_user.is_admin:
-        return {'error': 'You do not have permission to perform this action'}, 403
+@admin.route('/users/<int:id>/deactivate/', methods=['POST'])
+@token_auth.login_required(optional=True) # type: ignore
+def deactivate_user(id:int):
+    """
+    Deactivates a user account
 
-    user = db.get_or_404(User, id)
+    Deactivated users cannot take actions, and all their listings are deactivated
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
+    user = db.session.get(User, id)
+    if user is None:
+        return not_found('User not found')
     user.deactivate()
+    user_listings = db.session.execute(sa.select(Listing).where(Listing.userID == id)).scalars().all()
+    for listing in user_listings:
+        listing.deactivate()
+        db.session.add(listing)
     db.session.add(user)
     db.session.commit()
     return user.to_dict()
 
+@admin.route('/users/<int:id>/reactivate', methods=['POST'])
+@admin.route('/users/<int:id>/reactivate/', methods=['POST'])
+@token_auth.login_required(optional=True) # type: ignore
+def reactivate_user(id:int):
+    """
+    Reactivates the user account with id `id`
+
+    Note that this does not reactivate the listings of the user
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
+    user = db.session.get(User, id)
+    if user is None:
+        return not_found('User not found')
+    user.reactivate()
+    db.session.add(user)
+    db.session.commit()
+    return user.to_dict()
 
 @admin.route('/users/<int:id>/make_admin', methods=['POST'])
 @admin.route('/users/<int:id>/make_admin', methods=['POST'])
-@token_auth.login_required
-def make_user_admin(id):
-    current_user = token_auth.current_user()
-    if not current_user.is_admin:
-        return {'error': 'You do not have permission to perform this action'}, 403
-    user = db.get_or_404(User, id)
+@token_auth.login_required(optional=True) # type: ignore
+def make_user_admin(id: int):
+    """
+    Grants the user with id `id` admin privileges
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
+    user = db.session.get(User, id)
+    if user is None:
+        return not_found('User not found')
     user.make_admin()
     db.session.add(user)
     db.session.commit()
@@ -42,10 +86,13 @@ def make_user_admin(id):
 
 @admin.route('/users/new_admin', methods=['POST', 'PUT'])
 @admin.route('/users/new_admin/', methods=['POST', 'PUT'])
-@token_auth.login_required
+@token_auth.login_required(optional=True) # type: ignore
 def create_user():
-    if not token_auth.current_user().is_admin:
-        return {'error': 'You do not have permission to perform this action'}, 403
+    """
+    Creates a new user with admin privileges
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
 
     data = request.get_json()
     if not all(name in data for name in ["name", "email", "password"]):
@@ -68,14 +115,34 @@ def create_user():
 
 @admin.route('/listings/<int:id>/deactivate', methods=['POST'])
 @admin.route('/listings/<int:id>/deactivate/', methods=['POST'])
-@token_auth.login_required
-def deactivate_listing(id):
-    current_user = token_auth.current_user()
-    if not current_user.is_admin:
-        return {'error': 'You do not have permission to perform this action'}, 403
-
-    listing = db.get_or_404(Listing, id)
+@token_auth.login_required(optional=True) # type: ignore
+def deactivate_listing(id:int):
+    """
+    Deactivates a listing
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
+    listing = db.session.get(Listing, id)
+    if listing is None:
+        return not_found('Listing not found')
     listing.deactivate()
     db.session.add(listing)
     db.session.commit()
-    return listing.to_dict()
+    return {'message': 'Listing deactivated'}, 200
+
+@admin.route('/listings/<int:id>/reactivate', methods=['POST'])
+@admin.route('/listings/<int:id>/reactivate/', methods=['POST'])
+@token_auth.login_required(optional=True) # type: ignore
+def reactivate_listing(id:int):
+    """
+    Reactivates a listing
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized('You do not have permission to perform this action')
+    listing = db.session.get(Listing, id)
+    if listing is None:
+        return not_found('Listing not found')
+    listing.reactivate()
+    db.session.add(listing)
+    db.session.commit()
+    return {'message': 'Listing reactivated'}, 200

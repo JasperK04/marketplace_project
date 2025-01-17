@@ -5,4 +5,5 @@ body {
     --color-text-primary: #333;
     --color-text-secondary: #666;
     --color-background: #f5f3f3;
+    --color-destructive: #ff4d4d;
 }

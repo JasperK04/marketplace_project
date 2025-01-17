@@ -29,13 +29,13 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
-        data = {
+        data: dict[str, str|int] = {
             'id': self.id,
             'name': self.name
         }
         return data
 
-    def from_dict(self, data, new_user=False):
+    def from_dict(self, data:dict[str, str], new_user:bool=False):
         for field in ['name', 'email']:
             if field in data:
                 setattr(self, field, data[field])
@@ -43,7 +43,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
             self.set_password(data['password'])
         return self
 
-    def get_token(self, expires_in=3600):
+    def get_token(self, expires_in:int=3600):
         now = datetime.now(timezone.utc)
         if self.token and self.token_expiration and self.token_expiration.replace(
                 tzinfo=timezone.utc) > now + timedelta(seconds=60):
@@ -77,9 +77,19 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         self.is_deactivated = True
         return self
 
+    def reactivate(self):
+        """
+        Reactivates the user account
+
+        Note that this does not make the database commit
+        This is left to the caller
+        """
+        self.is_deactivated = False
+        return self
+
 
     @staticmethod
-    def check_token(token):
+    def check_token(token:str):
         user = db.session.scalar(select(User).where(User.token == token))
         if user is None or user.token_expiration is None or user.token_expiration.replace(
                 tzinfo=timezone.utc) < datetime.now(timezone.utc):
@@ -88,11 +98,11 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
 
 
     @staticmethod
-    def valid_username(name):
+    def valid_username(name:str):
         return re.match(r"^[a-zA-Z0-9_.-]{2,}$", name) is not None
 
     @staticmethod
-    def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver
+    def valid_password(password:str): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver
         if len(password) < 15 or len(password) >= 64:
             return False
         if not password.strip():
@@ -100,9 +110,9 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         return True
 
     @staticmethod
-    def valid_email(email): # See https://stackoverflow.com/a/201378
+    def valid_email(email:str): # See https://stackoverflow.com/a/201378
         return re.match(r"(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])", email) is not None
 
 @login.user_loader
-def load_user(id):
+def load_user(id:str):
     return db.session.get(User, int(id))

@@ -156,6 +156,7 @@ def test_delete_listing(id, *, token, expected):
     )
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
+
 if __name__ == '__main__':
 
     fake = Faker()
@@ -185,7 +186,7 @@ if __name__ == '__main__':
     cat_id = test_create_category(name, token=token, expected=201)
     test_get_category(cat_id, expected=200)
     test_get_categories(expected=200)
-    
+
     # listing routes
     listing_id = test_create_listing(title=fake.word(), price="10000,00", description=fake.sentence(),
                                      categoryID=cat_id, token=token, expected=201) # valid listing
@@ -212,7 +213,7 @@ if __name__ == '__main__':
     # deletion routes
     test_delete_user(token=token2, expected=204)
     test_delete_listing(id=listing_id, token=token, expected=204)
-    
+
     # user deletion routes
     listing_id = test_create_listing(title=fake.word(), price="99,99", description=fake.sentence(),
                                      categoryID=cat_id, token=token, expected=201) # new listing to check if its deleted
