@@ -18,6 +18,7 @@ class Listing(PaginatedAPIMixin, db.Model):
     price: Mapped[float] = mapped_column(nullable=False)
     sold: Mapped[bool] = mapped_column(nullable=False, insert_default=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
 
     def to_dict(self):
         data = {
@@ -43,6 +44,10 @@ class Listing(PaginatedAPIMixin, db.Model):
             if field in data:
                 setattr(self, field, data[field])
         setattr(self, "sold", sold)
+        return self
+
+    def deactivate(self):
+        self.is_deactivated = True
         return self
 
     @staticmethod

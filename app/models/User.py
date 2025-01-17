@@ -1,3 +1,4 @@
+from operator import is_
 import re
 from flask_login import UserMixin
 from sqlalchemy import Integer, String, Date, ForeignKey, select
@@ -15,6 +16,9 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     name: Mapped[str] = mapped_column(nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
+    is_admin: Mapped[bool] = mapped_column(nullable=False, server_default="0")
+    is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
+
 
     # Need to migrate DB to add about_me and profile_picture columns
 
@@ -36,7 +40,7 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
             'name': self.name
         }
         return data
-    
+
     def from_dict(self, data, new_user=False):
         for field in ['name', 'email']:
             if field in data:
@@ -59,6 +63,27 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         self.token_expiration = datetime.now(timezone.utc) - timedelta(
             seconds=1)
 
+    def make_admin(self):
+        """
+        Makes the account an admin
+
+        Note that this does not make the database commit
+        This is left to the caller
+        """
+        self.is_admin = True
+        return self
+
+    def deactivate(self):
+        """
+        Deactivates the user account
+
+        Note that this does not make the database commit
+        This is left to the caller
+        """
+        self.is_deactivated = True
+        return self
+
+
     @staticmethod
     def check_token(token):
         user = db.session.scalar(select(User).where(User.token == token))
@@ -71,9 +96,9 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
     @staticmethod
     def valid_username(name):
         return re.match(r"^[a-zA-Z0-9_.-]{2,}$", name) is not None
-    
+
     @staticmethod
-    def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver 
+    def valid_password(password): # See https://pages.nist.gov/800-63-4/sp800-63b.html#passwordver
         if len(password) < 15 or len(password) >= 64:
             return False
         if not password.strip():
