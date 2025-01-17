@@ -32,52 +32,6 @@
     }
 }
 
-/* custom checkbox */
-#remember_me {
-    display: none;
-}
-
-label[for="remember_me"] {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 1em;
-    user-select: none;
-}
-
-label[for="remember_me"]::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    border: 2px solid var(--color-primary);
-    border-radius: 4px;
-    background-color: #fff;
-    transition: all 0.2s ease-in-out;
-}
-
-label[for="remember_me"]::after {
-    content: '✔';
-    position: absolute;
-    top: -2px;
-    left: 3px;
-    transform: scale(0);
-    transform-origin: center;
-    transition: transform 0.2s ease-in-out;
-}
-
-#remember_me:checked + label[for="remember_me"]::after {
-    transform: scale(1);
-}
-
-#remember_me:checked + label[for="remember_me"]::before {
-    background-color: var(--color-primary);
-    border-color: var(--color-tertiary);
-}
-/* this sucked */
-
 #submit {
     background-color: var(--color-tertiary);
     color: var(--color-background);
@@ -87,15 +41,6 @@ label[for="remember_me"]::after {
 #submit:hover {
     background-color: var(--color-primary);
     border: 2px solid var(--color-tertiary);
-}
-
-p .btn {
-    position: relative;
-    top: 10px;
-}
-
-p .btn:hover {
-    background-color: var(--color-primary);
 }
 
 @media (max-width: 768px) {
