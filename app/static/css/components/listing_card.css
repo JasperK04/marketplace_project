@@ -1,8 +1,42 @@
+@import url(colors.css);
+
 .listing-card {
-    margin:1em;
+    padding: 1em;
+    width: fit-content;
+    background-color: var(--color-secondary);
+    border-radius: 8px;
+
+    > a {
+        text-decoration: none;
+    }
+
+    .listing-image {
+        width: 300px;
+        height: 200px;
+
+        > img {
+            border-radius: 5px 5px 0 0;
+        }
+    }
 
     .listing-content {
         display:flex;
         justify-content:space-between;
+        padding: 5px;
+        border-radius: 0 0 5px 5px;
+        background-color: var(--color-primary);
+        color: var(--color-text-secondary);
+        text-decoration: none;
+
+        > .listing-label {
+            font-size: 1.25em;
+            font-weight: 600;
+        }
+    }
+}
+
+.listing-card:hover{
+    .listing-content {
+        background-color: var(--color-tertiary);
     }
 }
