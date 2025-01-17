@@ -1,6 +1,11 @@
+{% block styles %}
+<link rel="stylesheet" href="{{url_for('static', filename='/css/register.css')}}">
+{% endblock %}
+
 {% extends 'base.html' %}
 
 {% block content %}
+<h1>Register</h1>
 <form id="register_form" action="" method="post">
     {{ form.hidden_tag() }}
     <p>
