@@ -34,3 +34,8 @@ button.destructive {
     background-color: var(--color-destructive);
     color: #fff;
 }
+
+button.disabled {
+    background-color: var(--color-disabled);
+    color: #fff;
+}

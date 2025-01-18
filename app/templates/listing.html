@@ -14,18 +14,25 @@
     <div class="listing">
         <header>
             <div class="listing-header">
-                <h1>{% if listing.is_deactivated %}[DEACTIVATED]{%endif%} {{listing.title}}</h1>
+                <h1>
+                    {% if listing.is_deactivated %}[DEACTIVATED]{% endif %}
+                    {{listing.title}}
+                    {% if listing.sold %} <span class="sold-tag">Sold</span>{% endif %}
+                </h1>
                 <div>
                     {% if current_user.is_authenticated %}
                         {% if current_user.id != listing.seller.id %}
-                            <button class="primary buy-button" id="buy-button"
-                                onclick="alert('This functionality hasn\'t been implemented yet')">Buy</button>
+                                {% if listing.sold %}
+                                <button class="disabled" disabled>Sold</button>
+                                {% else %}
+                                <button class="primary buy-button" id="buy-listing">Buy</button>
+                                {% endif %}
                         {% endif %}
                         {% if current_user.is_admin %}
                             {% if listing.is_deactivated %}
-                                <button class="primary" id="reactivate-listing">Re-activate</button>
+                            <button class="primary" id="reactivate-listing">Re-activate</button>
                             {% else %}
-                                <button class="destructive" id="deactivate-listing">Deactivate</button>
+                            <button class="destructive" id="deactivate-listing">Deactivate</button>
                             {% endif %}
                         {% endif %}
                     {% endif %}
