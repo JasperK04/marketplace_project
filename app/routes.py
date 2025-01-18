@@ -1,7 +1,7 @@
 from flask import render_template, redirect, url_for, request, flash
 from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
-from sqlalchemy import select
+from sqlalchemy import outerjoin, select
 from urllib.parse import urlsplit
 from werkzeug.utils import secure_filename
 import os
@@ -68,23 +68,27 @@ def register():
 
 
 # Profile stuff
-@app.route("/profile/<user_id>")
-def profile(user_id):
+@app.route("/profile/<int:user_id>")
+def profile(user_id:int):
     user = db.get_or_404(User, user_id)
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for('index'))
     listings = []
-    listings_with_images = db.session.query(Listing, Image.filename).join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original')).filter(Listing.userID == user.id).all()
-    
+    listings_with_images = (
+        db.session.query(Listing, Image.filename)
+        .join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True)
+        .filter(Listing.userID == user.id)
+        .all()
+    )
     for listing, filename in listings_with_images:
-        if not listing.is_deactivated
+        if not listing.is_deactivated:
             if filename:
                 listing = listing.to_dict()
                 listing["filename"] = filename
                 listings.append(listing)
             else:
                 listings.append(listing.to_dict())
-    
+
     # Will get this sorted out later, hopefully
     # profile_pic = db.session.execute(
     #    sa.select(Image).where(Image.userID == user.id)).scalars()
@@ -97,7 +101,7 @@ def edit_profile(user_id):
     user = db.get_or_404(User, user_id)
     listings = db.session.execute(  # pylint: disable=redefined-outer-name
         sa.select(Listing).where(Listing.userID == user.id)
-    ).scalars()
+    ).scalars().all()
 
     if user.id != current_user.id:
         flash("You are not allowed to edit this profile.")
@@ -120,7 +124,7 @@ def listings():
     listings = []
     listings_with_images = db.session.query(Listing, Image.filename).join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True).all()
     for listing, filename in listings_with_images:
-        if not listing.sold and not listing.is_deactivated  # instead of the Listing.find_open_listings()
+        if not listing.sold and not listing.is_deactivated:  # instead of the Listing.find_open_listings()
             if filename:
                 listing = listing.to_dict()
                 listing["filename"] = filename
@@ -139,12 +143,13 @@ def listings():
 def listing(listing_id: int):
     listing = db.get_or_404(Listing, listing_id).to_dict()
     image = db.session.execute(sa.select(Image).where((Image.listingID==listing_id) & (Image.variant == 'resized'))).scalar()
-    listing["filename"] = image.filename
+    if image:
+        listing["filename"] = image.filename
     if listing["is_deactivated"] and not can_view_restricted_pages():
         return redirect(url_for('listings'))
     return render_template("listing.html", listing=listing)
 
-  
+
 @app.route("/add_listing", methods=["GET", "POST"])
 @login_required
 def add_listing():
@@ -181,11 +186,11 @@ def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
     image = IM.open(file)
     img = image.copy()
 
-    # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used 
+    # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used
     if img.width < size[0] or img.height < size[1]:
         img = img.resize(size,resample=1) # 1=LANCZOS resampling leads to higher quality pictures
     else:
-        img.thumbnail(size,resample=1) 
+        img.thumbnail(size,resample=1)
     filename = secure_filename(file.filename)
     filepath = os.path.join(app.config[folder], filename)
     os.makedirs(app.config[folder], exist_ok=True)
@@ -206,9 +211,9 @@ def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
             userID=user_id,
             variant=variant
         )
-    
+
     return new_image
- 
+
 # Categories
 @app.route("/categories", methods=["GET"])
 def categories():
@@ -218,7 +223,7 @@ def categories():
     for category_id, value in categories.items():
         value["listings"] = [listing.to_dict() for listing in db.session.query(Listing).filter_by(categoryID=category_id).order_by(Listing.id.desc()).limit(12).all()]
     return render_template("categories.html", categories=categories)
-  
+
 @app.route("/categories/<int:category_id>", methods=["GET"])
 def category(category_id: int):
     category = db.get_or_404(
@@ -241,4 +246,4 @@ def category_name(category_name: str):  # pylint: disable=redefined-outer-name
         sa.select(Listing).where(Listing.categoryID == category.id)
     ).scalars()
     return render_template("category.html", category=category, listings=listings)
-  
+
