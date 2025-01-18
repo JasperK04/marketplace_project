@@ -36,10 +36,13 @@
                 &bullet; <span>{{ listing.created_at.strftime('%H:%M, %d %b %Y') }}</span>
             </div>
         </header>
-        <div class="image-and-price">
             <div class="image">
-                <img src="https://placehold.co/600x400/" alt="{{ listing.title }}">
-            </div>
+                {% if listing.filename %}
+                    <img class="listing-image" src="{{url_for('static',filename='assets/images/user_uploaded/listings_resized/'+ listing.filename)}}" alt="{{ listing.title }}">
+                {% else %}
+                    <img src="https://placehold.co/600x400" alt="{{ listing.title }}">
+                {% endif %}
+            <div>
             <div class="price">
                 <p>&euro; {{ listing.price }}</p>
             </div>

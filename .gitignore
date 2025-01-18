@@ -10,3 +10,6 @@ __pycache__/
 
 # flask session
 /flask_session/
+
+# listing images
+app/static/assets/images/user_uploaded/
