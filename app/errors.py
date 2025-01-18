@@ -8,10 +8,10 @@ def wants_json_response():
         request.accept_mimetypes['text/html']
 
 
-@app.app_errorhandler(HTTPException)
+@app.errorhandler(HTTPException)
 def error_handler(e):
-    if wants_json_response:
-        return api_error_response(e.code)
+    #if wants_json_response:
+    #    return api_error_response(e.code)
     error_codes = {
     400: ("Bad Request", "The server could not understand the request due to invalid syntax."),
     401: ("Unauthorized", "You must authenticate yourself to get the requested response."),
