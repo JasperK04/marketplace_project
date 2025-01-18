@@ -1,13 +1,14 @@
 {% extends "base.html" %}
 {% block styles %}
 <link rel="stylesheet" href="{{url_for('static', filename='/css/listing.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/components/confirm_modal.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='/css/components/buttons.css')}}">
 {% endblock %}
 {% block title %}
 {{ listing.title }} - Marketplace
 {% endblock %}
 {% block scripts %}
-<script src="{{url_for('static', filename='js/listing.js')}}" defer></script>
+<script src="{{url_for('static', filename='js/listing.js')}}" type="module" defer></script>
 {% endblock %}
 {% block content %}
 <section>
@@ -89,5 +90,6 @@
                 <p>{{ listing.description }}</p>
         </div>
     </div>
+    {% include 'components/confirm_modal.html' %}
 </section>
 {% endblock %}

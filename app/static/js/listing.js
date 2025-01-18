@@ -4,6 +4,8 @@
     * - Handles buying listings
 */
 
+import confirmModal from "./confirmModal.js";
+
 const deactivate_button = document.getElementById('deactivate-listing');
 if (deactivate_button) {
     deactivate_button.addEventListener('click', function() {
@@ -41,16 +43,20 @@ if (reactivate_button) {
 const buy_button = document.getElementById('buy-listing');
 if (buy_button) {
     buy_button.addEventListener('click', function() {
-        const listing_id = window.location.pathname.split('/').pop();
-        fetch(`/api/listings/${listing_id}/buy`, {
-            method: 'POST',
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Failed to buy listing');
-            }
-        });
+        confirmModal('Confirm Purchase', 'Are you sure you want to buy this listing?', buyListing);
+    });
+}
+
+function buyListing() {
+    const listing_id = window.location.pathname.split('/').pop();
+    fetch(`/api/listings/${listing_id}/buy`, {
+        method: 'POST',
+    })
+    .then(response => {
+        if (response.ok) {
+            window.location.reload();
+        } else {
+            alert('Failed to buy listing');
+        }
     });
 }
