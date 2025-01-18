@@ -28,8 +28,11 @@ def create_category():
     data = request.get_json()
     if "name" not in data: # check if category name is specified
         return bad_request('Must include a category name')
-    
+    if "description" not in data: # check if category description is specified
+        return bad_request('Must include a category description')
+
     data['name'] = Category.normalize_name(data['name'])
+    data['description'] = Category.normalize_description(data['description'])
     if not Category.valid_name(data['name']):
         return bad_request('This is not a valid category name')
     if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
@@ -42,7 +45,7 @@ def create_category():
     return cat.to_dict(), 201, {'Location': url_for('api.get_category',
                                                      id=cat.id)}
 
-# optional TODO: add authentication levels e.g. admin, 
+# optional TODO: add authentication levels e.g. admin,
 # such that only admins can change or delete categories
 
 # @api.route('/category/<int:id>', methods=['PATCH'])
@@ -52,11 +55,11 @@ def create_category():
 #     cat = db.get_or_404(Category, id)
 #     if "name" not in data: # check if category name is specified
 #         return bad_request('can\'t change name if no name is specified')
-    
+
 #     if db.session.scalar(sa.select(Category).where( # check the category name does not yet exist
 #             Category.name == data['name'])):
 #         return bad_request('this category already exists')
-    
+
 #     cat.from_dict(data) # change and commit changes of the category
 #     db.session.add(cat)
 #     db.session.commit()

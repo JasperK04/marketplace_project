@@ -11,29 +11,29 @@ cli = Blueprint("cli", __name__)
 
 
 @cli.cli.command("recreate-db")
-@click.option("--users", type=int, default=10, help="Number of users to create.")
-@click.option("--listings", type=int, default=100, help="Number of listings to create.")
+@click.option("--users", type=int, default=50, help="Number of users to create.")
+@click.option("--listings", type=int, default=500, help="Number of listings to create.")
 def initialize_database(users: int, listings: int):
     """Drops the current database and creates a new one with faked data."""
     fake = Faker()
-    categories = {
-        "Electronics": ["smartphone", "laptop", "tablet", "headphones", "camera", "smartwatch", "monitor", "printer", "router", "speaker"],
-        "Clothing": ["t-shirt", "jeans", "jacket", "dress", "shoes", "hat", "scarf", "socks", "blouse", "suit"],
-        "Books": ["novel", "cookbook", "biography", "textbook", "poetry collection", "graphic novel", "dictionary", "manual", "guidebook", "memoir"],
-        "Home & Garden": ["sofa", "table", "chair", "lamp", "rug", "blender", "microwave", "garden tools", "plant pot", "shelf"],
-        "Fashion & Beauty": ["lipstick", "perfume", "makeup kit", "nail polish", "handbag", "watch", "sunglasses", "skincare set", "bracelet", "necklace"],
-        "Sport": ["soccer ball", "basketball", "tennis racket", "yoga mat", "helmet", "bicycle", "weights", "swimsuit", "golf club", "sneakers"],
-        "Toys": ["action figure", "doll", "lego set", "board game", "puzzle", "plush toy", "toy car", "building blocks", "playset", "remote control car"],
-        "Vehicles": ["car", "motorcycle", "bicycle", "scooter", "truck", "boat", "trailer", "camper", "ATV", "skateboard"],
-        "Other": ["antique", "art piece", "collectible", "instrument", "tool", "pet supplies", "hobby kit", "gift card", "novelty item", "unknown item"],
+    categories: dict[str, dict[str, list[str] | str]] = {
+        "Electronics": {'keywords': ["smartphone", "laptop", "tablet", "headphones", "camera", "smartwatch", "monitor", "printer", "router", "speaker"], 'description': "Electronic devices and gadgets."},
+        "Clothing": {"keywords": ["t-shirt", "jeans", "jacket", "dress", "shoes", "hat", "scarf", "socks", "blouse", "suit"], 'description': "Apparel and accessories."},
+        "Books": {"keywords": ["novel", "cookbook", "biography", "textbook", "poetry collection", "graphic novel", "dictionary", "manual", "guidebook", "memoir"], 'description': "Literature and educational materials."},
+        "Home & Garden": {"keywords": ["sofa", "table", "chair", "lamp", "rug", "blender", "microwave", "garden tools", "plant pot", "shelf"], 'description': "Furniture and home improvement items."},
+        "Fashion & Beauty": {"keywords": ["lipstick", "perfume", "makeup kit", "nail polish", "handbag", "watch", "sunglasses", "skincare set", "bracelet", "necklace"], 'description': "Beauty products and fashion accessories."},
+        "Sport": {"keywords": ["soccer ball", "basketball", "tennis racket", "yoga mat", "helmet", "bicycle", "weights", "swimsuit", "golf club", "sneakers"], 'description': "Sporting goods and fitness equipment."},
+        "Toys": {"keywords": ["action figure", "doll", "lego set", "board game", "puzzle", "plush toy", "toy car", "building blocks", "playset", "remote control car"], 'description': "Children's toys and games."},
+        "Vehicles": {"keywords": ["car", "motorcycle", "bicycle", "scooter", "truck", "boat", "trailer", "camper", "ATV", "skateboard"], 'description': "Various types of vehicles and related accessories."},
+        "Other": {"keywords": ["antique", "art piece", "collectible", "instrument", "tool", "pet supplies", "hobby kit", "gift card", "novelty item", "unknown item"], 'description': "Miscellaneous items that do not fit into other categories."},
     }
     adjectives = ["smart", "fast", "reliable", "durable", "stylish", "modern", "classic", "unique", "rare", "vintage"]
     db.drop_all()
     print("Database dropped.")
     db.create_all()
     print("Database created.")
-    for category in categories.keys():
-        db.session.add(Category().from_dict({"name": category}))
+    for category, category_data in categories.items():
+        db.session.add(Category().from_dict({"name": category, "description": category_data['description']}))
     db.session.commit()
     print("Categories created.")
     for _ in range(users):
@@ -57,7 +57,7 @@ def initialize_database(users: int, listings: int):
 
     for _ in range(listings):
         category = choice(created_categories)
-        product = choice(categories[category.name])
+        product = choice(categories[category.name]["keywords"])
         title = f"{choice(adjectives).capitalize()} {product.capitalize()}"
         description = f"{fake.sentence(nb_words=3)} This {product} is {fake.text(max_nb_chars=50).lower()} and perfect for anyone looking to upgrade their {category.name.lower()}."
 
@@ -79,6 +79,24 @@ def initialize_database(users: int, listings: int):
     print("Database initialized.")
 
 
-@cli.cli.command("test")
-def test():
-    print("Test command executed.")
+@cli.cli.command("create-admin")
+@click.option("--name", type=str, prompt="Name", help="Admin name.")
+@click.option("--email", type=str, prompt="Email", help="Admin email.")
+@click.option("--password", type=str, prompt="Password", help="Admin password.")
+def create_admin(name:str, email:str, password:str):
+    if not User.valid_username(name):
+        print("Invalid username. Username must only contain alpha-numeric characters.")
+        return
+    if not User.valid_email(email):
+        print("Invalid email address.")
+        return
+    if db.session.scalar(User.query.filter(User.email == email)):
+        print("Email address already in use.")
+        return
+    if not User.valid_password(password):
+        print("Invalid password. Password must be between 15 and 64 characters long.")
+        return
+    admin = User().from_dict({"name": name, "email": email, "password": password}, new_user=True).make_admin()
+    db.session.add(admin)
+    db.session.commit()
+    print("Admin created with id:", admin.id, "name:", admin.name, "email:", admin.email, "password:", password)

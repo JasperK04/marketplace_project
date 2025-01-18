@@ -78,10 +78,10 @@ def test_revoke_token(token, *, expected):
     response = requests.delete(f"{BASE_URL}/tokens", headers=headers)
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
-def test_create_category(name, *, token, expected):
+def test_create_category(name, description, *, token, expected):
     """Test creating a category."""
     headers = {"Authorization": f"Bearer {token}"}
-    data = {"name": name}
+    data = {"name": name, "description": description}
     response = requests.put(f"{BASE_URL}/category", json=data, headers=headers)
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
     return response.json().get("id")
@@ -156,12 +156,14 @@ def test_delete_listing(id, *, token, expected):
     )
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
+
 if __name__ == '__main__':
 
     fake = Faker()
     email = fake.email()
     password = fake.password(32)
     name = fake.user_name()
+    description = fake.sentence()
 
     # user routes without authorization
     id = test_create_user(name, email, password, expected=201)
@@ -182,10 +184,10 @@ if __name__ == '__main__':
     test_modify_user(expected=200, token=token, email=email) # return email to original
 
     # category routes
-    cat_id = test_create_category(name, token=token, expected=201)
+    cat_id = test_create_category(name, description, token=token, expected=201)
     test_get_category(cat_id, expected=200)
     test_get_categories(expected=200)
-    
+
     # listing routes
     listing_id = test_create_listing(title=fake.word(), price="10000,00", description=fake.sentence(),
                                      categoryID=cat_id, token=token, expected=201) # valid listing
@@ -212,7 +214,7 @@ if __name__ == '__main__':
     # deletion routes
     test_delete_user(token=token2, expected=204)
     test_delete_listing(id=listing_id, token=token, expected=204)
-    
+
     # user deletion routes
     listing_id = test_create_listing(title=fake.word(), price="99,99", description=fake.sentence(),
                                      categoryID=cat_id, token=token, expected=201) # new listing to check if its deleted
