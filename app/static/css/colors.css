@@ -6,4 +6,5 @@ body {
     --color-text-secondary: #666;
     --color-background: #f5f3f3;
     --color-destructive: #ff4d4d;
+    --color-disabled: #ccc;
 }

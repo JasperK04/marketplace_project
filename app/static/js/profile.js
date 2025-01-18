@@ -1,3 +1,9 @@
+/*
+    JS for listing page (templates/profile.html)
+    * - Handles deactivating and reactivating users
+*/
+
+
 const deactivate_button = document.getElementById('deactivate-user');
 if (deactivate_button) {
     deactivate_button.addEventListener('click', function() {
