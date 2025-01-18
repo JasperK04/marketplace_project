@@ -85,7 +85,7 @@ def edit_profile(user_id):
         flash("You are not allowed to edit this profile.")
         return render_template("profile.html", user=user, listings=listings)
 
-    form = EditProfileForm()
+    form = EditProfileForm(obj=user)
     if form.validate_on_submit():
         user.about_me = form.about_me.data
         user.name = form.name.data
@@ -107,7 +107,6 @@ def listings():
 def listing(listing_id):
     listing = db.get_or_404(Listing, listing_id).to_dict()
     return render_template("listing.html", listing=listing)
-
 
 @app.route("/add_listing", methods=["GET", "POST"])
 @login_required
@@ -139,10 +138,20 @@ def add_listing():
         )
         db.session.add(new_image)
         db.session.commit()
-        return redirect(url_for("index"))
-    return render_template("add_listing.html", title="Add listing", form=form)
+        return redirect(url_for('index'))
+    return render_template('add_listing.html',title='Add listing',form=form)
 
 
+# Categories
+@app.route("/categories", methods=["GET"])
+def categories():
+    db_categories = db.session.query(Category).all()
+    categories = {category.id: {"category": category, "listings": []} for category in db_categories}
+    # get 10 most recent listings for each category, in a single query
+    for category_id, value in categories.items():
+        value["listings"] = [listing.to_dict() for listing in db.session.query(Listing).filter_by(categoryID=category_id).order_by(Listing.id.desc()).limit(12).all()]
+    return render_template("categories.html", categories=categories)
+  
 @app.route("/categories/<int:category_id>", methods=["GET"])
 def category(category_id: int):
     category = db.get_or_404(
