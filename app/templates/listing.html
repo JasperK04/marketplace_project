@@ -20,8 +20,8 @@
             </div>
         </header>
         <div class="image-and-price">
-            {% if image.filename %}
-            <img class="listing-image" src="{{url_for('static',filename='assets/images/listings_resized/'+ image.filename)}}" alt="{{ listing.title }}">
+            {% if listing.filename %}
+            <img class="listing-image" src="{{url_for('static',filename='assets/images/user_uploaded/listings_resized/'+ listing.filename)}}" alt="{{ listing.title }}">
             {% else %}
             <img src="https://placehold.co/600x400" alt="">
             {% endif %}
