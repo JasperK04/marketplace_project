@@ -163,11 +163,12 @@ def add_listing():
             select(Category.id).where(Category.name == form.category.data)
         )
         new_listing = Listing(
-            title=form.title.data,
+            title=Listing.normalize_title(form.title.data),
             categoryID=cat_id,
-            description=form.description.data,
-            price=form.price.data,
+            description=Listing.normalize_description(form.description.data),
+            price=Listing.normalize_price(form.price.data),
             userID=current_user.id,
+            sold=False
         )
         db.session.add(new_listing)
         db.session.flush()
