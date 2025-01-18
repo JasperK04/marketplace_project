@@ -41,6 +41,7 @@ body {
 
 .logo-header {
     flex-grow: 2;
+    height: fit-content;
 }
 
 .logo-header img {
@@ -146,6 +147,7 @@ body {
 
 /* Media Queries */
 @media (max-width: 768px) {
+    
     .header {
         align-items: flex-start;
     }
@@ -176,8 +178,9 @@ body {
 }
 
 @media (max-width: 500px) {
+    
     .logo-header img {
-        height: 50px;
+        height: 60px;
     }
 
     .nav-container {

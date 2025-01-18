@@ -5,9 +5,8 @@
     min-width: 250px;
     margin: 5dvh auto;
     border-radius: 30px;
-    border-style: double;
-    border-width: 5px;
-    background-color: var(--color-secondary);
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.15);
+    background-color: white;
 
     > h1 {
         font-size: 2em;
@@ -81,12 +80,11 @@ label[for="remember_me"]::after {
 #submit {
     background-color: var(--color-tertiary);
     color: var(--color-background);
-    border: 2px solid var(--color-primary);
+    border: none;
 }
 
 #submit:hover {
     background-color: var(--color-primary);
-    border: 2px solid var(--color-tertiary);
 }
 
 p .btn {
@@ -102,11 +100,20 @@ p .btn:hover {
 
     .container {
         padding: 3%;
+        width: 60dvw;
 
         > h1 {
             font-size: 1.6em;
             font-weight: 600;
             margin-bottom: 10px;
         }
+    }
+}
+
+@media (max-width: 500px) {
+
+    .container {
+        padding: 2%;
+        width: 70dvw;
     }
 }
