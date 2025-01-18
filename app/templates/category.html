@@ -2,6 +2,7 @@
 
 {% block content %}
     <h1>{{ category.name }}</h1>
+    <p>{{ category.description }}</p>
     <div class="listings">
         {% for listing in listings %}
             {% include 'components/listing_card.html' %}
