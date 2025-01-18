@@ -4,7 +4,7 @@ from app.forms import LoginForm,RegistrationForm, ListingForm
 from app.models.User import User
 from app.models.Category import Category
 import sqlalchemy as sa
-from sqlalchemy import select, and_
+from sqlalchemy import select
 from urllib.parse import urlsplit
 from werkzeug.utils import secure_filename
 import os
@@ -66,8 +66,16 @@ def register():
 @app.route('/profile/<user_id>')
 def profile(user_id):
     user = db.get_or_404(User, user_id)
-    listings = db.session.execute(
-        sa.select(Listing).where(Listing.userID == user.id)).scalars()
+    listings = []
+    listings_with_images = db.session.query(Listing, Image.filename).join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original')).filter(Listing.userID == user.id).all()
+    
+    for listing, filename in listings_with_images:
+        if filename:
+            listing = listing.to_dict()
+            listing["filename"] = filename
+            listings.append(listing)
+        else:
+            listings.append(listing.to_dict())
     profile_pic = db.session.execute(
         sa.select(Image).where(Image.userID == user.id)).scalars()
     return render_template('profile.html', user=user, listings=listings, profile_pic=profile_pic)
@@ -76,24 +84,24 @@ def profile(user_id):
 # Listings
 @app.route("/listings", methods=["GET"])
 def listings():
-    all_listings = db.session.query(Listing).all()
     listings = []
-    for listing in all_listings:
-        image = db.session.execute(sa.select(Image).where(and_(Image.listingID==listing.id, Image.variant == 'original'))).scalar()
-        listings.append({
-            "id": listing.id,
-            "title": listing.title,
-            "price": listing.price,
-            "filename": image.filename if image else None
-        })
+    listings_with_images = db.session.query(Listing, Image.filename).join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True).all()
+    for listing, filename in listings_with_images:
+        if filename:
+            listing = listing.to_dict()
+            listing["filename"] = filename
+            listings.append(listing)
+        else:
+            listings.append(listing.to_dict())
     return render_template("listings.html", listings=listings)
 
 
 @app.route("/listings/<int:listing_id>", methods=["GET"])
 def listing(listing_id):
     listing = db.get_or_404(Listing, listing_id).to_dict()
-    image = db.session.execute(sa.select(Image).where(and_(Image.listingID==listing_id, Image.variant == 'resized'))).scalar()
-    return render_template("listing.html", listing=listing, image=image)
+    image = db.session.execute(sa.select(Image).where((Image.listingID==listing_id) & (Image.variant == 'resized'))).scalar()
+    listing["filename"] = image.filename
+    return render_template("listing.html", listing=listing)
 
  
 
