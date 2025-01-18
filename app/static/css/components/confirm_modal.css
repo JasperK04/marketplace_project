@@ -35,6 +35,10 @@
         background-color: #218838;
     }
 
+    button.destructive:hover {
+        background-color: #bb1010;
+    }
+
     .close {
         position: absolute;
         top: 10px;
