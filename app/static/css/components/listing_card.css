@@ -1,13 +1,15 @@
-@import url(colors.css);
+@import url(../colors.css);
 
 .listing-card {
     padding: 1em;
     width: fit-content;
-    background-color: var(--color-secondary);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
 
     > a {
         text-decoration: none;
+        display: flex;
+        flex-direction: column;
     }
 
     .listing-image {
@@ -15,17 +17,17 @@
         height: 200px;
 
         > img {
-            border-radius: 5px 5px 0 0;
+            border-radius: 5px 5px 0px 0px;
         }
     }
 
     .listing-content {
         display:flex;
         justify-content:space-between;
-        padding: 5px;
-        border-radius: 0 0 5px 5px;
+        padding: 5px 8px;
+        border-radius: 0px 0px 5px 5px;
         background-color: var(--color-primary);
-        color: var(--color-text-secondary);
+        color: var(--color-text-primary);
         text-decoration: none;
 
         > .listing-label {
@@ -37,6 +39,46 @@
 
 .listing-card:hover{
     .listing-content {
-        background-color: var(--color-tertiary);
+        background-color: var(--color-secondary);
+    }
+}
+
+@media (min-width: 520px) and (max-width: 730px)  {
+
+    .listing-card {
+        width: 90dvw;
+        padding: 0.7em;
+        border-radius: 6px;        
+        
+        .listing-image {
+
+            > img {
+                border-radius: 5px 0px 0px 5px;
+            }
+        }
+    
+        > a {
+            flex-direction: row;
+        }
+
+        .listing-content {
+            flex-direction: column;
+            border-radius: 0px 5px 5px 0px;
+            width: 100%;
+            justify-content: space-around;
+            align-items: center;
+
+            .listing-price {
+                font-size: 1.75em
+            }
+        }
+    }
+}
+
+@media (max-width: 500px) {
+
+    .listing-card {
+        padding: 0.5em;
+        border-radius: 5px;
     }
 }
