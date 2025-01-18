@@ -35,7 +35,7 @@ class ListingForm(FlaskForm):
     description = TextAreaField('Description',validators=[DataRequired()])
     price = FloatField('Price',validators=[DataRequired()])
     file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
-    submit = SubmitField('Add listing')
+    submit = SubmitField('Create listing')
 
 
 class EditProfileForm(FlaskForm):
