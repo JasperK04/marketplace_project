@@ -1,1 +1,7 @@
-@import url(components/listing_grid.css)
+.listings {
+    margin: 3dvh 0 2dvh 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
+}
