@@ -11,8 +11,8 @@ cli = Blueprint("cli", __name__)
 
 
 @cli.cli.command("recreate-db")
-@click.option("--users", type=int, default=10, help="Number of users to create.")
-@click.option("--listings", type=int, default=100, help="Number of listings to create.")
+@click.option("--users", type=int, default=50, help="Number of users to create.")
+@click.option("--listings", type=int, default=500, help="Number of listings to create.")
 def initialize_database(users: int, listings: int):
     """Drops the current database and creates a new one with faked data."""
     fake = Faker()
