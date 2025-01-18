@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,37 +11,55 @@
     {% block scripts %}
     {% endblock %}
 </head>
+
 <body>
     <div class="header">
         <!-- first logo img, then other links, then next pages -->
-        <div class="logo-header">
-            <a href="{{ url_for('index') }}"><img src="images/placeholder.png"></a>
-        </div>
 
-        <div class="ref-links">
-            <ul>
-                <a href="{{ url_for('index') }}">Listings</a>
-                <a href="{{ url_for('add_listing')}}">Add listing</a>
-                {% if not current_user.is_anonymous %}
-                    <a href="{{ url_for('profile', user_id=current_user.id) }}">My Profile</a>
+        <nav class="nav nav-container">
+            <div class="links-container">
+                <div class="logo-header">
+                    <a href="{{ url_for('index') }}">
+                        <img src="images/placeholder.png" alt="Marketplace logo">
+                    </a>
+                </div>
+
+                    <div class="nav links">
+                        <a href="{{ url_for('index') }}">Listings</a>
+                        <a href="{{ url_for('index') }}">Categories</a>
+                    </div>
+
+                    <div class="new-listing">
+                        <a class="btn" href="{{ url_for('add_listing')}}">Add listing</a>
+            </div>
+            </div>
+
+            <!-- potential searchbar -->
+            <form class="searchbar" style="display: none;">
+                <input type="search" class="searchbar-field" id="searchbar" name="searchbar" placeholder="search"
+                    disabled="">
+            </form>
+
+            <div class="nav user">
+                {% if current_user.is_anonymous %}
+                <div class="login">
+                    <a class="btn" href="{{ url_for('login') }}">Login</a>
+                </div>
+
+                <div class="sign-up">
+                    <a class="btn" href="{{ url_for('register' )}}">Sign Up!</a>
+                </div>
+
+                {% else %}
+                    {% if not current_user.is_anonymous %}
+                        <a href="{{ url_for('profile', user_id=current_user.id) }}">My Profile</a>
+                    {% endif %}
+                <div class="logout">
+                    <a class="btn" href="{{ url_for('logout')}}">Logout</a>
+                </div>
                 {% endif %}
-            </ul>
-        </div>
 
-        {% if current_user.is_anonymous %}
-        <div class="login">
-            <a class="btn" href="{{ url_for('login') }}">Login</a>
-        </div>
-
-        <div class="sign-up">
-            <a class="btn" href="{{ url_for('register' )}}">Sign Up!</a>
-        </div>
-
-        {% else %}
-        <div class="logout">
-            <a class="btn" href="{{ url_for('logout')}}">Logout</a>
-        </div>
-        {% endif %}
+        </nav>
     </div>
 
     {% with messages=get_flashed_messages() %}
@@ -56,33 +75,32 @@
         {% block content %}
         {% endblock %}
     </div>
-    <div class="footer">
-        <div>
-            <ul>
-                <a href="{{ url_for('index') }}">About Us</a>
-                <a href="{{ url_for('index') }}">Contact Us</a>
-            </ul>
+    <nav class="footer">
+        <div class="footer-links">
+            <div class="flex-column gaps">
+                <a class="text-background pad" href="{{ url_for('index') }}">About Us</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Contact Us</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Home</a>
+            </div>
+            <div class="flex-column gaps">
+                <a class="text-background pad" href="{{ url_for('index') }}">Listings</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Categories</a>
+            </div>
+
+
         </div>
-        <div>
-            <ul>
-                <a href="{{ url_for('index') }}">Home</a>
-                <a href="{{ url_for('index') }}">Listings</a>
-            </ul>
+        <div class="logo-footer pad">
+            <a class="text-background" href="{{ url_for('index') }}">
+                <img src="images/placeholder.png" alt="Marketplace logo">
+            </a>
         </div>
-        <div>
-            <ul>
-                <a href="{{ url_for('index') }}">Categories:</a>
-            </ul>
-        </div>
-        <div class="logo-footer">
-            <a href="{{ url_for('index') }}"><img src="images/placeholder.png"></a>
-        </div>
-        <div class="copyright">
+        <div class="copyright pad text-background">
             <p>&copy; Marketplace <span id="year"></span></p>
             <script>
                 document.getElementById("year").innerText = new Date().getFullYear();
             </script>
         </div>
-    </div>
+    </nav>
 </body>
+
 </html>

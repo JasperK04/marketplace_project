@@ -1,2 +1,252 @@
 @import url(colors.css);
 @import url(components/buttons.css);
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--color-background);
+    color: var(--color-text-primary);
+    height: 100dvh;
+    display: flex;
+    flex-direction: column;
+}
+
+.header {
+    display:flex;
+    padding: 10px 15px;
+    background-color: var(--color-primary);
+    height: 12dvh;
+    min-height: 70px;
+}
+
+.container {
+    flex-grow: 1;
+}
+
+.nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.nav-container {
+    display:flex;
+    padding: 0 10px;
+    justify-content: space-between;
+    flex-grow: 10;
+    align-items: center;
+}
+
+.links-container {
+    display:flex;
+    justify-content: space-evenly;
+    align-items: center;
+    gap:15px;
+}
+
+.logo-header {
+    flex-grow: 2;
+    height: fit-content;
+}
+
+.logo-header img {
+    height: 70px;
+}
+
+.user {
+    gap: 5px;
+}
+
+.links {
+    max-height: 12dvh;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.nav a {
+    color: var(--color-background);
+    font-weight: bold;
+    transition: color 0.3s;
+    text-decoration: none;;
+}
+
+.login, .sign-up, .logout {
+    margin-left: auto;
+}
+
+.new-listing a {
+    min-width: fit-content;
+}
+
+.searchbar {
+    background-color: white;
+    border-radius: 5px;
+    width: 25dvw;
+    height: 4dvh;
+}
+
+.searchbar-field {
+    padding: 5px;
+    width: 100%;
+    height: 100%;
+}
+
+.btn {
+    background-color: var(--color-tertiary);
+    color: var(--color-background);
+    padding: 8px 15px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s;
+    text-decoration: none;
+}
+
+.btn:hover {
+    background-color: var(--color-quaternary);
+}
+
+.footer {
+    background-color: var(--color-primary);
+    color: var(--color-text-secondary);
+    text-align: center;
+    padding: 10px;
+}
+
+.footer ul {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.footer a {
+    text-decoration: none;
+}
+
+.footer a:hover {
+    color: var(--color-text-secondary);
+}
+
+.footer .copyright p {
+    margin: 0;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    padding-bottom: 1em;
+}
+
+.flex-column {
+    display: flex;
+    flex-direction: column;
+}
+
+.login>.btn, .sign-up>.btn, .logout>.btn {
+    display: block;
+    width: 5em;
+    text-align: center;
+}
+
+.gaps {
+    gap: 1.1dvw;
+}
+
+.pad {
+    padding: 4px;
+}
+
+/* Media Queries */
+@media (max-width: 768px) {
+
+    .header {
+        align-items: flex-start;
+    }
+
+    .btn {
+        padding: 6px 12px;
+    }
+
+    .links {
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 2px;
+    }
+
+    .user {
+        flex-direction: column;
+        gap: 10px
+    }
+
+    .footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .login>.btn, .sign-up>.btn, .logout>.btn {
+        width: 4.5em;
+    }
+}
+
+@media (max-width: 500px) {
+
+    .logo-header img {
+        height: 60px;
+    }
+
+    .nav-container {
+        gap: 3px;
+    }
+
+    .btn {
+        padding: 5px 10px;
+    }
+
+    .links {
+        display: none;
+    }
+
+    .login>.btn, .sign-up>.btn, .logout>.btn {
+        width: 3.8em;
+    }
+}
+
+
+.primary {
+    background-color: var(--color-primary);
+}
+
+.text-primary {
+    color: var(--color-text-primary);
+}
+
+.secondary {
+    background-color: var(--color-secondary);
+}
+
+.text-secondary {
+    color: var(--color-text-secondary);
+}
+
+.tertiary {
+    background-color: var(--color-tertiary);
+}
+
+.text-tertiary {
+    color: var(--color-tertiary);
+}
+
+.background {
+    background-color: var(--color-background);
+}
+
+.text-background {
+    color: var(--color-background);
+}
