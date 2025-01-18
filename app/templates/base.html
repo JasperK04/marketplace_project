@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
     {% block styles %}
     {% endblock %}
+    {% block scripts %}
+    {% endblock %}
 </head>
 
 <body>
@@ -59,6 +61,16 @@
 
         </nav>
     </div>
+
+    {% with messages=get_flashed_messages() %}
+        {% if messages %}
+            {% for message in messages %}
+            <div class="flash_message">
+                <p>{{ message }}</p>
+            </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
     <div class="container">
         {% block content %}
         {% endblock %}

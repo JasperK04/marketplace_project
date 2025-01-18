@@ -1,12 +1,15 @@
 <section class="listing-card">
-    <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
     <a href="{{ url_for('listing', listing_id=listing.id) }}">
         <div class="listing-image">
-            <img src="https://placehold.co/300x200" alt="">
+            {% if listing.filename %}
+                <img class="listing-image" src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ listing.filename)}}" alt="{{ listing.title }}">
+            {% else %}
+                <img width="300" height="200" src="https://placehold.co/300x200" alt="">
+            {% endif %}
         </div>
         <div class="listing-content">
-            <div>{{ listing.title }}</div>
-            <div>{{ listing.price}}</div>
+            <div class="listing-label listing-title">{{ listing.title }}</div>
+            <div class="listing-label listing-price">&euro;{{ listing.price }}</div>
         </div>
     </a>
 </section>

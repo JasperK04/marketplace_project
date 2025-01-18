@@ -19,6 +19,8 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = getenv("TRACK_MODIFICATIONS") or 
 app.config['SESSION_PERMANENT'] = True
 app.config['SESSION_TYPE'] = 'filesystem'
 app.config["SECRET_KEY"] = getenv("SECRET_KEY") or "secret-key"
+app.config['UPLOAD_FOLDER'] = path.abspath('app/static/assets/images/user_uploaded/listings/')
+app.config['RESIZED_FOLDER'] = path.abspath('app/static/assets/images/user_uploaded/listings_resized/')
 
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
