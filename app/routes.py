@@ -13,11 +13,13 @@ from .models.Listing import Listing
 from .models.Category import Category
 from .models.Image import Image
 
+def can_view_restricted_pages():
+    return current_user.is_authenticated and current_user.is_admin
 
 @app.route("/", methods=["GET"])
 @app.route("/index", methods=["GET"])
 def index():
-    listings = db.session.query(Listing).filter_by(sold=False).all()
+    listings = Listing.find_open_listings()
     return render_template("index.html", listings=listings)
 
 
@@ -29,8 +31,11 @@ def login():
     if form.validate_on_submit():
         user = db.session.scalar(sa.select(User).where(User.name == form.username.data))
         if user is None or not user.check_password(form.password.data):
-            flash("Invalid username or password")
-            return redirect(url_for("login"))
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
+        if user.is_deactivated:
+            flash('Account is deactivated')
+            return redirect(url_for('login'))
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get("next")
         if not next_page or urlsplit(next_page).netloc != "":
@@ -63,10 +68,11 @@ def register():
 # Profile stuff
 @app.route("/profile/<user_id>")
 def profile(user_id):
-    user = db.get_or_404(User, user_id)
+    user = db.get_or_404(User,user_id)
+    if user.is_deactivated and not can_view_restricted_pages():
+        return redirect(url_for('index'))
     listings = db.session.execute(
-        sa.select(Listing).where(Listing.userID == user.id)
-    ).scalars()
+        sa.select(Listing).where(Listing.userID == user.id, ~Listing.is_deactivated)).scalars()
     # Will get this sorted out later, hopefully
     # profile_pic = db.session.execute(
     #    sa.select(Image).where(Image.userID == user.id)).scalars()
@@ -99,13 +105,18 @@ def edit_profile(user_id):
 # Listings
 @app.route("/listings", methods=["GET"])
 def listings():
+    # Find all unsold, active listings
+    listings = Listing.find_open_listings()
     listings = db.session.query(Listing).all()
     return render_template("listings.html", listings=listings)
 
 
 @app.route("/listings/<int:listing_id>", methods=["GET"])
-def listing(listing_id):
+def listing(listing_id: int):
     listing = db.get_or_404(Listing, listing_id).to_dict()
+    print(listing)
+    if listing["is_deactivated"] and not can_view_restricted_pages():
+        return redirect(url_for('listings'))
     return render_template("listing.html", listing=listing)
 
 @app.route("/add_listing", methods=["GET", "POST"])
