@@ -84,7 +84,7 @@ def edit_profile(user_id):
         flash("You are not allowed to edit this profile.")
         return render_template("profile.html", user=user, listings=listings)
     
-    form = EditProfileForm()
+    form = EditProfileForm(obj=user)
     if form.validate_on_submit():
         user.about_me = form.about_me.data
         user.name = form.name.data
