@@ -1,28 +1,47 @@
 {% extends 'base.html' %}
-
+{% block title %}{{ user.name }}'s Profile{% endblock %}
+{% block scripts %}
+<script src="{{url_for('static', filename='js/profile.js')}}" defer></script>
+{% endblock scripts %}
 {% block content %}
-    <div class="profile_page">
-        <h1>{{ user.name }}'s Profile</h1>
+<div class="profile_page">
+    <h1>
+            {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}'s Profile
+            {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
+            {% if user.is_deactivated %}
+            <span><button class="primary" id="reactivate-user">Reactivate user</button></span>
+            {% else %}
+            <span><button class="destructive"
+                id="deactivate-user">Deactivate user</button>
+            </span>
+            {% endif %}
+            {% endif %}
+        </h1>
 
-        <h2 id="about_me">About me</h2>
-        <!-- TODO: Create 'about me' field in User table, migrate DB -->
-        <p>
-            <!-- {{ user.about_me }} -->
-        </p>
+        {% if user.id == current_user.id %}
+            <a href="{{ url_for('edit_profile', user_id=user.id) }}">Edit Your Profile</a>
+        {% endif %}
 
-        <!-- TODO: Add possibility to add profile photo to user profile -->
+        <h2 id="about_me">About Me</h2>
+        {% if user.about_me %}
+            <p>
+                {{ user.about_me }}
+            </p>
+        {% else %}
+            <p>
+                This user has not written a custom description yet
+            </p>
+        {% endif %}
 
-        <!-- 
+    <!-- TODO: Add possibility to add profile photo to user profile -->
 
-        -->
 
-    
-        <h2 id="current_listings">Current Listings</h2>
-        <div class="listings">
-            {% for listing in listings %}
-                {% include 'components/listing_card.html' %}
-            {% endfor %}
-        </div>
+
+    <h2 id="current_listings">Current Listings</h2>
+    <div class="listings">
+        {% for listing in listings %}
+        {% include 'components/listing_card.html' %}
+        {% endfor %}
     </div>
 
-{% endblock %}
+    {% endblock %}

@@ -1,6 +1,7 @@
 .listings {
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(300px, 1fr));
-    grid-gap:1em;
-    margin:1em;
+    margin: 3dvh 0 2dvh 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1em;
+    justify-content: center;
 }
