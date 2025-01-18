@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,32 +9,37 @@
     {% block styles %}
     {% endblock %}
 </head>
+
 <body>
     <div class="header">
         <!-- first logo img, then other links, then next pages -->
-        <div class="logo-header">
-            <a href="{{ url_for('index') }}">
-                <img src="images/placeholder.png" alt="Marketplace logo">
-            </a>
-        </div>
 
         <nav class="nav nav-container">
-            <div class="nav links">
-                <a href="{{ url_for('index') }}">Listings</a>
-                <a href="{{ url_for('index') }}">Categories</a>
-            </div>
+            <div class="links-container">
+                <div class="logo-header">
+                    <a href="{{ url_for('index') }}">
+                        <img src="images/placeholder.png" alt="Marketplace logo">
+                    </a>
+                </div>
 
-            <div class="new-listing">
-                <a class="btn" href="{{ url_for('add_listing')}}">Add listing</a>
+                    <div class="nav links">
+                        <a href="{{ url_for('index') }}">Listings</a>
+                        <a href="{{ url_for('index') }}">Categories</a>
+                    </div>
+
+                    <div class="new-listing">
+                        <a class="btn" href="{{ url_for('add_listing')}}">Add listing</a>
+            </div>
             </div>
 
             <!-- potential searchbar -->
             <form class="searchbar" style="display: none;">
-                <input type="search" class="searchbar-field" id="searchbar" name="searchbar" placeholder="search" disabled>
+                <input type="search" class="searchbar-field" id="searchbar" name="searchbar" placeholder="search"
+                    disabled="">
             </form>
 
-            {% if current_user.is_anonymous %}
             <div class="nav user">
+                {% if current_user.is_anonymous %}
                 <div class="login">
                     <a class="btn" href="{{ url_for('login') }}">Login</a>
                 </div>
@@ -50,7 +56,7 @@
                     <a class="btn" href="{{ url_for('logout')}}">Logout</a>
                 </div>
                 {% endif %}
-            </div>
+
         </nav>
     </div>
     <div class="container">
@@ -58,16 +64,18 @@
         {% endblock %}
     </div>
     <nav class="footer">
-        <div class="nav gaps">
-            <a class="text-background pad" href="{{ url_for('index') }}">About Us</a>
-            <a class="text-background pad" href="{{ url_for('index') }}">Contact Us</a>
-        </div>
-        <div class="nav gaps">
-            <a class="text-background pad" href="{{ url_for('index') }}">Home</a>
-        </div>
-        <div class="nav gaps">
-            <a class="text-background pad" href="{{ url_for('index') }}">Listings</a>
-            <a class="text-background pad" href="{{ url_for('index') }}">Categories</a>
+        <div class="footer-links">
+            <div class="flex-column gaps">
+                <a class="text-background pad" href="{{ url_for('index') }}">About Us</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Contact Us</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Home</a>
+            </div>
+            <div class="flex-column gaps">
+                <a class="text-background pad" href="{{ url_for('index') }}">Listings</a>
+                <a class="text-background pad" href="{{ url_for('index') }}">Categories</a>
+            </div>
+
+
         </div>
         <div class="logo-footer pad">
             <a class="text-background" href="{{ url_for('index') }}">
@@ -82,4 +90,5 @@
         </div>
     </nav>
 </body>
+
 </html>
