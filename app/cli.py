@@ -1,6 +1,7 @@
 from random import randint, choice
 from flask import Blueprint
 import click
+import sqlalchemy as sa
 from faker import Faker
 from app import db
 from app.models.User import User
@@ -87,23 +88,32 @@ def initialize_database(users: int, listings: int):
 
 
 @cli.cli.command("create-admin")
+@click.option("--username", type=str, prompt="Username", help="Admin username.")
 @click.option("--name", type=str, prompt="Name", help="Admin name.")
 @click.option("--email", type=str, prompt="Email", help="Admin email.")
 @click.option("--password", type=str, prompt="Password", help="Admin password.")
-def create_admin(name:str, email:str, password:str):
-    if not User.valid_name(name):
-        print("Invalid username. Username must only contain alpha-numeric characters.")
+def create_admin(username:str, name:str, email:str, password:str):
+    if not User.valid_username(username):
+        print("Username does not meet requirements.\nUsername must only contain alpha-numeric characters.")
+        return
+    if db.session.scalar(sa.select(User).where(
+            User.username == username)):
+        print("Username already in use.")
+        return
+    if len(name) > 70 or len(name) < 1:
+        print("Name does not meet requirements.\nName must be between 1 and 70 characters.")
         return
     if not User.valid_email(email):
-        print("Invalid email address.")
+        print("This is not a valid email address.")
         return
-    if db.session.scalar(User.query.filter(User.email == email)):
+    if db.session.scalar(sa.select(User).where(
+            User.email == email)):
         print("Email address already in use.")
         return
     if not User.valid_password(password):
-        print("Invalid password. Password must be between 15 and 64 characters long.")
+        print("Password does not meet requirements\nPassword must be between 15 and 64 characters long.")
         return
-    admin = User().from_dict({"name": name, "email": email, "password": password}, new_user=True).make_admin()
+    admin = User().from_dict({"username": username, "name": name, "email": email, "password": password}, new_user=True).make_admin()
     db.session.add(admin)
     db.session.commit()
-    print("Admin created with id:", admin.id, "name:", admin.name, "email:", admin.email, "password:", password)
+    print("Admin created with id:", admin.id, "username:", username, "name:", admin.name, "email:", admin.email, "password:", password)
