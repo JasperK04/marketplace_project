@@ -1,40 +1,41 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-from flask_login import LoginManager
-from flask_migrate import Migrate
-from flask_session import Session
-from os import path, getenv
+from os import getenv
 
-basedir = path.abspath(path.dirname(__file__))
+from app.extensions import db, migrate, session, login
+from app.config import config
+from app.routes import routes
+from app.api import api
+from app.cli import cli
+from app.errors import register_error_handler
 
-# Config stuff
-# TODO: Organise this in a cleaner manner than just a bunch of Python code here
 
-app = Flask(__name__)
+def create_app() -> Flask:
+    app = Flask(__name__)
+    app.config.from_object(config[getenv("FLASK_ENV", "development")])
 
-app.config["SQLALCHEMY_DATABASE_URI"] = getenv(
-    "DB_URL"
-) or "sqlite:///" + path.join(basedir, "app.db")
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = getenv("TRACK_MODIFICATIONS") or False
-app.config['SESSION_PERMANENT'] = True
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config["SECRET_KEY"] = getenv("SECRET_KEY") or "secret-key"
-app.config['UPLOAD_FOLDER'] = path.abspath('app/static/assets/images/user_uploaded/listings/')
-app.config['RESIZED_FOLDER'] = path.abspath('app/static/assets/images/user_uploaded/listings_resized/')
+    register_extensions(app)
+    register_blueprints(app)
+    register_error_handler(app)
 
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-session = Session(app)
+    create_db(app)
 
-login = LoginManager(app)
-login.login_view = 'login'
+    return app
 
-# Imports to make the app work
-from . import models, routes, api, cli, errors
 
-app.register_blueprint(api.api, url_prefix='/api')
-app.register_blueprint(cli.cli)
+def register_extensions(app: Flask) -> None:
+    db.init_app(app)
+    migrate.init_app(app, db)
+    session.init_app(app)
+    login.init_app(app)
+    login.login_view = "routes.login"
 
-# Create database
-with app.app_context():
-    db.create_all()
+
+def register_blueprints(app: Flask) -> None:
+    app.register_blueprint(routes)
+    app.register_blueprint(api, url_prefix="/api")
+    app.register_blueprint(cli)
+
+
+def create_db(app: Flask) -> None:
+    with app.app_context():
+        db.create_all()

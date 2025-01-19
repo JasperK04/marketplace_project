@@ -19,19 +19,19 @@
         <nav class="nav nav-container">
             <div class="links-container">
                 <div class="logo-header">
-                    <a href="{{ url_for('index') }}">
+                    <a href="{{ url_for('routes.index') }}">
                         <img src="images/placeholder.png" alt="Marketplace logo">
                     </a>
                 </div>
 
-                    <div class="nav links">
-                        <a href="{{ url_for('listings') }}">Listings</a>
-                        <a href="{{ url_for('categories') }}">Categories</a>
-                    </div>
+                <div class="nav links">
+                    <a href="{{ url_for('routes.listings') }}">Listings</a>
+                    <a href="{{ url_for('routes.categories') }}">Categories</a>
+                </div>
 
-                    <div class="new-listing">
-                        <a class="btn" href="{{ url_for('add_listing')}}">Add listing</a>
-            </div>
+                <div class="new-listing">
+                    <a class="btn" href="{{ url_for('routes.add_listing')}}">Add listing</a>
+                </div>
             </div>
 
             <!-- potential searchbar -->
@@ -42,21 +42,18 @@
 
             <div class="nav user">
                 {% if current_user.is_anonymous %}
-                <div class="login">
-                    <a class="btn" href="{{ url_for('login') }}">Login</a>
-                </div>
+                    <div class="login">
+                        <a class="btn" href="{{ url_for('routes.login') }}">Login</a>
+                    </div>
 
-                <div class="sign-up">
-                    <a class="btn" href="{{ url_for('register' )}}">Sign Up!</a>
-                </div>
-
+                    <div class="sign-up">
+                        <a class="btn" href="{{ url_for('routes.register' )}}">Sign Up!</a>
+                    </div>
                 {% else %}
-                    {% if not current_user.is_anonymous %}
-                        <a href="{{ url_for('profile', user_id=current_user.id) }}">My Profile</a>
-                    {% endif %}
-                <div class="logout">
-                    <a class="btn" href="{{ url_for('logout')}}">Logout</a>
-                </div>
+                    <a href="{{ url_for('routes.profile', user_id=current_user.id) }}">My Profile</a>
+                    <div class="logout">
+                        <a class="btn" href="{{ url_for('routes.logout')}}">Logout</a>
+                    </div>
                 {% endif %}
 
         </nav>
@@ -65,9 +62,9 @@
     {% with messages=get_flashed_messages() %}
         {% if messages %}
             {% for message in messages %}
-            <div class="flash_message">
-                <p>{{ message }}</p>
-            </div>
+                <div class="flash_message">
+                    <p>{{ message }}</p>
+                </div>
             {% endfor %}
         {% endif %}
     {% endwith %}
@@ -78,19 +75,17 @@
     <nav class="footer">
         <div class="footer-links">
             <div class="flex-column gaps">
-                <a class="text-background pad" href="{{ url_for('index') }}">About Us</a>
-                <a class="text-background pad" href="{{ url_for('index') }}">Contact Us</a>
-                <a class="text-background pad" href="{{ url_for('index') }}">Home</a>
+                <a class="text-background pad" href="{{ url_for('routes.index') }}">About Us</a>
+                <a class="text-background pad" href="{{ url_for('routes.index') }}">Contact Us</a>
+                <a class="text-background pad" href="{{ url_for('routes.index') }}">Home</a>
             </div>
             <div class="flex-column gaps">
-                <a class="text-background pad" href="{{ url_for('listings') }}">Listings</a>
-                <a class="text-background pad" href="{{ url_for('categories') }}">Categories</a>
+                <a class="text-background pad" href="{{ url_for('routes.listings') }}">Listings</a>
+                <a class="text-background pad" href="{{ url_for('routes.categories') }}">Categories</a>
             </div>
-
-
         </div>
         <div class="logo-footer pad">
-            <a class="text-background" href="{{ url_for('index') }}">
+            <a class="text-background" href="{{ url_for('routes.index') }}">
                 <img src="images/placeholder.png" alt="Marketplace logo">
             </a>
         </div>

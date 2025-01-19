@@ -1,8 +1,10 @@
 <section class="listing-card">
-    <a href="{{ url_for('listing', listing_id=listing.id) }}">
+    <a href="{{ url_for('routes.listing', listing_id=listing.id) }}">
         <div class="listing-image">
             {% if listing.filename %}
-                <img class="listing-image" src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ listing.filename)}}" alt="{{ listing.title }}">
+                <img class="listing-image"
+                    src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ listing.filename)}}"
+                    alt="{{ listing.title }}">
             {% else %}
                 <img width="300" height="200" src="https://placehold.co/300x200" alt="">
             {% endif %}
