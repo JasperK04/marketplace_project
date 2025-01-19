@@ -36,18 +36,24 @@ def initialize_database(users: int, listings: int):
         db.session.add(Category().from_dict({"name": category, "description": category_data['description']}))
     db.session.commit()
     print("Categories created.")
-    for _ in range(users):
-        db.session.add(
-            User()
-            .from_dict(
-                {
-                    "name": fake.user_name(),
-                    "email": fake.email(),
-                    "password": fake.password(length=randint(15, 65)),
-                },
-                new_user=True,
-            )
+    new_users: list[User] = []
+    while len(new_users) < users:
+        name = fake.name()
+        username = name.lower().replace(" ", "")
+        new_user = User().from_dict(
+            {
+                "username": username,
+                "name": name,
+                "email": fake.email(),
+                "password": fake.password(length=randint(15, 65)),
+            },
+            new_user=True,
         )
+        if new_user.email not in [user.email for user in new_users] and new_user.username not in [user.username for user in new_users]:
+            new_users.append(new_user)
+    for new_user in new_users:
+        db.session.add(new_user)
+
 
     db.session.commit()
     print("Users created.")
@@ -84,7 +90,7 @@ def initialize_database(users: int, listings: int):
 @click.option("--email", type=str, prompt="Email", help="Admin email.")
 @click.option("--password", type=str, prompt="Password", help="Admin password.")
 def create_admin(name:str, email:str, password:str):
-    if not User.valid_username(name):
+    if not User.valid_name(name):
         print("Invalid username. Username must only contain alpha-numeric characters.")
         return
     if not User.valid_email(email):

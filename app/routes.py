@@ -31,7 +31,7 @@ def login():
         return redirect(url_for("index"))
     form = LoginForm()
     if form.validate_on_submit():
-        user = db.session.scalar(sa.select(User).where(User.name == form.username.data))
+        user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
             flash('Invalid username or password')
             return redirect(url_for('login'))
@@ -58,8 +58,21 @@ def register():
         return redirect(url_for("index"))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(name=form.name.data, email=form.email.data)
-        user.set_password(form.password.data)
+        if db.session.scalar(sa.select(User).where(User.name == form.username.data)):
+            flash("Username already taken")
+            return redirect(url_for("register"))
+        if db.session.scalar(sa.select(User).where(User.email == form.email.data)):
+            flash("Email address already exists.")
+            return redirect(url_for("register"))
+        user = User().from_dict(
+            {
+                "username": form.username.data,
+                "name": form.name.data,
+                "email": form.email.data,
+                "password": form.password.data,
+            },
+            new_user=True,
+        )
         db.session.add(user)
         db.session.commit()
         flash("Congratulations, you are now a registered user!")
@@ -68,7 +81,36 @@ def register():
 
 
 # Profile stuff
-@app.route("/profile/<int:user_id>")
+@app.route("/profile/<user_name>", methods=["GET"])
+def profile_by_name(user_name:str):
+    print(user_name)
+    user = db.session.scalar(select(User).where(User.username == user_name))
+    if not user:
+        return redirect(url_for('index'))
+    if user.is_deactivated and not can_view_restricted_pages():
+        return redirect(url_for('index'))
+    listings = []
+    listings_with_images = (
+        db.session.query(Listing, Image.filename)
+        .join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True)
+        .filter(Listing.userID == user.id)
+        .all()
+    )
+    for listing, filename in listings_with_images:
+        if not listing.is_deactivated:
+            if filename:
+                listing = listing.to_dict()
+                listing["filename"] = filename
+                listings.append(listing)
+            else:
+                listings.append(listing.to_dict())
+
+    # Will get this sorted out later, hopefully
+    # profile_pic = db.session.execute(
+    #    sa.select(Image).where(Image.userID == user.id)).scalars()
+    return render_template("profile.html", user=user, listings=listings)
+
+@app.route("/profile/<int:user_id>", methods=["GET"])
 def profile(user_id:int):
     user = db.get_or_404(User, user_id)
     if user.is_deactivated and not can_view_restricted_pages():
