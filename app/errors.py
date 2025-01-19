@@ -1,17 +1,10 @@
-from flask import render_template, request
-from app import db, app
-from app.api.errors import error_response as api_error_response
+from flask import render_template
+from app import app
 from werkzeug.exceptions import HTTPException
-
-def wants_json_response():
-    return request.accept_mimetypes['application/json'] >= \
-        request.accept_mimetypes['text/html']
 
 
 @app.errorhandler(HTTPException)
 def error_handler(e):
-    #if wants_json_response:
-    #    return api_error_response(e.code)
     error_codes = {
     400: ("Bad Request", "The server could not understand the request due to invalid syntax."),
     401: ("Unauthorized", "You must authenticate yourself to get the requested response."),
@@ -29,5 +22,5 @@ def error_handler(e):
     503: ("Service Unavailable", "The server is not ready to handle the request. This could be due to maintenance or overload."),
     504: ("Gateway Timeout", "The server did not receive a timely response from the upstream server."),
     }
-    title, message = error_codes.get(e.code,'Unknown Error','Please contact admin for further help')
+    title, message = error_codes.get(e.code,'Unknown Error. Please contact admin for further help')
     return render_template('errors.html',title=title,message=message)
