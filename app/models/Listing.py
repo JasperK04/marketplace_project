@@ -16,7 +16,7 @@ class Listing(PaginatedAPIMixin, db.Model):
     title: Mapped[str] = mapped_column(nullable=False)
     description: Mapped[str] = mapped_column(nullable=False)
     price: Mapped[float] = mapped_column(nullable=False)
-    sold: Mapped[bool] = mapped_column(nullable=False, insert_default=True)
+    sold: Mapped[bool] = mapped_column(nullable=False, insert_default=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False) #type: ignore
     is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
 
