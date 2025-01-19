@@ -177,10 +177,11 @@ def add_listing():
         db.session.add(new_listing)
         db.session.flush()
 
-        img_org = resize_upload_image(file,(300,200),current_user.id,new_listing.id,'UPLOAD_FOLDER','listing','original')
-        img_resized = resize_upload_image(file,(600,400),current_user.id,new_listing.id,'RESIZED_FOLDER','listing','resized')
-        db.session.add(img_org)
-        db.session.add(img_resized)
+        if file:
+            img_org = resize_upload_image(file,(300,200),current_user.id,new_listing.id,'UPLOAD_FOLDER','listing','original')
+            img_resized = resize_upload_image(file,(600,400),current_user.id,new_listing.id,'RESIZED_FOLDER','listing','resized')
+            db.session.add(img_org)
+            db.session.add(img_resized)
         db.session.commit()
         return redirect(url_for('index'))
     return render_template('add_listing.html',title='Add listing',form=form)
