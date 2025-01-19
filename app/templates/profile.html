@@ -2,9 +2,10 @@
 {% block title %}{{ user.name }}'s Profile{% endblock %}
 {% block styles %}
 <link rel="stylesheet" href="{{url_for('static', filename='css/profile.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='css/components/confirm_modal.css')}}">
 {% endblock styles %}
 {% block scripts %}
-<script src="{{url_for('static', filename='js/profile.js')}}" defer></script>
+<script src="{{url_for('static', filename='js/profile.js')}}" defer type="module"></script>
 {% endblock scripts %}
 {% block content %}
 <div class="profile_page">
@@ -47,5 +48,7 @@
         {% endfor %}
     </div>
 </div>
+
+    {% include 'components/confirm_modal.html' %}
 
     {% endblock %}

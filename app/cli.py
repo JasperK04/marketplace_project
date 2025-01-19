@@ -25,6 +25,7 @@ def initialize_database(users: int, listings: int):
         "Sport": {"keywords": ["soccer ball", "basketball", "tennis racket", "yoga mat", "helmet", "bicycle", "weights", "swimsuit", "golf club", "sneakers"], 'description': "Sporting goods and fitness equipment."},
         "Toys": {"keywords": ["action figure", "doll", "lego set", "board game", "puzzle", "plush toy", "toy car", "building blocks", "playset", "remote control car"], 'description': "Children's toys and games."},
         "Vehicles": {"keywords": ["car", "motorcycle", "bicycle", "scooter", "truck", "boat", "trailer", "camper", "ATV", "skateboard"], 'description': "Various types of vehicles and related accessories."},
+        "Music": {"keywords": ["guitar", "piano", "violin", "drum set", "microphone", "amplifier", "headphones", "record player", "flute", "trumpet"], 'description': "Musical instruments and audio equipment."},
         "Other": {"keywords": ["antique", "art piece", "collectible", "instrument", "tool", "pet supplies", "hobby kit", "gift card", "novelty item", "unknown item"], 'description': "Miscellaneous items that do not fit into other categories."},
     }
     adjectives = ["smart", "fast", "reliable", "durable", "stylish", "modern", "classic", "unique", "rare", "vintage"]
