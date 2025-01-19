@@ -35,7 +35,7 @@ class ListingForm(FlaskForm):
     description = TextAreaField('Description',validators=[DataRequired()])
     price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
     file = FileField('Upload image',validators=[FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
-    submit = SubmitField('Add listing')
+    submit = SubmitField('Submit')
 
 
 class EditProfileForm(FlaskForm):

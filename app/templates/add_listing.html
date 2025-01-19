@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
+{% block styles %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/add_listing.css') }}">
+{% endblock %}
+
 {% block content %}
-    <h1>Add listing</h1>
+    <h1>{{ title }}</h1>
     <form method="post" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
         <p>
@@ -39,6 +43,6 @@
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
         </p>
-        </p>{{ form.submit() }}<p>
+        <p>{{ form.submit() }}</p>
     </form>
 {% endblock %}

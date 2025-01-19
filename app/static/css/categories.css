@@ -1,1 +1,33 @@
 @import url(components/listing_grid.css);
+@import url(components/listing_card.css);
+
+
+h1 {
+    font-size: 2rem;
+    margin: 0;
+    text-align: center;
+}
+
+
+.category {
+    padding: 1em;
+    width: fit-content;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin: 1em;
+
+    .category-header {
+        display:flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 1rem 5rem 0rem 5rem;
+
+    }
+
+    a {
+        text-decoration: none;
+        color: inherit;
+    }
+
+
+}
