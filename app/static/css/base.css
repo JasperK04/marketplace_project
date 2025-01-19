@@ -20,7 +20,7 @@ body {
 }
 
 .container {
-    flex-grow: 1;
+    margin: 3dvh 5dvh;
 }
 
 .nav {
