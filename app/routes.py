@@ -10,11 +10,14 @@ from PIL import Image as IM
 
 
 from app.extensions import db
+from app.config import config
 from app.forms import LoginForm, RegistrationForm, ListingForm, EditProfileForm
 from app.models.User import User
 from app.models.Listing import Listing
 from app.models.Category import Category
 from app.models.Image import Image
+
+app_config = config[os.getenv("FLASK_ENV", "development")]
 
 routes = Blueprint("routes", __name__)
 
@@ -326,8 +329,9 @@ def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
     else:
         img.thumbnail(size, resample=1)
     filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
-    filepath = os.path.join(app.config[folder], filename)
-    os.makedirs(app.config[folder], exist_ok=True)
+    folder = app_config.UPLOAD_FOLDER if folder == "UPLOAD_FOLDER" else app_config.RESIZED_FOLDER
+    os.makedirs(folder, exist_ok=True)
+    filepath = os.path.join(folder, filename)
     img.save(filepath)
     if type == "listing":
         new_image = Image(
