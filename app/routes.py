@@ -5,6 +5,7 @@ from sqlalchemy import outerjoin, select
 from urllib.parse import urlsplit
 from werkzeug.utils import secure_filename
 import os
+import uuid
 from PIL import Image as IM
 
 
@@ -159,17 +160,19 @@ def add_listing():
     form.category.choices = [
         category.name for category in db.session.query(Category).all()
     ]
+    form.submit.label.text = 'Add listing'
     if form.validate_on_submit():
         file = request.files.get("file")
         cat_id = db.session.scalar(
             select(Category.id).where(Category.name == form.category.data)
         )
         new_listing = Listing(
-            title=form.title.data,
+            title=Listing.normalize_title(form.title.data),
             categoryID=cat_id,
-            description=form.description.data,
-            price=form.price.data,
+            description=Listing.normalize_description(form.description.data),
+            price=Listing.normalize_price(form.price.data),
             userID=current_user.id,
+            sold=False
         )
         db.session.add(new_listing)
         db.session.flush()
@@ -182,7 +185,54 @@ def add_listing():
         return redirect(url_for('index'))
     return render_template('add_listing.html',title='Add listing',form=form)
 
+@app.route('/edit/<int:listing_id>', methods=['GET','POST'])
+@login_required
+def edit_listing(listing_id):
+    listing = db.get_or_404(Listing,listing_id)
 
+    if listing.userID != current_user.id:
+        flash("You are not allowed to edit this listing.")
+        return redirect(url_for('index')) # this depends on where the edit button/link will be placed
+
+    form = ListingForm(obj=listing)  # so that form is prefilled (only category is not)
+    form.category.choices = [category.name for category in db.session.query(Category).all()]
+    form.submit.label.text = 'Edit listing'
+    if form.validate_on_submit():
+        file = request.files['file']
+        if file:
+            # delete old images on disk and in the database
+            delete_images(listing_id)
+
+            # add new ones
+            img_org = resize_upload_image(file,(300,200),current_user.id,listing_id,'UPLOAD_FOLDER','listing','original')
+            img_resized = resize_upload_image(file,(600,400),current_user.id,listing_id,'RESIZED_FOLDER','listing','resized')
+
+            db.session.add(img_org)
+            db.session.add(img_resized)
+            db.session.commit()
+        listing.title = Listing.normalize_title(form.title.data)
+        listing.categoryID = db.session.scalar(select(Category.id).where(Category.name == form.category.data))
+        listing.description = Listing.normalize_description(form.description.data)
+        listing.price = Listing.normalize_price(form.price.data)
+        db.session.add(listing)
+        db.session.commit()
+        return redirect(url_for('profile',user_id=current_user.id)) # this depends on where the edit button/link will be placed
+    return render_template('add_listing.html',title='Edit listing',form=form)
+
+@app.route('/delete_listing/<int:listing_id>',methods=['GET','POST'])
+@login_required
+def delete_listing(listing_id):
+    listing = db.get_or_404(Listing,listing_id)
+
+    if listing.userID != current_user.id:
+        flash("You are not allowed to delete this listing.")
+        return redirect(url_for('index')) # this depends on where the edit button/link will be placed
+
+    delete_images(listing_id)
+
+    db.session.delete(listing)
+    db.session.commit()
+    return redirect(url_for('profile',user_id=current_user.id)) # this depends on where the edit button/link will be placed
 
 def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
     image = IM.open(file)
@@ -193,7 +243,7 @@ def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
         img = img.resize(size,resample=1) # 1=LANCZOS resampling leads to higher quality pictures
     else:
         img.thumbnail(size,resample=1)
-    filename = secure_filename(file.filename)
+    filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
     filepath = os.path.join(app.config[folder], filename)
     os.makedirs(app.config[folder], exist_ok=True)
     img.save(filepath)
@@ -215,6 +265,17 @@ def resize_upload_image(file,size,user_id,listing_id,folder,type,variant):
         )
 
     return new_image
+
+def delete_images(listing_id):
+    # first query the filepaths so the files on disk can be deleted
+    images = db.session.execute(sa.select(Image).where(Image.listingID == listing_id)).scalars()
+    for image in images:
+        if image is not None and os.path.exists(image.filepath):
+            os.remove(image.filepath)
+            # then delete images in database
+            db.session.delete(image)
+            db.session.commit()
+
 
 # Categories
 @app.route("/categories", methods=["GET"])
