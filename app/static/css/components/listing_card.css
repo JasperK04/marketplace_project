@@ -3,6 +3,7 @@
 .listing-card {
     padding: 1em;
     width: fit-content;
+    max-width: 96%;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
 

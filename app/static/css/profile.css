@@ -1,1 +1,79 @@
-@import url(components/listing_grid.css)
+@import url(components/listing_grid.css);
+@import url(components/listing_card.css);
+@import url(colors.css);
+
+hr {
+    margin: 2.5dvh 0px;
+}
+
+.listings {
+    margin: 0;
+}
+
+.profile_page {
+    margin: 3dvh auto;
+    width: 80dvw;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 15px;
+
+    .profile_container {
+        padding: 10px 15px;  
+
+        > h1 {
+            margin: 0 0 12px 0;
+        }
+
+        > a {
+            background-color: var(--color-tertiary);
+            color: var(--color-background);
+            padding: 8px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: bold;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+
+        > a:hover {
+            background-color: var(--color-quaternary);
+        }
+    }
+}
+
+@media (max-width: 630px) {
+
+    .listing-card {
+        max-width: fit-content;
+
+        > a {
+            flex-direction: column;
+        }
+
+        .listing-image {
+            width: 300px;
+            height: 200px;
+    
+            > img {
+                border-radius: 5px 5px 0px 0px;
+            }
+        }
+    
+        .listing-content {
+            border-radius: 0px 0px 5px 5px;
+            width: unset;
+            flex-direction: row;
+            justify-content: space-between;
+
+            > .listing-price {
+                font-size: 1.25em;
+            }
+        }
+    }
+}
+
+@media (max-width: 490px) {
+    
+    .profile_page {
+        width: 90dvw;
+    }
+}
