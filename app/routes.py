@@ -78,6 +78,7 @@ def profile(user_id:int):
         db.session.query(Listing, Image.filename)
         .join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True)
         .filter(Listing.userID == user.id)
+        .filter(Listing.sold == False)
         .all()
     )
     for listing, filename in listings_with_images:
