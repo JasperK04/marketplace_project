@@ -21,8 +21,9 @@ def can_view_restricted_pages():
 @app.route("/", methods=["GET"])
 @app.route("/index", methods=["GET"])
 def index():
-    listings = Listing.find_open_listings()
-    return render_template("index.html", listings=listings)
+    listings = Listing.find_open_listings(limit=30) # pylint: disable=redefined-outer-name
+    categories = db.session.query(Category).all() # pylint: disable=redefined-outer-name
+    return render_template("index.html", listings=listings, categories=categories)
 
 
 @app.route("/login", methods=["GET", "POST"])

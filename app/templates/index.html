@@ -1,15 +1,45 @@
 {% extends 'base.html' %}
 {% block styles %}
-    <link rel="stylesheet" href="{{url_for('static', filename='/css/index.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/index.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_grid.css')}}">
 {% endblock %}
 {% block title %}
-    Marketplace
+Marketplace
 {% endblock %}
 {% block content %}
-    <div class="listings">
-        {% for listing in listings %}
-            {% include 'components/listing_card.html' %}
-        {% endfor %}
+    <div class="index">
+        <div class="index-container intro">
+            <h1>Welcome to the Marketplace!</h1>
+            <p>Here you can find a variety of listings from different categories. Feel free to browse through the listings and
+                find what you are looking for.</p>
+        </div>
+        <div class="index-container categories-container">
+            <h2 class="category-meta">Categories</h2>
+            <div class="category-list">
+                {% for category in categories %}
+                <div class="category-card">
+                        <h3>{{ category.name }}</h3>
+                        <p>{{ category.description }}</p>
+                        <button class="outline">
+                            <a href="{{ url_for('category', category_id=category.id) }}">View Listings</a>
+                        </button>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="index-container listings-container">
+            <div class="listing-meta">
+                <h2>Open Listings</h2>
+                <button class="outline">
+                    <a href="{{ url_for('listings') }}">View All</a>
+                </button>
+            </div>
+            <div class="listings">
+                {% for listing in listings %}
+                {% include 'components/listing_card.html' %}
+                {% endfor %}
+            </div>
+        </div>
     </div>
 {% endblock %}
