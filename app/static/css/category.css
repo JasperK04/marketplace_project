@@ -1,0 +1,13 @@
+.category {
+    padding: 1em;
+    width: fit-content;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin: 1em;
+
+    .category-meta {
+        margin: 1rem 5rem 0rem 5rem;
+
+    }
+
+}
