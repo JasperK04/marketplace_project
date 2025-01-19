@@ -76,5 +76,7 @@ class Listing(PaginatedAPIMixin, db.Model):
         return normalized
 
     @staticmethod
-    def find_open_listings():
+    def find_open_listings(limit:int|None=None):
+        if limit:
+            return db.session.execute(select(Listing).where(~Listing.sold, ~Listing.is_deactivated).limit(limit)).scalars().all()
         return db.session.execute(select(Listing).where(~Listing.sold, ~Listing.is_deactivated)).scalars().all()
