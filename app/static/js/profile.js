@@ -3,37 +3,20 @@
     * - Handles deactivating and reactivating users
 */
 
+import confirmModal from './confirmModal.js';
+import { deactivate as deactivateUser, reactivate as reactivateUser } from './activationFunctions.js';
+
 
 const deactivate_button = document.getElementById('deactivate-user');
 if (deactivate_button) {
     deactivate_button.addEventListener('click', function() {
-        const user_id = window.location.pathname.split('/').pop();
-        fetch(`/api/admin/users/${user_id}/deactivate`, {
-            method: 'POST',
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Failed to deactivate listing');
-            }
-        });
+        confirmModal('Deactivate User', 'Are you sure you want to deactivate this user?\nThis will also deactivate all their listings', "users", deactivateUser);
     });
 }
 
 const reactivate_button = document.getElementById('reactivate-user');
 if (reactivate_button) {
     reactivate_button.addEventListener('click', function() {
-        const user_id = window.location.pathname.split('/').pop();
-        fetch(`/api/admin/users/${user_id}/reactivate`, {
-            method: 'POST',
-        })
-        .then(response => {
-            if (response.ok) {
-                window.location.reload();
-            } else {
-                alert('Failed to reactivate listing');
-            }
-        });
+        confirmModal('Reactivate User', 'Are you sure you want to reactivate this user?\nThis will not reactivate their listings', "users",reactivateUser);
     });
 }
