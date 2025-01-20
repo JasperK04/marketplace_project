@@ -32,6 +32,12 @@ pip install -r requirements.txt
 flask cli recreate-db
 ```
 
+### (Optional) Create admin user
+
+```bash
+flask cli create-admin
+```
+
 ### Run the server
 
 ```bash
