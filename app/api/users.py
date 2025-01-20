@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from flask import request, url_for
 from app.extensions import db
 from app.api import api
-from app.api.errors import bad_request
+from app.api.errors import bad_request, not_found
 from app.models.User import User
 from app.models.Listing import Listing
 from app.api.auth import token_auth
@@ -15,7 +15,8 @@ def get_user(id:int):
 
 @api.route("/users/<username>", methods=["GET"])
 def get_user_by_username(username:str):
-    return db.get_or_404(User, username).to_dict()
+    user = db.session.scalar(sa.select(User).where(User.username == username))
+    return user.to_dict() if user else not_found("cannot find this user")
 
 
 @api.route("/users/", methods=["GET"])
