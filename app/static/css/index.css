@@ -58,6 +58,19 @@
                 box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
             }
 
+
+
+        }
+
+        @media screen and (max-width: 800px) {
+            .category-meta {
+                margin:0;
+            }
+
+            .category-list {
+                margin:0;
+            }
+
         }
     }
 
@@ -72,6 +85,14 @@
             a {
                 text-decoration: none;
                 color: inherit;
+            }
+
+        }
+
+        @media screen and (max-width: 800px) {
+            .listing-meta {
+                margin:0;
+                flex-direction: column;
             }
 
         }
