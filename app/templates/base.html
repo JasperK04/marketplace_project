@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Marketplace{% endblock %}</title>
     <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
+    <script src="{{url_for('static', filename='js/menu.js')}}" defer></script>
     {% block styles %}
     {% endblock %}
     {% block scripts %}
@@ -16,7 +17,7 @@
     <div class="header">
         <!-- first logo img, then other links, then next pages -->
 
-        <nav class="nav nav-container">
+        <nav class="nav-container horizontal">
             <div class="links-container">
                 <div class="logo-header">
                     <a href="{{ url_for('routes.index') }}">
@@ -24,7 +25,7 @@
                     </a>
                 </div>
 
-                <div class="nav links">
+                <div class="links">
                     <a href="{{ url_for('routes.listings') }}">Listings</a>
                     <a href="{{ url_for('routes.categories') }}">Categories</a>
                 </div>
@@ -34,13 +35,7 @@
                 </div>
             </div>
 
-            <!-- potential searchbar -->
-            <form class="searchbar" style="display: none;">
-                <input type="search" class="searchbar-field" id="searchbar" name="searchbar" placeholder="search"
-                    disabled="">
-            </form>
-
-            <div class="nav user">
+            <div class="user">
                 {% if current_user.is_anonymous %}
                     <div class="login">
                         <a class="btn" href="{{ url_for('routes.login') }}">Login</a>
@@ -55,8 +50,30 @@
                         <a class="btn" href="{{ url_for('routes.logout')}}">Logout</a>
                     </div>
                 {% endif %}
-
+            </div>
         </nav>
+        <nav class="nav-container-vertical vertical">
+            <div class="logo-header">
+                <a href="{{ url_for('routes.index') }}">
+                    <img src="images/placeholder.png" alt="Marketplace logo">
+                </a>
+            </div>
+            <button class="btn" id="menu-button">
+                Menu
+            </div>
+        </nav>
+    </div>
+    <div id="vertical-menu">
+            <a href="{{ url_for('routes.listings') }}">Listings</a>
+            <a href="{{ url_for('routes.categories') }}">Categories</a>
+            <a class="btn" href="{{ url_for('routes.add_listing')}}">Add listing</a>
+            {% if current_user.is_anonymous %}
+                <a class="btn" href="{{ url_for('routes.login') }}">Login</a>
+                <a class="btn" href="{{ url_for('routes.register' )}}">Sign Up!</a>
+            {% else %}
+                <a href="{{ url_for('routes.profile', user_id=current_user.id) }}">My Profile</a>
+                <a class="btn" href="{{ url_for('routes.logout')}}">Logout</a>
+            {% endif %}
     </div>
 
     {% with messages=get_flashed_messages() %}
