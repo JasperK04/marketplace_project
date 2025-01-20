@@ -1,14 +1,14 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField,FileAllowed,FileRequired
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, SelectField, RadioField
+from flask_wtf.file import FileField,FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 import sqlalchemy as sa
-from app import db
+from app.extensions import db
 from app.models.User import User
-from app.models.Category import Category
 
 class RegistrationForm(FlaskForm):
-    name = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    username = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(),Length(15,65)])
     password2 = PasswordField(
@@ -33,12 +33,12 @@ class ListingForm(FlaskForm):
     title = StringField('Title',validators=[DataRequired()])
     category = RadioField('Category', validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
-    price = FloatField('Price',validators=[DataRequired()])
-    file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
-    submit = SubmitField('Create listing')
+    price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
+    file = FileField('Upload image',validators=[FileAllowed(['jpg', 'jpeg','png'])])
+    submit = SubmitField('Submit')
 
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     about_me = TextAreaField('About Me')
     submit = SubmitField('Save Changes')

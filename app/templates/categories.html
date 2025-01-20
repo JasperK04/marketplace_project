@@ -4,17 +4,20 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
 {% endblock %}
 {% block content %}
-<div class="container">
-    <h1>Categories</h1>
-    {% for data in categories.values() %}
-    <div>
+<h1>Categories</h1>
+{% for data in categories.values() %}
+<div class="category">
+    <div class="category-header">
         <h2>{{ data["category"].name }}</h2>
-        <div class="listings">
-            {% for listing in data["listings"] %}
-                {% include 'components/listing_card.html' %}
-            {% endfor %}
-        </div>
+        <button class="outline">
+            <a href="{{ url_for('routes.category', category_id=data['category'].id) }}">View All</a>
+        </button>
     </div>
-    {% endfor %}
+    <div class="listings">
+        {% for listing in data["listings"] %}
+        {% include 'components/listing_card.html' %}
+        {% endfor %}
+    </div>
 </div>
+{% endfor %}
 {% endblock %}

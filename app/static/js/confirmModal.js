@@ -1,4 +1,4 @@
-export default function confirmModal(title, message, callback) {
+export default function confirmModal(title, message, type=null, callback) {
     const modal = document.getElementById('confirm-modal');
     const confirm_button = document.getElementById('confirm-purchase');
     const cancel_button = document.getElementById('cancel-purchase');
@@ -10,7 +10,11 @@ export default function confirmModal(title, message, callback) {
     modal_message.innerText = message;
 
     confirm_button.addEventListener('click', function() {
-        callback();
+        if (type) {
+            callback(type);
+        } else {
+            callback();
+        }
         modal.close();
     });
 
