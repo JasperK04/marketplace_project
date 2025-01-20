@@ -66,9 +66,6 @@ def deactivate_user_by_username(username:str):
     """
     if not is_allowed_to_take_admin_action():
         return unauthorized("You do not have permission to perform this action")
-    data = request.get_json()
-    if not all(name in data for name in ["username"]):
-        return bad_request('must include an username')
     user = db.session.execute(sa.select(User).where(User.username == username)).scalar()
     if user is None:
         return not_found("User not found")
