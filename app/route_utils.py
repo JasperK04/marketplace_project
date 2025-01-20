@@ -1,10 +1,16 @@
 import uuid
+import os
+import sqlalchemy as sa
 from PIL import Image as IM
 from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.models.Listing import Listing
 from app.models.Image import Image
+from app.config import config
+
+app_config = config[os.getenv("FLASK_ENV", "development")]
+
 
 def get_open_listings_with_images(limit:int|None=None, by_user:int|None=None, by_category:int|None=None):
     listings = []
