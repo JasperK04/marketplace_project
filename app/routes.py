@@ -94,7 +94,7 @@ def register():
 
 
 # Profile stuff
-@app.route("/profile/<user_name>", methods=["GET"])
+@routes.route("/profile/<user_name>", methods=["GET"])
 def profile_by_name(user_name:str):
     print(user_name)
     user = db.session.scalar(select(User).where(User.username == user_name))
@@ -123,7 +123,7 @@ def profile_by_name(user_name:str):
     #    sa.select(Image).where(Image.userID == user.id)).scalars()
     return render_template("profile.html", user=user, listings=listings)
 
-@app.route("/profile/<int:user_id>", methods=["GET"])
+@routes.route("/profile/<int:user_id>", methods=["GET"])
 def profile(user_id:int):
     user = db.get_or_404(User, user_id)
     if user.is_deactivated and not can_view_restricted_pages():
