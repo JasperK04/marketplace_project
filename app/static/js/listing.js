@@ -24,7 +24,7 @@ if (reactivate_button) {
 const buy_button = document.getElementById('buy-listing');
 if (buy_button) {
     buy_button.addEventListener('click', () => {
-        confirmModal('Confirm Purchase', 'Are you sure you want to buy this listing?', buyListing);
+        confirmModal('Confirm Purchase', 'Are you sure you want to buy this listing?', null, buyListing);
     });
 }
 
