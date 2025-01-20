@@ -13,6 +13,10 @@ from app.api.auth import token_auth
 def get_user(id:int):
     return db.get_or_404(User, id).to_dict()
 
+@api.route("/users/<username>", methods=["GET"])
+def get_user_by_username(username:str):
+    return db.get_or_404(User, username).to_dict()
+
 
 @api.route("/users/", methods=["GET"])
 @api.route("/users", methods=["GET"])
@@ -62,12 +66,10 @@ def update_user():
     if 'name' in data:
         if data['name'] == user.name:
             return bad_request('New name can not be the same as previous')
-        if db.session.scalar(sa.select(User).where(
-                User.id != id and User.name == data['name'])):
-            return bad_request('Name already in use')
         if len(data["name"]) > 70 or len(data["name"]) < 1:
             return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
 
+    if 'username' in data:
         if data["username"] == user.username:
             return bad_request('New username can not be the same as previous.')
         if not User.valid_username(data['username']):
