@@ -16,11 +16,29 @@ hr {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 15px;
 
-    .profile_container {
+    > .profile_container {
         padding: 10px 15px;  
 
-        > h1 {
-            margin: 0 0 12px 0;
+        > .profile_main {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+
+            > .profile_picture img {
+                border-radius: 5px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            > .profile_name {
+                margin: 0 auto 12px auto;
+
+                > h1 {
+                    padding: 10px;
+                    margin: 0;
+                }
+            }
         }
 
         > a {
@@ -41,6 +59,16 @@ hr {
 }
 
 @media (max-width: 630px) {
+
+    .profile_page {
+    
+        .profile_container {
+            
+            .profile_main {
+                flex-direction: column;
+            }
+        }
+    }
 
     .listing-card {
         max-width: fit-content;
@@ -73,6 +101,9 @@ hr {
 
 @media (max-width: 490px) {
     
+    .container {
+        margin: 3dvh 2dvw;
+    }
     .profile_page {
         width: 90dvw;
     }
