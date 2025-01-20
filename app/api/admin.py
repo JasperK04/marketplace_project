@@ -55,6 +55,36 @@ def deactivate_user(id: int):
     db.session.commit()
     return user.to_dict()
 
+@admin.route("/users/<username>/deactivate", methods=["POST"])
+@admin.route("/users/<username>/deactivate/", methods=["POST"])
+@token_auth.login_required(optional=True)  # type: ignore
+def deactivate_user_by_username(username:str):
+    """
+    Deactivates a user account by username
+
+    Deactivated users cannot take actions, and all their listings are deactivated
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized("You do not have permission to perform this action")
+    data = request.get_json()
+    if not all(name in data for name in ["username"]):
+        return bad_request('must include an username')
+    user = db.session.execute(sa.select(User).where(User.username == username)).scalar()
+    if user is None:
+        return not_found("User not found")
+    user.deactivate()
+    user_listings = (
+        db.session.execute(sa.select(Listing).where(Listing.userID == user.id))
+        .scalars()
+        .all()
+    )
+    for listing in user_listings:
+        listing.deactivate()
+        db.session.add(listing)
+    db.session.add(user)
+    db.session.commit()
+    return user.to_dict()
+
 
 @admin.route("/users/<int:id>/reactivate", methods=["POST"])
 @admin.route("/users/<int:id>/reactivate/", methods=["POST"])
@@ -68,6 +98,26 @@ def reactivate_user(id: int):
     if not is_allowed_to_take_admin_action():
         return unauthorized("You do not have permission to perform this action")
     user = db.session.get(User, id)
+    if user is None:
+        return not_found("User not found")
+    user.reactivate()
+    db.session.add(user)
+    db.session.commit()
+    return user.to_dict()
+
+
+@admin.route("/users/<username>/reactivate", methods=["POST"])
+@admin.route("/users/<username>/reactivate/", methods=["POST"])
+@token_auth.login_required(optional=True)  # type: ignore
+def reactivate_user_by_username(username:str):
+    """
+    Reactivates the user account with username `username`
+
+    Note that this does not reactivate the listings of the user
+    """
+    if not is_allowed_to_take_admin_action():
+        return unauthorized("You do not have permission to perform this action")
+    user = db.session.execute(sa.select(User).where(User.username == username)).scalar()
     if user is None:
         return not_found("User not found")
     user.reactivate()
