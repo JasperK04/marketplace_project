@@ -36,6 +36,9 @@
             margin: 1rem 2.5rem;
 
             .category-card {
+                display:flex;
+                flex-direction:column;
+                justify-content: space-between;
                 padding: 1em;
                 width:10em;
                 box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
