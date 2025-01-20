@@ -7,17 +7,22 @@ from app.routes import routes
 from app.api import api
 from app.cli import cli
 from app.errors import register_error_handler
+from app.logging import setup_logging
 
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    app.config.from_object(config[getenv("FLASK_ENV", "development")])
+    enviroment = getenv("FLASK_ENV", "development")
+    app.config.from_object(config[enviroment])
 
     register_extensions(app)
     register_blueprints(app)
     register_error_handler(app)
 
     create_db(app)
+
+    if enviroment == "production":
+        setup_logging()
 
     return app
 
