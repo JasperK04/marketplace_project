@@ -34,7 +34,7 @@ class ListingForm(FlaskForm):
     category = RadioField('Category', validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
     price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
-    file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png'])])
+    file = FileField('Upload image',validators=[FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Submit')
 
 
