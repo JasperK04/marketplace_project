@@ -6,8 +6,8 @@ from app.api.errors import error_response
 
 
 @basic_auth.verify_password
-def verify_password(email:str, password:str):
-    user = db.session.scalar(sa.select(User).where(User.email == email))
+def verify_password(username:str, password:str):
+    user = db.session.scalar(sa.select(User).where(User.username == username))
     if user and user.check_password(password):
         return user
 

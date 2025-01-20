@@ -3,7 +3,7 @@ import sqlalchemy as sa
 from flask import request, url_for
 from app.extensions import db
 from app.api import api
-from app.api.errors import bad_request
+from app.api.errors import bad_request, not_found
 from app.models.User import User
 from app.models.Listing import Listing
 from app.api.auth import token_auth
@@ -12,6 +12,11 @@ from app.api.auth import token_auth
 @api.route("/users/<int:id>", methods=["GET"])
 def get_user(id:int):
     return db.get_or_404(User, id).to_dict()
+
+@api.route("/users/<username>", methods=["GET"])
+def get_user_by_username(username:str):
+    user = db.session.scalar(sa.select(User).where(User.username == username))
+    return user.to_dict() if user else not_found("cannot find this user")
 
 
 @api.route("/users/", methods=["GET"])
@@ -62,12 +67,10 @@ def update_user():
     if 'name' in data:
         if data['name'] == user.name:
             return bad_request('New name can not be the same as previous')
-        if db.session.scalar(sa.select(User).where(
-                User.id != id and User.name == data['name'])):
-            return bad_request('Name already in use')
         if len(data["name"]) > 70 or len(data["name"]) < 1:
             return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
 
+    if 'username' in data:
         if data["username"] == user.username:
             return bad_request('New username can not be the same as previous.')
         if not User.valid_username(data['username']):
