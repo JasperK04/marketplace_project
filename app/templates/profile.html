@@ -8,7 +8,9 @@
 <script src="{{url_for('static', filename='js/profile.js')}}" defer type="module"></script>
 {% endblock scripts %}
 {% block content %}
+
 <div class="profile_page">
+    <div class="profile_container">    
     <h1>
         {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}'s Profile
         {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
@@ -35,9 +37,16 @@
         </p>
     {% endif %}
 
+    <hr/>
+
+    <h2 id="about_me">About Me</h2>
+    {% if user.about_me %}
+        <p>{{ user.about_me }}</p>
+    {% else %}
+        <p>This user has not written a custom description yet</p>
+    {% endif %}
+
     <!-- TODO: Add possibility to add profile photo to user profile -->
-
-
 
     <h2 id="current_listings">Current Listings</h2>
     <div class="listings">
@@ -47,6 +56,6 @@
     </div>
 </div>
 
-    {% include 'components/confirm_modal.html' %}
+{% include 'components/confirm_modal.html' %}
 
-    {% endblock %}
+{% endblock %}
