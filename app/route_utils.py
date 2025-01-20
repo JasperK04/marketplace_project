@@ -1,10 +1,17 @@
 import uuid
+import os
+import sqlalchemy as sa
+
 from PIL import Image as IM
 from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.models.Listing import Listing
 from app.models.Image import Image
+from app.config import config
+
+app_config = config[os.getenv("FLASK_ENV", "development")]
+
 
 def get_open_listings_with_images(limit:int|None=None, by_user:int|None=None, by_category:int|None=None):
     listings = []
@@ -66,19 +73,28 @@ def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
             type=type,
             userID=user_id,
             variant=variant,
-        )
-
+        )   
     return new_image
 
 
-def delete_images(listing_id:int):
+def delete_images(id:int,variant:str):
     # first query the filepaths so the files on disk can be deleted
-    images = db.session.execute(
-        sa.select(Image).where(Image.listingID == listing_id)
-    ).scalars()
-    for image in images:
+    if variant == "listing":
+        images = db.session.execute(
+            sa.select(Image).where(Image.listingID == id)
+        ).scalars()
+        for image in images:
+            if image and os.path.exists(image.filepath):
+                os.remove(image.filepath)
+                # then delete images in database
+                db.session.delete(image)
+                db.session.commit()
+    else:
+        image = db.session.execute(
+            sa.select(Image).where(Image.userID == id)
+        ).scalar()
         if image and os.path.exists(image.filepath):
             os.remove(image.filepath)
-            # then delete images in database
+            # then delete image in database
             db.session.delete(image)
             db.session.commit()
