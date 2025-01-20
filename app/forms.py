@@ -1,11 +1,10 @@
 from flask_wtf import FlaskForm
-from flask_wtf.file import FileField,FileAllowed,FileRequired
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, FloatField, SelectField, RadioField
+from flask_wtf.file import FileField,FileAllowed
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, RadioField
 from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Length, Regexp
 import sqlalchemy as sa
-from app import db
+from app.extensions import db
 from app.models.User import User
-from app.models.Category import Category
 
 class RegistrationForm(FlaskForm):
     name = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
