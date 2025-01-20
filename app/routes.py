@@ -3,10 +3,7 @@ from flask_login import current_user, login_user, logout_user, login_required
 import sqlalchemy as sa
 from sqlalchemy import select
 from urllib.parse import urlsplit
-from werkzeug.utils import secure_filename
 import os
-import uuid
-from PIL import Image as IM
 
 
 from app.extensions import db
@@ -16,6 +13,7 @@ from app.models.User import User
 from app.models.Listing import Listing
 from app.models.Category import Category
 from app.models.Image import Image
+from app.route_utils import get_open_listings_with_images, resize_upload_image, delete_images
 
 app_config = config[os.getenv("FLASK_ENV", "development")]
 
@@ -29,9 +27,8 @@ def can_view_restricted_pages():
 @routes.route("/", methods=["GET"])
 @routes.route("/index", methods=["GET"])
 def index():
-    listings = Listing.find_open_listings(
-        limit=30
-    )  # pylint: disable=redefined-outer-name
+    listings = get_open_listings_with_images(limit=30)
+
     categories = db.session.query(
         Category
     ).all()  # pylint: disable=redefined-outer-name
@@ -102,22 +99,7 @@ def profile_by_name(user_name:str):
         return redirect(url_for('index'))
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for('index'))
-    listings = []
-    listings_with_images = (
-        db.session.query(Listing, Image.filename)
-        .join(Image, (Image.listingID == Listing.id) & (Image.variant == 'original'), isouter=True)
-        .filter(Listing.userID == user.id)
-        .all()
-    )
-    for listing, filename in listings_with_images:
-        if not listing.is_deactivated:
-            if filename:
-                listing = listing.to_dict()
-                listing["filename"] = filename
-                listings.append(listing)
-            else:
-                listings.append(listing.to_dict())
-
+    listings = get_open_listings_with_images(by_user=user.id)
     # Will get this sorted out later, hopefully
     # profile_pic = db.session.execute(
     #    sa.select(Image).where(Image.userID == user.id)).scalars()
@@ -128,27 +110,7 @@ def profile(user_id:int):
     user = db.get_or_404(User, user_id)
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for("routes.index"))
-    listings = []
-    listings_with_images = (
-        db.session.query(Listing, Image.filename)
-        .join(
-            Image,
-            (Image.listingID == Listing.id) & (Image.variant == "original"),
-            isouter=True,
-        )
-        .filter(Listing.userID == user.id)
-        .filter(Listing.sold == False)
-        .all()
-    )
-    for listing, filename in listings_with_images:
-        if not listing.is_deactivated:
-            if filename:
-                listing = listing.to_dict()
-                listing["filename"] = filename
-                listings.append(listing)
-            else:
-                listings.append(listing.to_dict())
-
+    listings = get_open_listings_with_images(by_user=user_id)
     # Will get this sorted out later, hopefully
     # profile_pic = db.session.execute(
     #    sa.select(Image).where(Image.userID == user.id)).scalars()
@@ -159,13 +121,7 @@ def profile(user_id:int):
 @login_required
 def edit_profile(user_id):
     user = db.get_or_404(User, user_id)
-    listings = (
-        db.session.execute(  # pylint: disable=redefined-outer-name
-            sa.select(Listing).where(Listing.userID == user.id)
-        )
-        .scalars()
-        .all()
-    )
+    listings = get_open_listings_with_images(by_user=user_id)
 
     if user.id != current_user.id:
         flash("You are not allowed to edit this profile.")
@@ -185,31 +141,7 @@ def edit_profile(user_id):
 # Listings
 @routes.route("/listings", methods=["GET"])
 def listings():
-    listings = []
-    listings_with_images = (
-        db.session.query(Listing, Image.filename)
-        .join(
-            Image,
-            (Image.listingID == Listing.id) & (Image.variant == "original"),
-            isouter=True,
-        )
-        .all()
-    )
-    for listing, filename in listings_with_images:
-        if (
-            not listing.sold and not listing.is_deactivated
-        ):  # instead of the Listing.find_open_listings()
-            if filename:
-                listing = listing.to_dict()
-                listing["filename"] = filename
-                listings.append(listing)
-            else:
-                listings.append(listing.to_dict())
-
-    # Find all unsold, active listings
-    # listings = Listing.find_open_listings()
-    # listings = db.session.query(Listing).all()
-
+    listings = get_open_listings_with_images()
     return render_template("listings.html", listings=listings)
 
 
@@ -341,55 +273,6 @@ def delete_listing(listing_id:int):
     return redirect(
         url_for("routes.profile", user_id=current_user.id)
     )  # this depends on where the edit button/link will be placed
-
-
-def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
-    image = IM.open(file)
-    img = image.copy()
-
-    # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used
-    if img.width < size[0] or img.height < size[1]:
-        img = img.resize(
-            size, resample=1
-        )  # 1=LANCZOS resampling leads to higher quality pictures
-    else:
-        img.thumbnail(size, resample=1)
-    filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
-    folder = app_config.UPLOAD_FOLDER if folder == "UPLOAD_FOLDER" else app_config.RESIZED_FOLDER
-    os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, filename)
-    img.save(filepath)
-    if type == "listing":
-        new_image = Image(
-            filename=filename,
-            filepath=filepath,
-            type=type,
-            listingID=listing_id,
-            variant=variant,
-        )
-    else:
-        new_image = Image(
-            filename=filename,
-            filepath=filepath,
-            type=type,
-            userID=user_id,
-            variant=variant,
-        )
-
-    return new_image
-
-
-def delete_images(listing_id:int):
-    # first query the filepaths so the files on disk can be deleted
-    images = db.session.execute(
-        sa.select(Image).where(Image.listingID == listing_id)
-    ).scalars()
-    for image in images:
-        if image and os.path.exists(image.filepath):
-            os.remove(image.filepath)
-            # then delete images in database
-            db.session.delete(image)
-            db.session.commit()
 
 
 # Categories

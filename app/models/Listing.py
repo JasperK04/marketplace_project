@@ -31,7 +31,7 @@ class Listing(PaginatedAPIMixin, db.Model):
                 "name": seller.name
             },
             "title": self.title,
-            "price": self.price / 100,
+            "price": format((self.price / 100), '.2f'),
             "description": self.description,
             "category": {
                 "id": self.categoryID,
