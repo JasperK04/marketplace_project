@@ -12,11 +12,12 @@ from app.models.mixin import PaginatedAPIMixin, UserMixin
 
 class User(PaginatedAPIMixin, UserMixin, db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(nullable=False)
+    username: Mapped[str] = mapped_column(String(20), nullable=False, unique=True, index=True)
+    name: Mapped[str] = mapped_column(String(70),nullable=False)
     password_hash: Mapped[str] = mapped_column(nullable=False)
     email: Mapped[str] = mapped_column(nullable=False, unique=True)
-    is_admin: Mapped[bool] = mapped_column(nullable=False, server_default="0")
-    is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
+    is_admin: Mapped[bool] = mapped_column(nullable=False, insert_default=False)
+    is_deactivated: Mapped[bool] = mapped_column(nullable=False, insert_default=False)
     about_me: Mapped[str] = mapped_column(String(140), nullable=True)
     token: Mapped[Optional[str]] = mapped_column(String(32), index=True, unique=True)
     token_expiration: Mapped[Optional[datetime]]
@@ -28,11 +29,15 @@ class User(PaginatedAPIMixin, UserMixin, db.Model):
         return check_password_hash(self.password_hash, password)
 
     def to_dict(self):
-        data: dict[str, str | int] = {"id": self.id, "name": self.name}
+        data: dict[str, str|int] = {
+            'id': self.id,
+            'username': self.username,
+            'name': self.name
+        }
         return data
 
-    def from_dict(self, data: dict[str, str], new_user: bool = False):
-        for field in ["name", "email"]:
+    def from_dict(self, data:dict[str, str], new_user:bool=False):
+        for field in ['username', 'name', 'email']:
             if field in data:
                 setattr(self, field, data[field])
         if new_user and "password" in data:

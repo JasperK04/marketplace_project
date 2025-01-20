@@ -105,21 +105,23 @@ def create_user():
         return unauthorized("You do not have permission to perform this action")
 
     data = request.get_json()
-    if not all(name in data for name in ["name", "email", "password"]):
-        return bad_request("must include a name, email and a password")
-    data["email"] = data["email"].lower()
-    if not User.valid_username(data["name"]):
-        return bad_request(
-            "Username does not meet requirements.\nUsername must only contain alpha-numeric characters."
-        )
-    if not User.valid_email(data["email"]):
-        return bad_request("This is not a valid email address")
-    if db.session.scalar(sa.select(User).where(User.email == data["email"])):
-        return bad_request("Email address already in use")
-    if not User.valid_password(data["password"]):
-        return bad_request(
-            "Password does not meet requirements\nPassword must be between 15 and 64 characters long."
-        )
+    if not all(name in data for name in ["username", "name", "email", "password"]):
+        return bad_request('must include an username, a name, email and a password')
+    data['email'] = data['email'].lower()
+    if not User.valid_username(data['username']):
+        return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
+    if db.session.scalar(sa.select(User).where(
+            User.username == data['username'])):
+        return bad_request('Username already in use')
+    if len(data["name"]) > 70 or len(data["name"]) < 1:
+        return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
+    if not User.valid_email(data['email']):
+        return bad_request('This is not a valid email address')
+    if db.session.scalar(sa.select(User).where(
+            User.email == data['email'])):
+        return bad_request('Email address already in use')
+    if not User.valid_password(data['password']):
+        return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
     user = User().from_dict(data, new_user=True).make_admin()
     db.session.add(user)
     db.session.commit()

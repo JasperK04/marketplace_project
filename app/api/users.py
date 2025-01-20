@@ -26,21 +26,23 @@ def get_users():
 @api.route("/users", methods=["POST", "PUT"])
 def create_user():
     data = request.get_json()
-    if not all(name in data for name in ["name", "email", "password"]):
-        return bad_request("must include a name, email and a password")
-    data["email"] = data["email"].lower()
-    if not User.valid_username(data["name"]):
-        return bad_request(
-            "Username does not meet requirements.\nUsername must only contain alpha-numeric characters."
-        )
-    if not User.valid_email(data["email"]):
-        return bad_request("This is not a valid email address")
-    if db.session.scalar(sa.select(User).where(User.email == data["email"])):
-        return bad_request("Email address already in use")
-    if not User.valid_password(data["password"]):
-        return bad_request(
-            "Password does not meet requirements\nPassword must be between 15 and 64 characters long."
-        )
+    if not all(name in data for name in ["username", "name", "email", "password"]):
+        return bad_request('must include an username, a name, email and a password')
+    data['email'] = data['email'].lower()
+    if not User.valid_username(data['username']):
+        return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
+    if db.session.scalar(sa.select(User).where(
+            User.username == data['username'])):
+        return bad_request('Username already in use')
+    if len(data["name"]) > 70 or len(data["name"]) < 1:
+        return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
+    if not User.valid_email(data['email']):
+        return bad_request('This is not a valid email address')
+    if db.session.scalar(sa.select(User).where(
+            User.email == data['email'])):
+        return bad_request('Email address already in use')
+    if not User.valid_password(data['password']):
+        return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
     user = User().from_dict(data, new_user=True)
     db.session.add(user)
     db.session.commit()
@@ -57,33 +59,36 @@ def update_user():
     user = db.get_or_404(User, id)
     data = request.get_json()
 
-    if "name" in data:
-        if data["name"] == user.name:
-            return bad_request("New name can not be the same as previous")
-        elif not User.valid_username(data["name"]):
-            return bad_request(
-                "Username does not meet requirements.\nUsername must only contain alpha-numeric characters."
-            )
+    if 'name' in data:
+        if data['name'] == user.name:
+            return bad_request('New name can not be the same as previous')
+        if db.session.scalar(sa.select(User).where(
+                User.id != id and User.name == data['name'])):
+            return bad_request('Name already in use')
+        if len(data["name"]) > 70 or len(data["name"]) < 1:
+            return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
 
-    if "password" in data:
-        if user.check_password(data["password"]):
-            return bad_request("New password can not be the same as previous")
-        if not User.valid_password(data["password"]):
-            return bad_request(
-                "Password does not meet requirements\nPassword must be between 15 and 64 characters long."
-            )
+        if data["username"] == user.username:
+            return bad_request('New username can not be the same as previous.')
+        if not User.valid_username(data['username']):
+            return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
+
+    if 'password' in data:
+        if user.check_password(data['password']):
+            return bad_request('New password can not be the same as previous')
+        if not User.valid_password(data['password']):
+            return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
         new_password = True
 
-    if "email" in data:
-        data["email"] = data["email"].lower()
-        if data["email"] == user.email:
-            return bad_request("New email can not be the same as previous")
-        elif not User.valid_email(data["email"]):
-            return bad_request("This is not a valid email address")
-        elif db.session.scalar(
-            sa.select(User).where(User.id != id and User.email == data["email"])
-        ):
-            return bad_request("Email address already in use")
+    if 'email' in data:
+        data['email'] = data['email'].lower()
+        if data['email'] == user.email:
+            return bad_request('New email can not be the same as previous')
+        if not User.valid_email(data['email']):
+            return bad_request('This is not a valid email address')
+        if db.session.scalar(sa.select(User).where(
+                User.id != id and User.email == data['email'])):
+            return bad_request('Email address already in use')
 
     user.from_dict(data, new_password)
     db.session.commit()

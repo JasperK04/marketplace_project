@@ -7,7 +7,8 @@ from app.extensions import db
 from app.models.User import User
 
 class RegistrationForm(FlaskForm):
-    name = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    username = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     email = StringField('Email', validators=[DataRequired(), Email()])
     password = PasswordField('Password', validators=[DataRequired(),Length(15,65)])
     password2 = PasswordField(
@@ -33,11 +34,11 @@ class ListingForm(FlaskForm):
     category = RadioField('Category', validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
     price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
-    file = FileField('Upload image',validators=[FileAllowed(['jpg', 'jpeg','png', 'gif', 'svg'])])
+    file = FileField('Upload image',validators=[FileRequired(),FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Submit')
 
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$",message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')])
+    name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     about_me = TextAreaField('About Me')
     submit = SubmitField('Save Changes')

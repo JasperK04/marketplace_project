@@ -21,15 +21,14 @@ class Listing(PaginatedAPIMixin, db.Model):
     is_deactivated: Mapped[bool] = mapped_column(nullable=False, server_default="0")
 
     def to_dict(self):
-        data: dict[
-            str, int | dict[str, int | str | None] | str | float | bool | datetime
-        ] = {
-            "id": self.id,
-            "seller": {
+        seller = db.session.scalar(select(User).where(User.id == self.userID))
+
+        data: dict[str, int | dict[str, int | str | None] | str | float | bool | datetime] = {
+            'id': self.id,
+            'seller': {
                 "id": self.userID,
-                "name": db.session.scalar(
-                    select(User.name).where(User.id == self.userID)
-                ),
+                "username": seller.username,
+                "name": seller.name
             },
             "title": self.title,
             "price": self.price / 100,
