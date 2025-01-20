@@ -3,7 +3,8 @@ from flask import Blueprint
 import click
 import sqlalchemy as sa
 from faker import Faker
-from app import db
+
+from app.extensions import db
 from app.models.User import User
 from app.models.Listing import Listing
 from app.models.Category import Category
@@ -18,24 +19,179 @@ def initialize_database(users: int, listings: int):
     """Drops the current database and creates a new one with faked data."""
     fake = Faker()
     categories: dict[str, dict[str, list[str] | str]] = {
-        "Electronics": {'keywords': ["smartphone", "laptop", "tablet", "headphones", "camera", "smartwatch", "monitor", "printer", "router", "speaker"], 'description': "Electronic devices and gadgets."},
-        "Clothing": {"keywords": ["t-shirt", "jeans", "jacket", "dress", "shoes", "hat", "scarf", "socks", "blouse", "suit"], 'description': "Apparel and accessories."},
-        "Books": {"keywords": ["novel", "cookbook", "biography", "textbook", "poetry collection", "graphic novel", "dictionary", "manual", "guidebook", "memoir"], 'description': "Literature and educational materials."},
-        "Home & Garden": {"keywords": ["sofa", "table", "chair", "lamp", "rug", "blender", "microwave", "garden tools", "plant pot", "shelf"], 'description': "Furniture and home improvement items."},
-        "Fashion & Beauty": {"keywords": ["lipstick", "perfume", "makeup kit", "nail polish", "handbag", "watch", "sunglasses", "skincare set", "bracelet", "necklace"], 'description': "Beauty products and fashion accessories."},
-        "Sport": {"keywords": ["soccer ball", "basketball", "tennis racket", "yoga mat", "helmet", "bicycle", "weights", "swimsuit", "golf club", "sneakers"], 'description': "Sporting goods and fitness equipment."},
-        "Toys": {"keywords": ["action figure", "doll", "lego set", "board game", "puzzle", "plush toy", "toy car", "building blocks", "playset", "remote control car"], 'description': "Children's toys and games."},
-        "Vehicles": {"keywords": ["car", "motorcycle", "bicycle", "scooter", "truck", "boat", "trailer", "camper", "ATV", "skateboard"], 'description': "Various types of vehicles and related accessories."},
-        "Music": {"keywords": ["guitar", "piano", "violin", "drum set", "microphone", "amplifier", "headphones", "record player", "flute", "trumpet"], 'description': "Musical instruments and audio equipment."},
-        "Other": {"keywords": ["antique", "art piece", "collectible", "instrument", "tool", "pet supplies", "hobby kit", "gift card", "novelty item", "unknown item"], 'description': "Miscellaneous items that do not fit into other categories."},
+        "Electronics": {
+            "keywords": [
+                "smartphone",
+                "laptop",
+                "tablet",
+                "headphones",
+                "camera",
+                "smartwatch",
+                "monitor",
+                "printer",
+                "router",
+                "speaker",
+            ],
+            "description": "Electronic devices and gadgets.",
+        },
+        "Clothing": {
+            "keywords": [
+                "t-shirt",
+                "jeans",
+                "jacket",
+                "dress",
+                "shoes",
+                "hat",
+                "scarf",
+                "socks",
+                "blouse",
+                "suit",
+            ],
+            "description": "Apparel and accessories.",
+        },
+        "Books": {
+            "keywords": [
+                "novel",
+                "cookbook",
+                "biography",
+                "textbook",
+                "poetry collection",
+                "graphic novel",
+                "dictionary",
+                "manual",
+                "guidebook",
+                "memoir",
+            ],
+            "description": "Literature and educational materials.",
+        },
+        "Home & Garden": {
+            "keywords": [
+                "sofa",
+                "table",
+                "chair",
+                "lamp",
+                "rug",
+                "blender",
+                "microwave",
+                "garden tools",
+                "plant pot",
+                "shelf",
+            ],
+            "description": "Furniture and home improvement items.",
+        },
+        "Fashion & Beauty": {
+            "keywords": [
+                "lipstick",
+                "perfume",
+                "makeup kit",
+                "nail polish",
+                "handbag",
+                "watch",
+                "sunglasses",
+                "skincare set",
+                "bracelet",
+                "necklace",
+            ],
+            "description": "Beauty products and fashion accessories.",
+        },
+        "Sport": {
+            "keywords": [
+                "soccer ball",
+                "basketball",
+                "tennis racket",
+                "yoga mat",
+                "helmet",
+                "bicycle",
+                "weights",
+                "swimsuit",
+                "golf club",
+                "sneakers",
+            ],
+            "description": "Sporting goods and fitness equipment.",
+        },
+        "Toys": {
+            "keywords": [
+                "action figure",
+                "doll",
+                "lego set",
+                "board game",
+                "puzzle",
+                "plush toy",
+                "toy car",
+                "building blocks",
+                "playset",
+                "remote control car",
+            ],
+            "description": "Children's toys and games.",
+        },
+        "Vehicles": {
+            "keywords": [
+                "car",
+                "motorcycle",
+                "bicycle",
+                "scooter",
+                "truck",
+                "boat",
+                "trailer",
+                "camper",
+                "ATV",
+                "skateboard",
+            ],
+            "description": "Various types of vehicles and related accessories.",
+        },
+        "Music": {
+            "keywords": [
+                "guitar",
+                "piano",
+                "violin",
+                "drum set",
+                "microphone",
+                "amplifier",
+                "headphones",
+                "record player",
+                "flute",
+                "trumpet",
+            ],
+            "description": "Musical instruments and audio equipment.",
+        },
+        "Other": {
+            "keywords": [
+                "antique",
+                "art piece",
+                "collectible",
+                "instrument",
+                "tool",
+                "pet supplies",
+                "hobby kit",
+                "gift card",
+                "novelty item",
+                "unknown item",
+            ],
+            "description": "Miscellaneous items that do not fit into other categories.",
+        },
     }
-    adjectives = ["smart", "fast", "reliable", "durable", "stylish", "modern", "classic", "unique", "rare", "vintage"]
+    adjectives = [
+        "smart",
+        "fast",
+        "reliable",
+        "durable",
+        "stylish",
+        "modern",
+        "classic",
+        "unique",
+        "rare",
+        "vintage",
+    ]
     db.drop_all()
     print("Database dropped.")
     db.create_all()
     print("Database created.")
     for category, category_data in categories.items():
-        db.session.add(Category().from_dict({"name": category, "description": category_data['description']}))
+        db.session.add(
+            Category().from_dict(
+                {"name": category, "description": category_data["description"]}
+            )
+        )
     db.session.commit()
     print("Categories created.")
     new_users: list[User] = []

@@ -1,28 +1,29 @@
-from . import api
-from app import db
 import sqlalchemy as sa
+
 from flask import request, url_for
+from app.extensions import db
+from app.api import api
 from app.api.errors import bad_request
 from app.models.User import User
 from app.models.Listing import Listing
 from app.api.auth import token_auth
 
 
-@api.route('/users/<int:id>', methods=['GET'])
-def get_user(id):
+@api.route("/users/<int:id>", methods=["GET"])
+def get_user(id:int):
     return db.get_or_404(User, id).to_dict()
 
-@api.route('/users/', methods=['GET'])
-@api.route('/users', methods=['GET'])
+
+@api.route("/users/", methods=["GET"])
+@api.route("/users", methods=["GET"])
 def get_users():
-    page = request.args.get('page', 1, type=int)
-    per_page = min(request.args.get('per_page', 10, type=int), 100)
-    return User.to_collection_dict(sa.select(User), page, per_page,
-                                   'api.get_users')
+    page = request.args.get("page", 1, type=int)
+    per_page = min(request.args.get("per_page", 10, type=int), 100)
+    return User.to_collection_dict(sa.select(User), page, per_page, "api.get_users")
 
 
-@api.route('/users/', methods=['POST', 'PUT'])
-@api.route('/users', methods=['POST', 'PUT'])
+@api.route("/users/", methods=["POST", "PUT"])
+@api.route("/users", methods=["POST", "PUT"])
 def create_user():
     data = request.get_json()
     if not all(name in data for name in ["username", "name", "email", "password"]):
@@ -45,16 +46,15 @@ def create_user():
     user = User().from_dict(data, new_user=True)
     db.session.add(user)
     db.session.commit()
-    return user.to_dict(), 201, {'Location': url_for('api.get_users',
-                                                     id=user.id)}
+    return user.to_dict(), 201, {"Location": url_for("api.get_users", id=user.id)}
 
 
-@api.route('/users/', methods=['PATCH'])
-@api.route('/users', methods=['PATCH'])
+@api.route("/users/", methods=["PATCH"])
+@api.route("/users", methods=["PATCH"])
 @token_auth.login_required
 def update_user():
     new_password = False
-    current_user: User = token_auth.current_user() # type: ignore
+    current_user: User = token_auth.current_user()  # type: ignore
     id = current_user.id
     user = db.get_or_404(User, id)
     data = request.get_json()
@@ -95,10 +95,10 @@ def update_user():
     return user.to_dict()
 
 
-@api.route('/users', methods=['DELETE'])
+@api.route("/users", methods=["DELETE"])
 @token_auth.login_required
 def delete_user():
-    current_user: User = token_auth.current_user() # type: ignore
+    current_user: User = token_auth.current_user()  # type: ignore
     id = current_user.id
     user = User.query.get(id)
     if user:
@@ -108,4 +108,4 @@ def delete_user():
         db.session.commit()
         return f"successfully deleted:\n{user.to_dict()}", 204
     else:
-        return bad_request('cannot delete a user that does not exist')
+        return bad_request("cannot delete a user that does not exist")
