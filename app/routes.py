@@ -349,9 +349,7 @@ def category(category_id: int):
     category = db.get_or_404(
         Category, category_id
     )  # pylint: disable=redefined-outer-name
-    listings = db.session.execute(  # pylint: disable=redefined-outer-name
-        sa.select(Listing).where(Listing.categoryID == category.id)
-    ).scalars()
+    listings = get_open_listings_with_images(by_category=category_id)
     return render_template("category.html", category=category, listings=listings)
 
 
