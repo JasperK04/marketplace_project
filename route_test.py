@@ -10,10 +10,11 @@ In order to use this route testing script you have to start the flask applicatio
 If needed, adjust the BASE_URL.
 """
 
-def test_create_user(name, email, password, *, expected):
+def test_create_user(name, username, email, password, *, expected):
     """Test the user creation route."""
     data = {
         "name": name,
+        "username": username,
         "email": email,
         "password": password
     }
@@ -30,6 +31,13 @@ def test_get_user(id, *, expected):
     )
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
+def test_get_user_by_username(username, *, expected):
+    """Test the user creation route."""
+    response = requests.get(
+        f"{BASE_URL}/users/{username}"
+    )
+    assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
+
 def test_get_users(*, expected):
     """Test the user creation route."""
     response = requests.get(
@@ -37,11 +45,13 @@ def test_get_users(*, expected):
     )
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
-def test_modify_user(*, expected, token, name=None, email=None, password=None):
+def test_modify_user(*, expected, token, name=None, username=None, email=None, password=None):
     """Test the user creation route."""
     data = {}
     if name:
         data["name"] = name
+    if username:
+        data["username"] = username
     if email:
         data["email"] = email
     if password:
@@ -62,9 +72,9 @@ def test_delete_user(*, token, expected):
     )
     assert response.status_code == expected, f"Unexpected status code: {response.status_code}"
 
-def test_get_token(email, password, *, expected):
+def test_get_token(username, password, *, expected):
     """Test the token creation route."""
-    auth = HTTPBasicAuth(email, password)
+    auth = HTTPBasicAuth(username, password)
     response = requests.post(
         f"{BASE_URL}/tokens",
         auth=auth
@@ -162,23 +172,27 @@ if __name__ == '__main__':
     fake = Faker()
     email = fake.email()
     password = fake.password(32)
-    name = fake.user_name()
+    name = fake.name()
+    username = fake.user_name()
     description = fake.sentence()
 
     # user routes without authorization
-    id = test_create_user(name, email, password, expected=201)
-    test_create_user(name+"1", email, password, expected=400) # same email
-    test_create_user(name, 'invalid-email', password, expected=400) # invalid email
-    test_create_user(name+"漢字", fake.email(), password, expected=400) # invalid name
-    test_create_user(name+'2', fake.email(), fake.password(10), expected=400) # invalid password
+    id = test_create_user(name, username, email, password, expected=201)
+    test_create_user(name+"1", username, email, password, expected=400) # same email
+    test_create_user(name, username, 'invalid-email', password, expected=400) # invalid email
+    test_create_user(name+"漢字", username, fake.email(), password, expected=400) # invalid name
+    test_create_user(name+'2', username+'漢字', email, password, expected=400) # invalid username
+    test_create_user(name+'3', username, fake.email(), fake.password(10), expected=400) # invalid password
     test_get_user(id, expected=200)
+    test_get_user_by_username(username, expected=200)
     test_get_users(expected=200)
 
     # token routes for authorization
-    test_get_token(fake.email(), fake.password(), expected=401) # not a user
-    token = test_get_token(email, password, expected=201) # is a user
+    test_get_token(fake.user_name(), fake.password(), expected=401) # not a user
+    token = test_get_token(username, password, expected=201) # is a user
 
-    assert id == test_modify_user(expected=200, token=token, name=fake.user_name()) # modify name
+    assert id == test_modify_user(expected=200, token=token, name=fake.name()) # modify name
+    assert id == test_modify_user(expected=200, token=token, username=fake.user_name()) # modify name
     assert id == test_modify_user(expected=200, token=token, email=fake.email()) # modify email
     assert id == test_modify_user(expected=200, token=token, password=fake.password(32)) # modify password
     test_modify_user(expected=200, token=token, email=email) # return email to original
@@ -203,9 +217,9 @@ if __name__ == '__main__':
     test_modify_listing(expected=400, token=token, id=listing_id, category="another fake category")
 
     # second user
-    email2, password2 = fake.email(), fake.password(32)
-    id2 = test_create_user(fake.user_name(), email2, password2, expected=201)
-    token2 = test_get_token(email2, password2, expected=201)
+    username, password2 = fake.user_name(), fake.password(32)
+    id2 = test_create_user(fake.name(), username, fake.email(), password2, expected=201)
+    token2 = test_get_token(username, password2, expected=201)
 
     test_buy_listing(listing_id, token=token, expected=400) # can't buy your own
     test_buy_listing(listing_id, token=token2, expected=200) # someone else can

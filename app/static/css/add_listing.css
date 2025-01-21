@@ -125,6 +125,18 @@ input[type="file"]:focus {
     outline: none;
 }
 
+#price {
+    padding: 5px 5px 5px 15px;
+    width: calc(95% - 10px);
+}
+
+.euro-symbol {
+    position: relative;
+    z-index: 100;
+    top: 24px;
+    right: 25px;
+}
+
 #submit {
     padding: 8px;
     font-size: 1em;
