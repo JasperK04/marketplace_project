@@ -68,6 +68,7 @@ def register():
         return redirect(url_for("routes.index"))
     form = RegistrationForm()
     if form.validate_on_submit():
+        file = request.files.get("file")
         if db.session.scalar(sa.select(User).where(User.name == form.username.data)):
             flash("Username already taken")
             return redirect(url_for("register"))
@@ -84,6 +85,19 @@ def register():
             new_user=True,
         )
         db.session.add(user)
+        db.session.flush()
+        
+        if file:
+            img = resize_upload_image(
+                file=file,
+                size=(200,200),
+                user_id=user.id,
+                listing_id=None,
+                folder='UPLOAD_FOLDER',
+                type='profile',
+                variant='original',
+            )
+            db.session.add(img)
         db.session.commit()
         flash("Congratulations, you are now a registered user!")
         return redirect(url_for("routes.login"))
@@ -100,10 +114,10 @@ def profile_by_name(user_name:str):
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for('index'))
     listings = get_open_listings_with_images(by_user=user.id)
-    # Will get this sorted out later, hopefully
-    # profile_pic = db.session.execute(
-    #    sa.select(Image).where(Image.userID == user.id)).scalars()
-    return render_template("profile.html", user=user, listings=listings)
+    
+    profile_pic = db.session.execute(
+        sa.select(Image).where(Image.userID == user.id)).scalar()
+    return render_template("profile.html", user=user, listings=listings, profile_pic=profile_pic)
 
 @routes.route("/profile/<int:user_id>", methods=["GET"])
 def profile(user_id:int):
@@ -111,10 +125,10 @@ def profile(user_id:int):
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for("routes.index"))
     listings = get_open_listings_with_images(by_user=user_id)
-    # Will get this sorted out later, hopefully
-    # profile_pic = db.session.execute(
-    #    sa.select(Image).where(Image.userID == user.id)).scalars()
-    return render_template("profile.html", user=user, listings=listings)
+    
+    profile_pic = db.session.execute(
+        sa.select(Image).where(Image.userID == user.id)).scalar()
+    return render_template("profile.html", user=user, listings=listings,profile_pic=profile_pic)
 
 
 @routes.route("/profile/<user_id>/edit", methods=["GET", "POST"])
@@ -129,11 +143,29 @@ def edit_profile(user_id):
 
     form = EditProfileForm(obj=user)
     if form.validate_on_submit():
+        file = request.files.get("file")
         user.about_me = form.about_me.data
         user.name = form.name.data
         db.session.add(user)
+        db.session.flush()
+        if file:
+            delete_images(user.id,"user")
+
+            img = resize_upload_image(
+                file,
+                (200,200),
+                user.id,
+                None,
+                'UPLOAD_FOLDER',
+                'profile',
+                'original',
+            )
+            db.session.add(img)
         db.session.commit()
-        return render_template("profile.html", user=user, listings=listings)
+
+        profile_pic = db.session.execute(
+            sa.select(Image).where(Image.userID == current_user.id)).scalar()
+        return render_template("profile.html", user=user, listings=listings,profile_pic=profile_pic)
 
     return render_template("edit_profile.html", user=user, form=form)
 
@@ -187,8 +219,24 @@ def add_listing():
         db.session.add(new_listing)
         db.session.flush()
         if file:
-            img_org = resize_upload_image(file,(300,200),current_user.id,new_listing.id,'UPLOAD_FOLDER','listing','original')
-            img_resized = resize_upload_image(file,(600,400),current_user.id,new_listing.id,'RESIZED_FOLDER','listing','resized')
+            img_org = resize_upload_image(
+                file,
+                (300,200),
+                None,
+                new_listing.id,
+                'UPLOAD_FOLDER',
+                'listing',
+                'original',
+            )
+            img_resized = resize_upload_image(
+                file,
+                (600,400),
+                None,
+                new_listing.id,
+                'RESIZED_FOLDER',
+                'listing',
+                'resized',
+            )
             db.session.add(img_org)
             db.session.add(img_resized)
         db.session.commit()
@@ -213,16 +261,16 @@ def edit_listing(listing_id:int):
     ]
     form.submit.label.text = "Edit listing"
     if form.validate_on_submit():
-        file = request.files["file"]
+        file = request.files.get("file")
         if file:
             # delete old images on disk and in the database
-            delete_images(listing_id)
+            delete_images(listing_id,"listing")
 
             # add new ones
             img_org = resize_upload_image(
                 file,
                 (300, 200),
-                current_user.id,
+                None,
                 listing_id,
                 "UPLOAD_FOLDER",
                 "listing",
@@ -231,7 +279,7 @@ def edit_listing(listing_id:int):
             img_resized = resize_upload_image(
                 file,
                 (600, 400),
-                current_user.id,
+                None,
                 listing_id,
                 "RESIZED_FOLDER",
                 "listing",
@@ -266,7 +314,7 @@ def delete_listing(listing_id:int):
             url_for("routes.index")
         )  # this depends on where the edit button/link will be placed
 
-    delete_images(listing_id)
+    delete_images(listing_id,"listing")
 
     db.session.delete(listing)
     db.session.commit()

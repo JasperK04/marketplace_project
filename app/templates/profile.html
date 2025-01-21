@@ -11,20 +11,32 @@
 
 <div class="profile_page">
     <div class="profile_container">    
-    <h1>
-        {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}'s Profile
-        {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
-            {% if user.is_deactivated %}
-                <span><button class="primary" id="reactivate-user">Reactivate user</button></span>
-            {% else %}
-                <span><button class="destructive" id="deactivate-user">Deactivate user</button></span>
-            {% endif %}
-        {% endif %}
-    </h1>
-
-    {% if user.id == current_user.id %}
-        <a href="{{ url_for('routes.edit_profile', user_id=user.id) }}">Edit Your Profile</a>
-    {% endif %}
+        <div class="profile_main">
+            <div class="profile_picture"> 
+                {% if profile_pic.filename %}
+                    <img src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ profile_pic.filename)}}" alt="Profile picture">
+                {% else %}
+                    <img src="https://placehold.co/200x200" alt="Profile picture">
+                {% endif %}
+            </div>
+            <div class="profile_name">
+                <h1>
+                    {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}'s Profile
+                </h1>
+            </div>
+            <div class="user_buttons">
+                {% if user.id == current_user.id %}
+                    <a href="{{ url_for('routes.edit_profile', user_id=user.id) }}">Edit Profile</a>
+                {% endif %}
+                {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
+                    {% if user.is_deactivated %}
+                        <span><button class="primary" id="reactivate-user">Reactivate user</button></span>
+                    {% else %}
+                        <span><button class="destructive" id="deactivate-user">Deactivate user</button></span>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
 
     <h2 id="about_me">About Me</h2>
     {% if user.about_me %}

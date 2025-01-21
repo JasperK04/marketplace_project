@@ -16,19 +16,60 @@ hr {
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 15px;
 
-    .profile_container {
+    > .profile_container {
         padding: 10px 15px;
-
-        > h1 {
-            margin: 0 0 12px 0;
-            display:flex;
+        
+        > .profile_main {
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: row;
             justify-content: space-between;
+            align-items: center;
 
-            @media screen and (max-width: 800px) {
-                flex-direction: column;
-                text-align:center;
+            > .profile_picture img {
+                border-radius: 5px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+            }
+
+            > .user_buttons {
+                align-self: flex-start;
+
+                > a {
+                    display: block;
+                    width: 5em;
+                    background-color: var(--color-tertiary);
+                    color: var(--color-background);
+                    padding: 8px 15px;
+                    border-radius: 5px;
+                    text-decoration: none;
+                    text-align: center;
+                    font-weight: bold;
+                    transition: background-color 0.2s;
+                    text-decoration: none;
+                }
+        
+                > a:hover {
+                    background-color: var(--color-quaternary);
+                }
+
+                > span > button {
+                    width: 11em;
+                }
+            }
+
+            > .profile_name {
+                margin: 0.5em;
+                text-align: center;
+
+                > h1 {
+                    margin: 0 0 12px 0;
+                    display:flex;
+                    justify-content: space-between;
+
+                }
             }
         }
+
 
         > a {
             background-color: var(--color-tertiary);
@@ -43,6 +84,17 @@ hr {
 
         > a:hover {
             background-color: var(--color-quaternary);
+        }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .profile_page .profile_container .profile_main {
+        flex-direction: column;
+        text-align: center;
+
+        > .user_buttons {
+            align-self: center;
         }
     }
 }

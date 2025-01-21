@@ -13,6 +13,7 @@ class RegistrationForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(),Length(15,65)])
     password2 = PasswordField(
         'Repeat Password', validators=[DataRequired(), EqualTo('password')])
+    file = FileField('Upload profile picture',validators=[FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Register')
 
     def validate_email(self, email):
@@ -41,4 +42,5 @@ class ListingForm(FlaskForm):
 class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     about_me = TextAreaField('About Me')
+    file = FileField('Upload (new) profile picture',validators=[FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Save Changes')
