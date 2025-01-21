@@ -35,12 +35,12 @@ class ListingForm(FlaskForm):
     category = RadioField('Category', validators=[DataRequired()])
     description = TextAreaField('Description',validators=[DataRequired()])
     price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
-    file = FileField('Upload image',validators=[FileAllowed(['jpg', 'jpeg','png'])])
+    file = FileField('Upload image (300x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Submit')
 
 
 class EditProfileForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
     about_me = TextAreaField('About Me')
-    file = FileField('Upload (new) profile picture',validators=[FileAllowed(['jpg', 'jpeg','png'])])
+    file = FileField('Upload (new) profile picture (200x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])])
     submit = SubmitField('Save Changes')
