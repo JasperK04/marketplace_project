@@ -23,6 +23,11 @@
                 border-radius: 5px;
                 font-size: 14px;
             }
+
+            button > a {
+                color: #fff;
+                text-decoration: none;
+            }
         }
 
         .listing-meta {
