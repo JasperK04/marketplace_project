@@ -21,8 +21,8 @@
         <p>{{ form.submit() }}</p>
     </form>
     <hr>
-    <p>
+    <p class="new-user-callout">
         New User?<br/>
-        <a class="btn" href="{{ url_for('routes.register') }}">Click to Register!</a>
+        <button class="outline"><a href="{{ url_for('routes.register') }}">Click to Register!</a></button>
     </p>
 {% endblock %}

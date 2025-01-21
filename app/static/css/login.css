@@ -87,14 +87,14 @@ label[for="remember_me"]::after {
     background-color: var(--color-primary);
 }
 
-p .btn {
-    position: relative;
-    top: 10px;
+.new-user-callout {
+    text-align: center;
+    a {
+        color: var(--color-primary);
+        text-decoration: none
+    };
 }
 
-p .btn:hover {
-    background-color: var(--color-primary);
-}
 
 @media (max-width: 768px) {
 
