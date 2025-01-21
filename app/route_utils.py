@@ -52,13 +52,7 @@ def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
     image = IM.open(file)
     img = image.copy()
 
-    # if image is smaller than preferred size, thumbnail (resize with same aspect ratio) cannot be used
-    if img.width < size[0] or img.height < size[1]:
-        img = img.resize(
-            size, resample=1
-        )  # 1=LANCZOS resampling leads to higher quality pictures
-    else:
-        img.thumbnail(size, resample=1)
+    img = img.resize(size,resample=1)  # always resize image (ignore aspect ratio) because of styling.
     filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
     folder = app_config.UPLOAD_FOLDER if folder == "UPLOAD_FOLDER" else app_config.RESIZED_FOLDER
     os.makedirs(folder, exist_ok=True)
