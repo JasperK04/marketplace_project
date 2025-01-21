@@ -19,10 +19,6 @@ body {
     min-height: 70px;
 }
 
-.container {
-    margin: 3dvh 5dvh;
-}
-
 .nav {
     display: flex;
     flex-direction: row;

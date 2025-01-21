@@ -36,6 +36,14 @@
             font-size: 1.25em;
             font-weight: 600;
         }
+
+        @media screen and (max-width: 800px) {
+            .listing-label {
+                text-align:center;
+                font-size: 1em;
+                font-weight: normal;
+            }
+        }
     }
 
     @media screen and (max-width: 800px) {

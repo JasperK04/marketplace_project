@@ -10,6 +10,10 @@
         border-radius: 8px;
         margin: 1em;
 
+        @media screen and (max-width: 800px) {
+            margin: 1em 0em;
+        }
+
     }
 
     .intro {
@@ -17,6 +21,13 @@
 
         h1 {
             font-size: 2.5rem;
+        }
+
+        @media screen and (max-width: 800px) {
+            h1 {
+                font-size: 2rem;
+            }
+
         }
 
     }
@@ -34,6 +45,7 @@
             gap: .5em;
             justify-content: space-evenly;
             margin: 1rem 2.5rem;
+            justify-items:center;
 
             .category-card {
                 display:flex;
@@ -71,8 +83,19 @@
                 margin:0;
             }
 
+
+        }
+
+
+    }
+
+    @media screen and (max-width: 800px) {
+        .categories-container {
+            padding:1em 0em;
+            margin:1em 0em;
         }
     }
+
 
     .listings-container {
 

@@ -20,6 +20,8 @@
         gap: .5em;
         justify-content: space-evenly;
         margin: 1rem 2.5rem;
+        justify-items:center;
+        min-width: fit-content;
 
         .category-card {
             display:flex;

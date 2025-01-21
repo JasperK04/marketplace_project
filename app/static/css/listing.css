@@ -16,6 +16,12 @@
             justify-content: space-between;
             align-items: center;
 
+            h1 {
+                display:flex;
+                align-items:center;
+                gap:15px;
+            }
+
             .sold-tag {
                 background-color: #dc3545;
                 color: #fff;
@@ -23,7 +29,16 @@
                 border-radius: 5px;
                 font-size: 14px;
             }
+
         }
+
+        @media screen and (max-width: 800px) {
+            .listing-header {
+                flex-direction: column;
+                justify-items: center;
+            }
+        }
+
 
         .listing-meta {
             font-size: 14px;
@@ -83,19 +98,21 @@
     }
 
 
-    @media (max-width: 768px) {
+    @media (max-width: 800px) {
         .image-and-price {
             flex-direction: column;
-        }
 
-        .image {
-            margin-right: 0;
-            margin-bottom: 20px;
-        }
+            .image {
+                padding:0;
+                margin-right: 0;
+                margin-bottom: 20px;
+            }
 
-        .price {
-            text-align: center;
-            margin-top: 0;
+            .price {
+                text-align: center;
+                margin-top: 0;
+            }
+
         }
     }
 
@@ -112,6 +129,7 @@
             list-style: none;
             gap: 2em;
             margin: auto 0;
+            flex-wrap:wrap;
 
             li {
                 a {
@@ -141,6 +159,13 @@
         h2 {
             margin-top: 0;
             font-size: 1.5em;
+        }
+
+        @media screen and (max-width: 800px) {
+            h2 {
+                font-size: 1.2em;
+            }
+
         }
 
         p {
