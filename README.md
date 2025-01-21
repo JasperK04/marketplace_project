@@ -38,6 +38,11 @@ flask cli recreate-db
 flask cli create-admin
 ```
 
+### Create secret key in .env file in app directory
+```bash
+echo "SECRET_KEY='your secret key here'" > .env
+```
+
 ### Run the server
 
 ```bash
