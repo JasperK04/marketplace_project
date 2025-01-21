@@ -9,5 +9,16 @@
         margin: 1rem 5rem 0rem 5rem;
 
     }
+}
 
+
+@media screen and (max-width: 800px) {
+    .category {
+        margin:0;
+
+        .category-meta {
+            margin: 0;
+        }
+
+    }
 }

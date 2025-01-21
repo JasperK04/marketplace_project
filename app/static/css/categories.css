@@ -20,6 +20,8 @@
         gap: .5em;
         justify-content: space-evenly;
         margin: 1rem 2.5rem;
+        justify-items:center;
+        min-width: fit-content;
 
         .category-card {
             display:flex;
@@ -46,6 +48,17 @@
 
     }
 
+    @media screen and (max-width: 800px) {
+
+        .category-list {
+            margin: 0;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1em;
+            justify-content: center;
+        }
+
+    }
+
 
 }
 
@@ -68,6 +81,16 @@
     a {
         text-decoration: none;
         color: inherit;
+    }
+
+    @media screen and (max-width: 800px) {
+
+        .category-header {
+            margin: 0;
+            justify-content: center;
+            flex-direction: column;
+        }
+
     }
 
 

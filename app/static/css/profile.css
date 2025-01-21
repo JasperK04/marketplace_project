@@ -17,10 +17,17 @@ hr {
     border-radius: 15px;
 
     .profile_container {
-        padding: 10px 15px;  
+        padding: 10px 15px;
 
         > h1 {
             margin: 0 0 12px 0;
+            display:flex;
+            justify-content: space-between;
+
+            @media screen and (max-width: 800px) {
+                flex-direction: column;
+                text-align:center;
+            }
         }
 
         > a {
@@ -40,40 +47,3 @@ hr {
     }
 }
 
-@media (max-width: 630px) {
-
-    .listing-card {
-        max-width: fit-content;
-
-        > a {
-            flex-direction: column;
-        }
-
-        .listing-image {
-            width: 300px;
-            height: 200px;
-    
-            > img {
-                border-radius: 5px 5px 0px 0px;
-            }
-        }
-    
-        .listing-content {
-            border-radius: 0px 0px 5px 5px;
-            width: unset;
-            flex-direction: row;
-            justify-content: space-between;
-
-            > .listing-price {
-                font-size: 1.25em;
-            }
-        }
-    }
-}
-
-@media (max-width: 490px) {
-    
-    .profile_page {
-        width: 90dvw;
-    }
-}
