@@ -23,6 +23,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+### Create secret key in .env file in app directory
+```bash
+echo "SECRET_KEY='your secret key here'" > .env
+```
+
 ### Seed the database
 
 > [!WARNING]
@@ -36,11 +41,6 @@ flask cli recreate-db
 
 ```bash
 flask cli create-admin
-```
-
-### Create secret key in .env file in app directory
-```bash
-echo "SECRET_KEY='your secret key here'" > .env
 ```
 
 ### Run the server

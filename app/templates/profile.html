@@ -10,9 +10,9 @@
 {% block content %}
 
 <div class="profile_page">
-    <div class="profile_container">    
+    <div class="profile_container">
         <div class="profile_main">
-            <div class="profile_picture"> 
+            <div class="profile_picture">
                 {% if profile_pic.filename %}
                     <img src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ profile_pic.filename)}}" alt="Profile picture">
                 {% else %}
@@ -38,26 +38,25 @@
             </div>
         </div>
 
-    <h2 id="about_me">About Me</h2>
-    {% if user.about_me %}
-        <p>
-            {{ user.about_me }}
-        </p>
-    {% else %}
-        <p>
-            This user has not written a custom description yet
-        </p>
-    {% endif %}
+        <h2 id="about_me">About Me</h2>
+        {% if user.about_me %}
+            <p>
+                {{ user.about_me }}
+            </p>
+        {% else %}
+            <p>
+                This user has not written a custom description yet
+            </p>
+        {% endif %}
 
-    <hr/>
+        <hr/>
 
-    <!-- TODO: Add possibility to add profile photo to user profile -->
-
-    <h2 id="current_listings">Current Listings</h2>
-    <div class="listings">
-        {% for listing in listings %}
-            {% include 'components/listing_card.html' %}
-        {% endfor %}
+        <h2 id="current_listings">Current Listings</h2>
+        <div class="listings">
+            {% for listing in listings %}
+                {% include 'components/listing_card.html' %}
+            {% endfor %}
+        </div>
     </div>
 </div>
 
