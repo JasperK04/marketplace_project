@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block styles %}
+<link rel="stylesheet" href="{{url_for('static', filename='/css/contact.css')}}">
+{% endblock %}
+{% block content %}
+    <div class="content">
+        <div class="content-container intro">
+            <h1>Contact us</h1>
+            <p>
+                For complaints, issues, bugs or other things:
+                <p>
+                Email: devteam@marketplace.com<br>
+                Phone number: 06-11223344<br>
+                </p>
+            </p>
+        </div>
+    </div>
+{% endblock %}

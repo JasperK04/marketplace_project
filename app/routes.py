@@ -316,3 +316,13 @@ def category_name(category_name: str):  # pylint: disable=redefined-outer-name
         sa.select(Listing).where(Listing.categoryID == category.id)
     ).scalars()
     return render_template("category.html", category=category, listings=listings)
+
+
+# about/contact us
+@routes.route('/about_us',methods=["GET"])
+def about_us():
+    return render_template("about_us.html")
+
+@routes.route('/contact_us',methods=["GET"])
+def contact_us():
+    return render_template("contact_us.html")
