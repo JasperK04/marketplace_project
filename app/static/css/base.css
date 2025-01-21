@@ -120,6 +120,13 @@ body {
             justify-content: space-between;
             flex-grow: 10;
             align-items: center;
+
+            a {
+                color: var(--color-background);
+                font-weight: bold;
+                text-decoration: none;
+                letter-spacing: 1px;
+            }
         }
 
     }

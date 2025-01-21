@@ -17,9 +17,9 @@
             align-items: center;
 
             h1 {
-                display:flex;
-                align-items:center;
-                gap:15px;
+                display: flex;
+                align-items: center;
+                gap: 15px;
             }
 
             .sold-tag {
@@ -29,40 +29,42 @@
                 border-radius: 5px;
                 font-size: 14px;
             }
-            button > a {
+
+            button>a {
                 color: #fff;
                 text-decoration: none;
-          }
-
-        @media screen and (max-width: 800px) {
-            .listing-header {
-                flex-direction: column;
-                justify-items: center;
             }
-        }
+
+            @media screen and (max-width: 800px) {
+                .listing-header {
+                    flex-direction: column;
+                    justify-items: center;
+                }
+            }
 
 
-        .listing-meta {
-            font-size: 14px;
-            color: var(--color-text-secondary);
-            margin-top: 10px;
-            flex-basis: 100%;
-            text-align: left;
-        }
+            .listing-meta {
+                font-size: 14px;
+                color: var(--color-text-secondary);
+                margin-top: 10px;
+                flex-basis: 100%;
+                text-align: left;
+            }
 
-        h1 {
-            margin: 0;
-            font-size: 2em;
-        }
+            h1 {
+                margin: 0;
+                font-size: 2em;
+            }
 
-        .buy-button {
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
+            .buy-button {
+                font-size: 16px;
+                cursor: pointer;
+                transition: background 0.3s;
+            }
 
-        .buy-button:hover {
-            background-color: #218838;
+            .buy-button:hover {
+                background-color: #218838;
+            }
         }
     }
 
@@ -105,7 +107,7 @@
             flex-direction: column;
 
             .image {
-                padding:0;
+                padding: 0;
                 margin-right: 0;
                 margin-bottom: 20px;
             }
@@ -131,7 +133,7 @@
             list-style: none;
             gap: 2em;
             margin: auto 0;
-            flex-wrap:wrap;
+            flex-wrap: wrap;
 
             li {
                 a {
