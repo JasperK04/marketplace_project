@@ -58,17 +58,14 @@ hr {
             }
 
             > .profile_name {
-                margin: 0 auto 12px auto;
+                margin: 0.5em;
+                text-align: center;
 
                 > h1 {
                     margin: 0 0 12px 0;
                     display:flex;
                     justify-content: space-between;
 
-                    @media screen and (max-width: 800px) {
-                        flex-direction: column;
-                        text-align:center;
-                    }
                 }
             }
         }
@@ -87,6 +84,17 @@ hr {
 
         > a:hover {
             background-color: var(--color-quaternary);
+        }
+    }
+}
+
+@media screen and (max-width: 800px) {
+    .profile_page .profile_container .profile_main {
+        flex-direction: column;
+        text-align: center;
+
+        > .user_buttons {
+            align-self: center;
         }
     }
 }
