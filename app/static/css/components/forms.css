@@ -1,0 +1,161 @@
+@import url(colors.css);
+
+form {
+
+    div {
+        padding: 5px;
+    }
+
+
+    /* ============================== */
+    /*        text & textarea         */
+    /* ============================== */
+
+    /* required text and textarea format
+    <div>
+        {{ form.text.label }}<br>
+        {{ form.text() }}
+    </div>
+    */
+
+    .text {
+        width: 100%;
+        padding: 5px;
+        border-radius: 5px;
+    }
+
+    .text-area {
+        height: 3em;
+        resize: vertical;
+    }
+
+    .text:hover {
+        border: 2px solid var(--color-primary);
+    }
+
+    .text:focus {
+        outline: none;
+        border: 2px solid var(--color-primary);
+    }
+
+
+    /* ============================== */
+    /*           checkbox             */
+    /* ============================== */
+
+    /* required checkbox format
+    <div>
+        <label class="checkbox">{{ form.checkbox() }} <span class="checkbox_label">remember me</span></label>
+    </div>
+    */
+    .checkbox_input {
+        display: none;
+    }
+
+    .checkbox {
+        position: relative;
+        cursor: pointer;
+        font-size: 1em;
+        user-select: none;
+    }
+
+    .checkbox_label {
+        font-size: 1.1em;
+    }
+
+    .checkbox_label::before {
+        content: '';
+        display: inline-block;
+        position: relative;
+        top: 3px;
+        width: 15px;
+        height: 15px;
+        margin-right: 8px;
+        border: 2px solid var(--color-primary);
+        border-radius: 4px;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .checkbox_label::after {
+        content: '✔';
+        position: absolute;
+        top: calc(50% - 1px);
+        left: 3px;
+        transform: translateY(-50%) scale(0);
+        transform-origin: center;
+        font-size: 0.9em;
+        transition: transform 0.2s ease-in-out;
+    }
+
+    .checkbox_input:checked + .checkbox_label::before {
+        background-color: var(--color-primary);
+        border-color: var(--color-tertiary);
+    }
+
+    /* Show the checkmark when checked */
+    .checkbox_input:checked + .checkbox_label::after {
+        transform: translateY(-50%) scale(1);
+    }
+
+
+    /* ============================== */
+    /*             file               */
+    /* ============================== */
+
+    /* required file input format
+    <div>
+        <label class="file">{{ form.file() }} <span class="file-label">remember me</span></label>
+    </div>
+    */
+
+    .file-input {
+        display: none;
+    }
+
+    .file {
+        display: block;
+        width: 99%;
+        margin: 5px 0;
+    }
+
+    .file-label {
+        display: block;
+        width: calc(100% - 10px);
+        padding: 10px 5px;
+        color: var(--color-primary);
+        text-align: center;
+        font-size: 1em;
+        border: 2px dashed var(--color-primary);
+        border-radius: 5px;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        transition: border-color 0.2s ease-in-out;
+    }
+    
+    .file-input-label:hover, .file-input-label:focus {
+        border-color: var(--color-secondary);
+        outline: none;
+    }
+
+
+    /* ============================== */
+    /*         submit button          */
+    /* ============================== */
+
+    /* required submit format
+    <div>{{ form.submit() }}</div> 
+    */
+    .submit {
+        width: 100%;
+        margin-top: 5px;
+        padding: 8px 5px;
+        border-radius: 5px;
+        background-color: var(--color-tertiary);
+        color: var(--color-background);
+        border: none;
+    }
+
+    .submit:hover {
+        background-color: var(--color-primary);
+    }
+}

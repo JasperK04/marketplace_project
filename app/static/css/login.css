@@ -1,3 +1,5 @@
+@import url(components/forms.css);
+
 .container {
     padding: 4%;
     width: 40dvw;
@@ -14,77 +16,6 @@
         margin: 0 0 15px 0;
         text-align: center;
     }
-
-    > form {
-        text-align: left;
-
-        > p {
-            width: inherit;
-            margin: 2dvh 5%;
-
-            > input {
-                width: 100%;
-                padding: 5px;
-                border-radius: 5px;
-            }
-        }
-    }
-}
-
-/* custom checkbox */
-#remember_me {
-    display: none;
-}
-
-label[for="remember_me"] {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    cursor: pointer;
-    font-size: 1em;
-    user-select: none;
-}
-
-label[for="remember_me"]::before {
-    content: '';
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-right: 8px;
-    border: 2px solid var(--color-primary);
-    border-radius: 4px;
-    background-color: #fff;
-    transition: all 0.2s ease-in-out;
-}
-
-label[for="remember_me"]::after {
-    content: '✔';
-    position: absolute;
-    top: -2px;
-    left: 3px;
-    transform: scale(0);
-    transform-origin: center;
-    transition: transform 0.2s ease-in-out;
-}
-
-#remember_me:checked + label[for="remember_me"]::after {
-    transform: scale(1);
-}
-
-#remember_me:checked + label[for="remember_me"]::before {
-    background-color: var(--color-primary);
-    border-color: var(--color-tertiary);
-}
-/* this sucked */
-
-#submit {
-    background-color: var(--color-tertiary);
-    color: var(--color-background);
-    border: none;
-}
-
-#submit:hover {
-    background-color: var(--color-primary);
 }
 
 .new-user-callout {
@@ -95,7 +26,7 @@ label[for="remember_me"]::after {
     };
 }
 
-
+/* 
 @media (max-width: 768px) {
 
     .container {
@@ -116,4 +47,4 @@ label[for="remember_me"]::after {
         padding: 2%;
         width: 70dvw;
     }
-}
+} */
