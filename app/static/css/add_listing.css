@@ -17,3 +17,17 @@
         text-align: center;
     }
 }
+
+@media (max-width: 800px) {
+    
+    .container {
+        width: 60dvw;
+    }
+}
+
+@media (max-width: 500px) {
+    
+    .container {
+        width: 75dvw;
+    }
+}

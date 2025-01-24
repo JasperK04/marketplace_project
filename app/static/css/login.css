@@ -20,31 +20,25 @@
 
 .new-user-callout {
     text-align: center;
+    p {
+        margin: 5px 0;
+    }
     a {
         color: var(--color-primary);
         text-decoration: none
     };
 }
 
-/* 
-@media (max-width: 768px) {
-
+@media (max-width: 800px) {
+    
     .container {
-        padding: 3%;
         width: 60dvw;
-
-        > h1 {
-            font-size: 1.6em;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
     }
 }
 
 @media (max-width: 500px) {
-
+    
     .container {
-        padding: 2%;
-        width: 70dvw;
+        width: 75dvw;
     }
-} */
+}
