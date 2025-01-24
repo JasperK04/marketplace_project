@@ -3,46 +3,49 @@
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/add_listing.css') }}">
 {% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/fileUpload.js') }}"></script>
+{% endblock %}
 
 {% block content %}
     <h1>{{ title }}</h1>
     <form method="post" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
-        <p>
+        <div>
             {{ form.title.label }}<br>
             {{ form.title(size=32) }}
             {% for error in form.title.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
+        </div>
+        <div>
             {{ form.category.label }}<br>
             {{ form.category(size=32) }}
             {% for error in form.category.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
+        </div>
+        <div>
             {{ form.description.label }}<br>
             {{ form.description(size=32) }}
             {% for error in form.description.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
-            {{ form.price.label }}<span class="euro-symbol">&euro;</span><br>
+        </div>
+        <div>
+            {{ form.price.label }}<br>
+            <span class="text-icon">€</span>
             {{ form.price(size=16) }}
             {% for error in form.price.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>
-            {{ form.file.label }}<br>
-            {{ form.file(size=32) }}
+        </div>
+        <div>
+            <label class="file">{{ form.file() }} <span id="image-upload" class="file-label">upload product picture</span></label>
             {% for error in form.file.errors %}
             <span style="color: red;">[{{ error }}]</span>
             {% endfor %}
-        </p>
-        <p>{{ form.submit() }}</p>
+        </div>
+        <div>{{ form.submit() }}</div>
     </form>
 {% endblock %}

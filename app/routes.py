@@ -145,7 +145,7 @@ def edit_profile(user_id):
     if form.validate_on_submit():
         file = request.files.get("file")
         user.about_me = form.about_me.data
-        user.name = form.name.data
+        user.username = form.username.data
         db.session.add(user)
         db.session.flush()
         if file:

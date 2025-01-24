@@ -38,16 +38,23 @@ class LoginForm(FlaskForm):
 
 
 class ListingForm(FlaskForm):
-    title = StringField('Title',validators=[DataRequired()])
-    category = RadioField('Category', validators=[DataRequired()])
-    description = TextAreaField('Description',validators=[DataRequired()])
-    price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")])
-    file = FileField('Upload image (300x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])])
+    title = StringField('Title',validators=[DataRequired()],
+                        render_kw={"class": "text", "placeholder": "Enter a product title", "autocomplete": "no", "autofocus": "autofocus"})
+    category = RadioField('Category', validators=[DataRequired()],
+                          render_kw={"class": "radiofield_input"})
+    description = TextAreaField('Description',validators=[DataRequired()],
+                                render_kw={"class": "text-area", "placeholder": "Enter a product description", "autocomplete": "no"})
+    price = StringField('Price',validators=[DataRequired(),Regexp(r"^[0-9]+([.,][0-9]+)*$",message="Can only enter numbers or one of the following:,.")],
+                        render_kw={"class": "text", "placeholder": "12,34", "autocomplete": "no"})
+    file = FileField('Upload image (300x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])],
+                     render_kw={"class": "file-input", "onchange": "getFileName(event)", "accept": "image/jpeg, image/jpg, image/png"})
     submit = SubmitField('Submit', render_kw={"class": "submit"})
 
 
 class EditProfileForm(FlaskForm):
-    name = StringField('Name', validators=[DataRequired(),Length(1, 70, message='Name must be between 1 and 70 characters long')])
-    about_me = TextAreaField('About Me')
-    file = FileField('Upload (new) profile picture (200x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])])
+    username = StringField('username', validators=[DataRequired(),Regexp(r"^[a-zA-Z0-9_.-]{2,}$", message='Username must be longer than 2 characters and consist of alphanumeric characters or one of the following: "_.-"')],
+                       render_kw={"class": "text", "placeholder": "Enter a new username", "autocomplete": "username", "autofocus": "autofocus"})
+    about_me = TextAreaField('About Me', render_kw={"class": "text-area", "placeholder": "Talk about yourself", "autocomplete": "no"})
+    file = FileField('Upload (new) profile picture (200x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])],
+                     render_kw={"class": "file-input", "onchange": "getFileName(event)", "accept": "image/jpeg, image/jpg, image/png"})
     submit = SubmitField('Save Changes', render_kw={"class": "submit"})
