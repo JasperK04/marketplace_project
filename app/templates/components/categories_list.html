@@ -1,0 +1,12 @@
+
+<div class="category-list">
+    {% for category in categories %}
+        <a class="category-card" href="{{ url_for('routes.category', category_id=category.id) }}">
+            <h3>{{ category.name }}</h3>
+            <p>{{ category.description }}</p>
+            <button class="outline">
+                <span>View Listings</span>
+            </button>
+        </a>
+    {% endfor %}
+</div>

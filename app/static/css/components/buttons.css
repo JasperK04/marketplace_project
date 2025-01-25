@@ -12,6 +12,10 @@ button:focus {
     outline-offset: 1px;
 }
 
+button:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
 button.primary {
     background-color: var(--color-primary);
     color: #fff;

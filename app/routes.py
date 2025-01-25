@@ -27,12 +27,25 @@ def can_view_restricted_pages():
 @routes.route("/", methods=["GET"])
 @routes.route("/index", methods=["GET"])
 def index():
-    listings = get_open_listings_with_images(limit=30)
+    # Get query parameters for pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 36, type=int)
 
-    categories = db.session.query(
-        Category
-    ).all()  # pylint: disable=redefined-outer-name
-    return render_template("index.html", listings=listings, categories=categories)
+    # Fetch listings with pagination
+    listings, per_page, total_pages = get_open_listings_with_images(page=page, per_page=per_page)
+    current_page_url = url_for('routes.index')
+
+    categories = db.session.query(Category).all()
+
+    return render_template(
+        "index.html",
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=current_page_url,
+        categories=categories
+    )
 
 
 @routes.route("/login", methods=["GET", "POST"])
@@ -352,12 +365,12 @@ def delete_listing(listing_id:int):
 @routes.route("/categories", methods=["GET"])
 def categories():
     db_categories = db.session.query(Category).all()
-    categories = {
+    listings_per_cat = {
         category.id: {"category": category, "listings": []}
         for category in db_categories
     }
     # get 10 most recent listings for each category, in a single query
-    for category_id, value in categories.items():
+    for category_id, value in listings_per_cat.items():
         value["listings"] = [
             listing.to_dict()
             for listing in db.session.query(Listing)
@@ -366,7 +379,10 @@ def categories():
             .limit(12)
             .all()
         ]
-    return render_template("categories.html", categories=categories)
+
+    categories = db.session.query(Category).all()
+
+    return render_template("categories.html", listings_per_cat=listings_per_cat, categories=categories)
 
 
 @routes.route("/categories/<int:category_id>", methods=["GET"])

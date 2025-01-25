@@ -1,95 +1,17 @@
 @import url(components/paginated_listings.css);
 @import url(components/listing_card.css);
-
-
-.intro {
-    padding: 1em;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    text-align: center;
-
-    h1 {
-        font-size: 2rem;
-        margin: 0;
-    }
-
-    .category-list {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1em;
-        justify-content: center;
-        margin: 1em;
-        justify-items:center;
-
-        .category-card {
-            display:flex;
-            flex-direction:column;
-            justify-content: space-between;
-            padding: 1em;
-            width:10em;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-            border-radius: 8px;
-            text-align: center;
-
-            a {
-                text-decoration: none;
-                color: inherit;
-            }
-
-        }
-
-        .category-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
-        }
-
-    }
-
-    @media screen and (max-width: 800px) {
-
-        .category-list {
-            margin: 0;
-            gap: 1em;
-        }
-    }
-}
-
+@import url(components/categories_list.css);
 
 .category {
-    margin-top: 1em;
-    padding: 1em;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    border-radius: 8px;
-
     .category-header {
-        display:flex;
-        justify-content: space-between;
+        display: flex;
+        flex-direction: row;
         align-items: center;
-        margin: 1rem 5rem 0rem 5rem;
+        justify-content: space-between;
+        padding: 0 1em 5px 1em;
 
-    }
-
-    a {
-        text-decoration: none;
-        color: inherit;
-    }
-
-    @media (max-width: 800px) {
-
-        .category-header {
-            margin: 1em 0;
-            justify-content: center;
-            flex-direction: column;
-
-            > h2 {
-                margin: 10px 0;
-            }
+        > a {
+            border-radius: 5px;
         }
-    }
-}
-
-@media (max-width: 550px) {
-    .container {
-        margin: 2dvh 2.5dvh;
     }
 }

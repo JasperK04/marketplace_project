@@ -4,28 +4,23 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/categories.css') }}">
 {% endblock %}
 {% block content %}
-    <div class="intro">
+    <div class="sub-container">
         <h1>Categories</h1>
         <p>This page lists all categories, as well as a selection of listings per category.</p>
-        <div class="category-list">
-            {% for data in categories.values() %}
-                <div class="category-card">
-                    <h3>{{ data["category"].name }}</h3>
-                    <p>{{ data["category"].description }}</p>
-                    <button class="outline">
-                        <a href="{{ url_for('routes.category', category_id=data['category'].id) }}">View Listings</a>
-                    </button>
-                </div>
-            {% endfor %}
-        </div>
+    </div>    
+    
+    <div class="sub-container">
+        {% include 'components/categories_list.html' %}
     </div>
-    {% for data in categories.values() %}
+
+    <div class="sub-container">
+    {% for data in listings_per_cat.values() %}
         <div class="category">
             <div class="category-header">
                 <h2>{{ data["category"].name }}</h2>
-                <button class="outline">
-                    <a href="{{ url_for('routes.category', category_id=data['category'].id) }}">View All</a>
-                </button>
+                <a href="{{ url_for('routes.category', category_id=data['category'].id) }}">
+                    <button class="outline">View All</button>
+                </a>
             </div>
             <div class="listings">
                 {% for listing in data["listings"] %}
@@ -33,5 +28,7 @@
                 {% endfor %}
             </div>
         </div>
+        <hr>
     {% endfor %}
+    </div>  
 {% endblock %}
