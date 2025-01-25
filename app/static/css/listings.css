@@ -1,15 +1,15 @@
 @import url(components/paginated_listings.css);
 
-h1 {
-    font-size: 2rem;
-    margin: 0;
-}
-
 .intro {
     padding: 1em;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     text-align: center;
+
+    h1 {
+        font-size: 2rem;
+        margin: 0;
+    }
 }
 
 @media (max-width: 500px) {

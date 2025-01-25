@@ -7,13 +7,10 @@
 {% endblock %}
 
 {% block content %}
-    <div class="category">
-        <div class="category-meta">
-            <h1>{{ category.name }}</h1>
-            <p>{{ category.description }}</p>
-        </div>
-        
-        {% include 'components/paginated_listings.html' %}
-        
+    <div class="intro">
+        <h1>{{ category.name }}</h1>
+        <p>{{ category.description }}</p>
     </div>
+
+    {% include 'components/paginated_listings.html' %}
 {% endblock %}
