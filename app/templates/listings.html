@@ -1,8 +1,6 @@
 {% extends 'base.html' %}
 {% block styles %}
     <link rel="stylesheet" href="{{url_for('static', filename='/css/listings.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_grid.css')}}">
-    <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
 {% endblock %}
 {% block title %}
     Listings - Marketplace
@@ -12,9 +10,6 @@
         <h1>Listings</h1>
         <p>This page lists all unsold listings.</p>
     </div>
-    <div class="listings">
-        {% for listing in listings %}
-            {% include 'components/listing_card.html' %}
-        {% endfor %}
-    </div>
+
+    {% include 'components/paginated_listings.html' %}
 {% endblock %}

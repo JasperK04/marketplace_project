@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 {% block styles %}
 <link rel="stylesheet" href="{{url_for('static', filename='/css/index.css')}}">
-<link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_grid.css')}}">
+<link rel="stylesheet" href="{{url_for('static', filename='/css/components/paginated_listings.css')}}">
 <link rel="stylesheet" href="{{url_for('static', filename='/css/components/listing_card.css')}}">
 {% endblock %}
 {% block title %}
@@ -33,7 +33,7 @@ Marketplace
         <div class="listing-meta">
             <h2>Open Listings</h2>
             <button class="outline">
-                <a href="{{ url_for('routes.listings') }}">View All</a>
+                <a href="{{ url_for('routes.listings', page=current_page-1, per_page=per_page) }}">View All</a>
             </button>
         </div>
         <div class="listings">

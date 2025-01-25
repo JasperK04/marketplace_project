@@ -19,7 +19,16 @@ from app.config import config
 app_config = config[os.getenv("FLASK_ENV", "development")]
 
 
-def get_open_listings_with_images(limit:int|None=None, by_user:int|None=None, by_category:int|None=None):
+def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_page=36):
+    # basic normalization
+    if per_page >= 600:
+        per_page = 600
+    elif isinstance(per_page, int):
+        per_page = per_page if per_page % 12 == 0 else (per_page // 12 + 1) * 12
+        per_page = min(max(per_page, 12), 60)
+    else:
+        per_page = 12
+    
     listings = []
     listings_with_images = (
         db.session.query(Listing, Image.filename)
@@ -34,9 +43,14 @@ def get_open_listings_with_images(limit:int|None=None, by_user:int|None=None, by
         listings_with_images = listings_with_images.filter(Listing.userID == by_user)
     if by_category:
         listings_with_images = listings_with_images.filter(Listing.categoryID == by_category)
-    if limit:
-        listings_with_images = listings_with_images.limit(limit)
-    listings_with_images = listings_with_images.all()
+
+    total_items = listings_with_images.count()
+    total_pages = -(-total_items // per_page)
+
+    # Apply pagination
+    start = (page - 1) * per_page
+    listings_with_images = listings_with_images.offset(start).limit(per_page).all()
+
     for listing, filename in listings_with_images:
         if filename:
             listing = listing.to_dict()
@@ -45,7 +59,7 @@ def get_open_listings_with_images(limit:int|None=None, by_user:int|None=None, by
         else:
             listings.append(listing.to_dict())
 
-    return listings
+    return listings, per_page, total_pages
 
 
 def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
