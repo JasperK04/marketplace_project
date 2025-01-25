@@ -46,7 +46,6 @@ def index():
         current_page_url=current_page_url,
         categories=categories
     )
-    return render_template("index.html", listings=listings, categories=categories)
 
 
 @routes.route("/login", methods=["GET", "POST"])
