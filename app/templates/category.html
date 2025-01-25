@@ -7,10 +7,12 @@
 {% endblock %}
 
 {% block content %}
-    <div class="intro">
+    <div class="sub-container">
         <h1>{{ category.name }}</h1>
         <p>{{ category.description }}</p>
     </div>
 
-    {% include 'components/paginated_listings.html' %}
+    <div class="sub-container">
+        {% include 'components/paginated_listings.html' %}
+    </div>
 {% endblock %}
