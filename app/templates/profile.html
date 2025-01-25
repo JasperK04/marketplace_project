@@ -52,11 +52,8 @@
         <hr/>
 
         <h2 id="current_listings">Current Listings</h2>
-        <div class="listings">
-            {% for listing in listings %}
-                {% include 'components/listing_card.html' %}
-            {% endfor %}
-        </div>
+        {% include 'components/paginated_listings.html' %}
+
     </div>
 </div>
 

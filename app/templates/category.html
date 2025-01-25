@@ -4,8 +4,6 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/category.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/listing_card.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/components/listing_grid.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -14,10 +12,8 @@
             <h1>{{ category.name }}</h1>
             <p>{{ category.description }}</p>
         </div>
-        <div class="listings">
-            {% for listing in listings %}
-                {% include 'components/listing_card.html' %}
-            {% endfor %}
-        </div>
+        
+        {% include 'components/paginated_listings.html' %}
+        
     </div>
 {% endblock %}

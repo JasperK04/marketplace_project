@@ -1,3 +1,6 @@
+@import url(components/paginated_listings.css);
+@import url(components/listing_card.css);
+
 .category {
     padding: 1em;
     width: fit-content;

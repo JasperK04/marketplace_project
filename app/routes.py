@@ -113,22 +113,33 @@ def profile_by_name(user_name:str):
         return redirect(url_for('index'))
     if user.is_deactivated and not can_view_restricted_pages():
         return redirect(url_for('index'))
-    listings = get_open_listings_with_images(by_user=user.id)
     
     profile_pic = db.session.execute(
         sa.select(Image).where(Image.userID == user.id)).scalar()
-    return render_template("profile.html", user=user, listings=listings, profile_pic=profile_pic)
+    
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 36, type=int)
+
+    # Fetch listings with pagination
+    listings, per_page, total_pages = get_open_listings_with_images(by_user=user.id, page=page, per_page=per_page)
+    current_page_url = url_for('routes.profile', user_id=user.id)
+
+    return render_template(
+        "profile.html",
+        user=user,
+        profile_pic=profile_pic,
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=current_page_url
+    )
+
 
 @routes.route("/profile/<int:user_id>", methods=["GET"])
 def profile(user_id:int):
     user = db.get_or_404(User, user_id)
-    if user.is_deactivated and not can_view_restricted_pages():
-        return redirect(url_for("routes.index"))
-    listings = get_open_listings_with_images(by_user=user_id)
-    
-    profile_pic = db.session.execute(
-        sa.select(Image).where(Image.userID == user.id)).scalar()
-    return render_template("profile.html", user=user, listings=listings,profile_pic=profile_pic)
+    return profile_by_name(user.username)
 
 
 @routes.route("/profile/<user_id>/edit", methods=["GET", "POST"])
@@ -173,8 +184,22 @@ def edit_profile(user_id):
 # Listings
 @routes.route("/listings", methods=["GET"])
 def listings():
-    listings = get_open_listings_with_images()
-    return render_template("listings.html", listings=listings)
+    # Get query parameters for pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 36, type=int)
+
+    # Fetch listings with pagination
+    listings, per_page, total_pages = get_open_listings_with_images(page=page, per_page=per_page)
+    current_page_url = url_for('routes.listings')
+
+    return render_template(
+        "listings.html",
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=current_page_url
+    )
 
 
 @routes.route("/listings/<int:listing_id>", methods=["GET"])
@@ -349,21 +374,31 @@ def category(category_id: int):
     category = db.get_or_404(
         Category, category_id
     )  # pylint: disable=redefined-outer-name
-    listings = get_open_listings_with_images(by_category=category_id)
-    return render_template("category.html", category=category, listings=listings)
+    print(category_id)
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 24, type=int)
+
+    listings, per_page, total_pages = get_open_listings_with_images(by_category=category_id, page=page, per_page=per_page)
+    current_page_url = url_for('routes.category', category_id=category_id)
+
+    return render_template("category.html", 
+        category=category, 
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=current_page_url
+        )
 
 
 @routes.route("/categories/<category_name>", methods=["GET"])
 def category_name(category_name: str):  # pylint: disable=redefined-outer-name
-    category = db.session.scalar(
+    cat = db.session.scalar(
         select(Category).where(Category.name == category_name.title())
     )  # pylint: disable=redefined-outer-name
-    if category is None:
+    if cat is None:
         return redirect(url_for("routes.index"))
-    listings = db.session.execute(  # pylint: disable=redefined-outer-name
-        sa.select(Listing).where(Listing.categoryID == category.id)
-    ).scalars()
-    return render_template("category.html", category=category, listings=listings)
+    return category(cat.id)
 
 
 # about/contact us

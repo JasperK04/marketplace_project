@@ -1,4 +1,4 @@
-@import url(components/listing_grid.css);
+@import url(components/paginated_listings.css);
 @import url(components/listing_card.css);
 
 
@@ -6,7 +6,6 @@
     padding: 1em;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    margin: 1em;
     text-align: center;
 
     h1 {
@@ -15,13 +14,12 @@
     }
 
     .category-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: .5em;
-        justify-content: space-evenly;
-        margin: 1rem 2.5rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1em;
+        justify-content: center;
+        margin: 1em;
         justify-items:center;
-        min-width: fit-content;
 
         .category-card {
             display:flex;
@@ -31,7 +29,6 @@
             width:10em;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
             border-radius: 8px;
-            margin: 1em;
             text-align: center;
 
             a {
@@ -52,23 +49,17 @@
 
         .category-list {
             margin: 0;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 1em;
-            justify-content: center;
         }
-
     }
-
-
 }
 
 
 .category {
+    margin-top: 1em;
     padding: 1em;
-    width: fit-content;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
-    margin: 1em;
 
     .category-header {
         display:flex;
@@ -83,15 +74,22 @@
         color: inherit;
     }
 
-    @media screen and (max-width: 800px) {
+    @media (max-width: 800px) {
 
         .category-header {
-            margin: 0;
+            margin: 1em 0;
             justify-content: center;
             flex-direction: column;
+
+            > h2 {
+                margin: 10px 0;
+            }
         }
-
     }
+}
 
-
+@media (max-width: 550px) {
+    .container {
+        margin: 2dvh 2.5dvh;
+    }
 }

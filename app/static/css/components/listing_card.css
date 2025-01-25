@@ -1,5 +1,3 @@
-@import url(../colors.css);
-
 .listing-card {
     padding: 1em;
     max-width: 96%;
@@ -16,6 +14,7 @@
 
         > img {
             display: block;
+            max-width: 300px;
             border-radius: 5px 5px 0px 0px;
             width: 100%;
             height: 100%;
@@ -35,21 +34,22 @@
         > .listing-label {
             font-size: 1.25em;
             font-weight: 600;
-        }
 
-        @media screen and (max-width: 800px) {
-            .listing-label {
-                text-align:center;
+            @media (max-width: 500px) {
                 font-size: 1em;
-                font-weight: normal;
             }
         }
-    }
 
-    @media screen and (max-width: 800px) {
-        .listing-content {
-            flex-direction: column;
-            text-align: center;
+        > .listing-title {
+            text-align: left;
+            max-width: 70%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        > .listing-price {
+            text-align: right;
         }
     }
 }
@@ -61,5 +61,14 @@
     .listing-content {
         background-color: var(--color-secondary);
     }
+}
 
+@media (max-width: 500px) {
+    .listing-card {
+        padding: 0.5em;
+
+        .listing-content {
+            padding: 5px;
+        }
+    }
 }

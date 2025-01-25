@@ -1,0 +1,47 @@
+
+<div class="listing-container">
+    <div class="pagination-dropdown">
+        <form class="dropdown-form" method="get" action="{{ current_page_url }}">
+            <label class="dropdown-label" for="per_page">Items per page:</label>
+            <select class="dropdown-select" id="per_page" name="per_page" onchange="this.form.submit()">
+                <option value="600" {% if per_page == 600 %}selected{% endif %} hidden>all</option>
+                <option value="12" {% if per_page == 12 %}selected{% endif %}>12</option>
+                <option value="24" {% if per_page == 24 %}selected{% endif %}>24</option>
+                <option value="36" {% if per_page == 36 %}selected{% endif %}>36</option>
+                <option value="60" {% if per_page == 60 %}selected{% endif %}>60</option>
+            </select>
+        </form>
+    </div>
+
+    <div class="listings">
+        {% for listing in listings %}
+            {% include 'components/listing_card.html' %}
+        {% endfor %}
+    </div>
+
+    <div class="pagination-pages">
+        <ul>
+            {% if current_page > 1 %}
+                <li><a class="page-btn" href="{{ current_page_url }}?page={{ page }}&per_page={{ per_page }}">Prev</a></li>
+            {% endif %}
+            {% for page in range(current_page - 2, current_page + 3) %}
+                {% if page > 0 and page <= total_pages %}
+                    <li>
+                        {% if page == current_page %}
+                            <a class="page-btn active" href="{{ current_page_url }}?page={{ page }}&per_page={{ per_page }}">
+                                {{ page }}
+                            </a>
+                        {% else %}
+                            <a class="page-btn" href="{{ current_page_url }}?page={{ page }}&per_page={{ per_page }}">
+                                {{ page }}
+                            </a>
+                        {% endif %}
+                    </li>
+                {% endif %}
+            {% endfor %}
+            {% if current_page < total_pages %}
+                <li><a class="page-btn" href="{{ current_page_url }}?page={{ page }}&per_page={{ per_page }}">Next</a></li>
+            {% endif %}
+        </ul>
+    </div>
+</div>

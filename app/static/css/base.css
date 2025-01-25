@@ -236,60 +236,10 @@ body {
         width: 4.5em;
     }
 }
-
+*/
 
 @media (max-width: 500px) {
-
-    .logo-header img {
-        height: 60px;
+    .container {
+        margin: 2dvh 2.5dvh;
     }
-
-    .nav-container {
-        gap: 3px;
-    }
-
-    .btn {
-        padding: 5px 10px;
-    }
-
-    .links {
-        display: none;
-    }
-
-    .login>.btn, .sign-up>.btn, .logout>.btn {
-        width: 3.8em;
-    }
-}
- */
-
-.primary {
-    background-color: var(--color-primary);
-}
-
-.text-primary {
-    color: var(--color-text-primary);
-}
-
-.secondary {
-    background-color: var(--color-secondary);
-}
-
-.text-secondary {
-    color: var(--color-text-secondary);
-}
-
-.tertiary {
-    background-color: var(--color-tertiary);
-}
-
-.text-tertiary {
-    color: var(--color-tertiary);
-}
-
-.background {
-    background-color: var(--color-background);
-}
-
-.text-background {
-    color: var(--color-background);
 }
