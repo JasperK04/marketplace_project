@@ -159,11 +159,22 @@ def profile(user_id:int):
 @login_required
 def edit_profile(user_id):
     user = db.get_or_404(User, user_id)
-    listings = get_open_listings_with_images(by_user=user_id)
+
+    # Get query parameters for pagination
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 24, type=int)
+
+    # Fetch listings with pagination
+    listings, per_page, total_pages = get_open_listings_with_images(page=page, per_page=per_page, by_user=user_id)
+    current_page_url = url_for('routes.profile', user_id=current_user.id)
 
     if user.id != current_user.id:
         flash("You are not allowed to edit this profile.")
-        return render_template("profile.html", user=user, listings=listings)
+        return render_template("profile.html", user=user, listings=listings,
+                               profile_pic="https://placehold.co/200x200",
+                               current_page=page, total_pages=total_pages,
+                               per_page=per_page, current_page_url=current_page_url
+                              )
 
     form = EditProfileForm(obj=user)
     if form.validate_on_submit():
@@ -189,7 +200,15 @@ def edit_profile(user_id):
 
         profile_pic = db.session.execute(
             sa.select(Image).where(Image.userID == current_user.id)).scalar()
-        return render_template("profile.html", user=user, listings=listings,profile_pic=profile_pic)
+        return render_template("profile.html",
+            listings=listings,
+            current_page=page,
+            total_pages=total_pages,
+            per_page=per_page,
+            current_page_url=current_page_url,
+            profile_pic=profile_pic,
+            user=user
+        )
 
     return render_template("edit_profile.html", user=user, form=form)
 
