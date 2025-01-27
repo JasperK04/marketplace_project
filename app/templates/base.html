@@ -92,22 +92,23 @@
     </div>
     <nav class="footer">
         <div class="footer-links">
-            <div class="flex-column gaps">
+            <div class="flex-column">
                 <a class="text-background pad" href="{{ url_for('routes.about_us') }}">About Us</a>
                 <a class="text-background pad" href="{{ url_for('routes.contact_us') }}">Contact Us</a>
                 <a class="text-background pad" href="{{ url_for('routes.index') }}">Home</a>
             </div>
-            <div class="flex-column gaps">
-                <a class="text-background pad" href="{{ url_for('routes.listings') }}">Listings</a>
-                <a class="text-background pad" href="{{ url_for('routes.categories') }}">Categories</a>
+            <div class="flex-column">
+                <a class="text-background" href="{{ url_for('routes.listings') }}">Listings</a>
+                <a class="text-background" href="{{ url_for('routes.categories') }}">Categories</a>
+                <a class="text-background" href="{{ url_for('routes.index') }}" style="display: none;">Categories</a>
             </div>
         </div>
-        <div class="logo-footer pad">
+        <div class="logo-footer">
             <a class="text-background" href="{{ url_for('routes.index') }}">
                 <img src="{{url_for('static', filename='assets/images/socials/marketplace.png')}}" alt="Marketplace logo">
             </a>
         </div>
-        <div class="copyright pad text-background">
+        <div class="copyright text-background">
             <p>&copy; Marketplace <span id="year"></span></p>
             <script>
                 document.getElementById("year").innerText = new Date().getFullYear();

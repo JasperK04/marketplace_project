@@ -1,8 +1,1 @@
 @import url(components/paginated_listings.css);
-@import url(components/intro.css);
-
-@media (max-width: 500px) {
-    .listing-container {
-        padding: 0.5em;
-    }
-}

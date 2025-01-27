@@ -1,2 +1,6 @@
 @import url(components/paginated_listings.css);
 @import url(components/categories_list.css);
+
+.listing-meta {
+    margin-bottom: 5px;
+}
