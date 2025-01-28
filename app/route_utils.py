@@ -47,6 +47,11 @@ def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_pa
     total_items = listings_with_images.count()
     total_pages = -(-total_items // per_page)
 
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
+
     # Apply pagination
     start = (page - 1) * per_page
     listings_with_images = listings_with_images.offset(start).limit(per_page).all()

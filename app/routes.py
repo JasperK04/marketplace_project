@@ -37,6 +37,11 @@ def index():
 
     categories = db.session.query(Category).all()
 
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
+
     return render_template(
         "index.html",
         listings=listings,
@@ -137,6 +142,11 @@ def profile_by_name(user_name:str):
     listings, per_page, total_pages = get_open_listings_with_images(by_user=user.id, page=page, per_page=per_page)
     current_page_url = url_for('routes.profile', user_id=user.id)
 
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
+
     return render_template(
         "profile.html",
         user=user,
@@ -167,6 +177,11 @@ def edit_profile(user_id):
     # Fetch listings with pagination
     listings, per_page, total_pages = get_open_listings_with_images(page=page, per_page=per_page, by_user=user_id)
     current_page_url = url_for('routes.profile', user_id=current_user.id)
+
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
 
     if user.id != current_user.id:
         flash("You are not allowed to edit this profile.")
@@ -223,6 +238,11 @@ def listings():
     # Fetch listings with pagination
     listings, per_page, total_pages = get_open_listings_with_images(page=page, per_page=per_page)
     current_page_url = url_for('routes.listings')
+
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
 
     return render_template(
         "listings.html",
@@ -415,6 +435,11 @@ def category(category_id: int):
 
     listings, per_page, total_pages = get_open_listings_with_images(by_category=category_id, page=page, per_page=per_page)
     current_page_url = url_for('routes.category', category_id=category_id)
+
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
 
     return render_template("category.html", 
         category=category, 
