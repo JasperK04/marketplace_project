@@ -84,13 +84,18 @@
             }
 
             > .active {
-                background-color: var(--color-tertiary);
+                background-color: var(--color-quaternary);
+                text-decoration: underline;
             }
 
             > .active:hover {
-                background-color: var(--color-tertiary);
+                background-color: var(--color-quaternary);
                 box-shadow: none;
                 cursor: default;
+            }
+
+            > .main {
+                background-color: var(--color-tertiary);
             }
         }
     }
