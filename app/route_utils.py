@@ -5,7 +5,6 @@ import sqlalchemy as sa
 import os
 import sqlalchemy as sa
 from PIL import Image as IM
-from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.models.Listing import Listing
@@ -34,8 +33,7 @@ def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_pa
         db.session.query(Listing, Image.filename)
         .join(
             Image,
-            (Image.listingID == Listing.id) & (Image.variant == "original"),
-            isouter=True,
+            (Image.listingID == Listing.id), isouter=True,
         )
         .filter((Listing.sold == False) & (Listing.is_deactivated == False))
     )
@@ -67,40 +65,48 @@ def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_pa
     return listings, per_page, total_pages
 
 
-def resize_upload_image(file, size, user_id, listing_id, folder, type, variant):
-    image = IM.open(file)
-    img = image.copy()
+def resize_upload_image(file, ratio, size, user_id=None, listing_id=None):
+    img = IM.open(file)
+    format = img.format
 
-    img = img.resize(size,resample=1)  # always resize image (ignore aspect ratio) because of styling.
-    filename = f"{uuid.uuid4()}_{secure_filename(file.filename)}"
-    folder = app_config.UPLOAD_FOLDER if folder == "UPLOAD_FOLDER" else app_config.RESIZED_FOLDER
+    # find the biggest centered box within the uploaded picture
+    x, y = ratio
+    width, height = img.size
+    max_x = width // x
+    max_y = height // y
+    max_size = min(max_x, max_y)
+    new_width = max_size * x
+    new_height = max_size * y
+    start_x = (width - new_width) // 2
+    start_y = (height - new_height) // 2 
+
+    # resize the box within to the requested size   
+    img = img.resize(size, resample=1, box=(start_x, start_y, start_x+new_width, start_y+new_height))
+
+    filename = f"{uuid.uuid4()}_{f'profile' if user_id else listing_id}.{format.lower()}" #type: ignore
+    folder = app_config.PICTURE_FOLDER
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
-    img.save(filepath)
-    if type == "listing":
-        new_image = Image(
-            filename=filename,
-            filepath=filepath,
-            type=type,
-            listingID=listing_id,
-            variant=variant,
-        )
-    else:
-        new_image = Image(
-            filename=filename,
-            filepath=filepath,
-            type=type,
-            userID=user_id,
-            variant=variant,
-        )   
+    img.save(filepath, format)
+
+    assert listing_id or user_id, 'requires a listing_id or user_id'
+
+    new_image = Image(
+        filepath=filepath,
+        filename=filename,
+        listingID=listing_id,
+        userID=user_id
+    )
+ 
     return new_image
 
 
-def delete_images(id:int,variant:str):
+def delete_images(listing_id=None, user_id=None):
     # first query the filepaths so the files on disk can be deleted
-    if variant == "listing":
+    assert listing_id or user_id, 'one or the other is required'
+    if listing_id:
         images = db.session.execute(
-            sa.select(Image).where(Image.listingID == id)
+            sa.select(Image).where(Image.listingID == listing_id)
         ).scalars()
         for image in images:
             if image and os.path.exists(image.filepath):
@@ -110,7 +116,7 @@ def delete_images(id:int,variant:str):
                 db.session.commit()
     else:
         image = db.session.execute(
-            sa.select(Image).where(Image.userID == id)
+            sa.select(Image).where(Image.userID == user_id)
         ).scalar()
         if image and os.path.exists(image.filepath):
             os.remove(image.filepath)

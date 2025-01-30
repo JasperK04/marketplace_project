@@ -108,12 +108,9 @@ def register():
         if file:
             img = resize_upload_image(
                 file=file,
-                size=(200,200),
-                user_id=user.id,
-                listing_id=None,
-                folder='UPLOAD_FOLDER',
-                type='profile',
-                variant='original',
+                ratio=(1, 1),
+                size=(200, 200),
+                user_id=user.id
             )
             db.session.add(img)
         db.session.commit()
@@ -199,18 +196,15 @@ def edit_profile(user_id):
         db.session.add(user)
         db.session.flush()
         if file:
-            delete_images(user.id,"user")
+            delete_images(user_id=user.id)
 
-            img = resize_upload_image(
-                file,
-                (200,200),
-                user.id,
-                None,
-                'UPLOAD_FOLDER',
-                'profile',
-                'original',
+            image = resize_upload_image(
+                file=file,
+                ratio=(1, 1),
+                size=(200, 200),
+                user_id=user_id
             )
-            db.session.add(img)
+            db.session.add(image)
         db.session.commit()
 
         profile_pic = db.session.execute(
@@ -259,7 +253,7 @@ def listing(listing_id: int):
     listing = db.get_or_404(Listing, listing_id).to_dict()
     image = db.session.execute(
         sa.select(Image).where(
-            (Image.listingID == listing_id) & (Image.variant == "resized")
+            (Image.listingID == listing_id)
         )
     ).scalar()
     if image:
@@ -273,9 +267,6 @@ def listing(listing_id: int):
 @login_required
 def add_listing():
     form = ListingForm()
-    form.category.choices = [
-        category.name for category in db.session.query(Category).all()
-    ]
     form.submit.label.text = "Add listing"
     if form.validate_on_submit():
         file = request.files.get("file")
@@ -296,26 +287,13 @@ def add_listing():
         db.session.add(new_listing)
         db.session.flush()
         if file:
-            img_org = resize_upload_image(
-                file,
-                (300,200),
-                None,
-                new_listing.id,
-                'UPLOAD_FOLDER',
-                'listing',
-                'original',
+            image = resize_upload_image(
+                file=file,
+                ratio=(3, 2),
+                size=(600, 400),
+                listing_id=new_listing.id
             )
-            img_resized = resize_upload_image(
-                file,
-                (600,400),
-                None,
-                new_listing.id,
-                'RESIZED_FOLDER',
-                'listing',
-                'resized',
-            )
-            db.session.add(img_org)
-            db.session.add(img_resized)
+            db.session.add(image)
         db.session.commit()
         return redirect(url_for("routes.index"))
     return render_template("add_listing.html", title="Add listing", form=form)
@@ -332,39 +310,31 @@ def edit_listing(listing_id:int):
             url_for("routes.index")
         )  # this depends on where the edit button/link will be placed
 
-    form = ListingForm(obj=listing)  # so that form is prefilled (only category is not)
-    form.category.choices = [
-        category.name for category in db.session.query(Category).all()
-    ]
+    form = ListingForm(obj=listing)
+
+    if not form.validate_on_submit():
+        form.category.data = db.session.scalar(select(Category.name).where(
+                             Category.id == listing.categoryID))
+        
+        if listing.price is not None:
+            form.price.data = f"{listing.price / 100:.2f}".replace(".", ",")
+
     form.submit.label.text = "Edit listing"
+
     if form.validate_on_submit():
         file = request.files.get("file")
         if file:
             # delete old images on disk and in the database
-            delete_images(listing_id,"listing")
+            delete_images(listing_id=listing_id)
 
-            # add new ones
-            img_org = resize_upload_image(
-                file,
-                (300, 200),
-                None,
-                listing_id,
-                "UPLOAD_FOLDER",
-                "listing",
-                "original",
-            )
-            img_resized = resize_upload_image(
-                file,
-                (600, 400),
-                None,
-                listing_id,
-                "RESIZED_FOLDER",
-                "listing",
-                "resized",
+            image = resize_upload_image(
+                file=file,
+                ratio=(3, 2),
+                size=(600, 400),
+                listing_id=listing_id
             )
 
-            db.session.add(img_org)
-            db.session.add(img_resized)
+            db.session.add(image)
             db.session.commit()
         listing.title = Listing.normalize_title(form.title.data)
         listing.categoryID = db.session.scalar(

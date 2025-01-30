@@ -14,7 +14,7 @@
         <div class="profile_main">
             <div class="profile_picture">
                 {% if profile_pic.filename %}
-                    <img src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ profile_pic.filename)}}" alt="Profile picture">
+                    <img height="200" src="{{url_for('static',filename='assets/images/user_uploaded/'+ profile_pic.filename)}}" alt="Profile picture">
                 {% else %}
                     <img src="https://placehold.co/200x200" alt="Profile picture">
                 {% endif %}

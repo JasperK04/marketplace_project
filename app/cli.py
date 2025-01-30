@@ -212,6 +212,8 @@ def initialize_database(users: int, listings: int):
     for new_user in new_users:
         db.session.add(new_user)
 
+    admin = User().from_dict({"username": "jasperkleine", "name": "jasperkleine", "email": "jasper@kleine.nl", "password": "jasperkleine123"}, new_user=True).make_admin()
+    db.session.add(admin)
 
     db.session.commit()
     print("Users created.")
@@ -241,6 +243,7 @@ def initialize_database(users: int, listings: int):
     print("Listings created.")
 
     print("Database initialized.")
+    
 
 
 @cli.cli.command("create-admin")

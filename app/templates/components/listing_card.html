@@ -3,7 +3,7 @@
         <div class="listing-image">
             {% if listing.filename %}
                 <img
-                    src="{{url_for('static',filename='assets/images/user_uploaded/listings/'+ listing.filename)}}"
+                    src="{{url_for('static',filename='assets/images/user_uploaded/'+ listing.filename)}}"
                     alt="{{ listing.title }}">
             {% else %}
                 <img src="https://placehold.co/300x200" alt="">

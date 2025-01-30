@@ -5,6 +5,10 @@ from wtforms.validators import ValidationError, DataRequired, Email, EqualTo, Le
 import sqlalchemy as sa
 from app.extensions import db
 from app.models.User import User
+from app.models.Category import Category
+
+def get_categories():
+        return [(category.name, category.name) for category in db.session.query(Category).all()]
 
 class RegistrationForm(FlaskForm):
     name = StringField('Name', render_kw={"class": "text", "placeholder": "Enter your full name", "autocomplete": "name", "autofocus": "autofocus"},
@@ -49,6 +53,10 @@ class ListingForm(FlaskForm):
     file = FileField('Upload image (300x200)',validators=[FileAllowed(['jpg', 'jpeg','png'])],
                      render_kw={"class": "file-input", "onchange": "getFileName(event)", "accept": "image/jpeg, image/jpg, image/png"})
     submit = SubmitField('Submit', render_kw={"class": "submit"})
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.category.choices = get_categories()
 
 
 class EditProfileForm(FlaskForm):

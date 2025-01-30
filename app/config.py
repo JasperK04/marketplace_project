@@ -9,10 +9,7 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = "filesystem"
     SESSION_PERMANENT = True
-    UPLOAD_FOLDER = os.path.abspath("app/static/assets/images/user_uploaded/listings/")
-    RESIZED_FOLDER = os.path.abspath(
-        "app/static/assets/images/user_uploaded/listings_resized/"
-    )
+    PICTURE_FOLDER = os.path.abspath("app/static/assets/images/user_uploaded")
     SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
         os.path.abspath(os.path.dirname(__file__)), "app.db"
     )
