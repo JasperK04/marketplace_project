@@ -9,7 +9,7 @@
 {% endblock scripts %}
 {% block content %}
 
-<div class="profile_page">
+<div class="sub-container">
     <div class="profile_container">
         <div class="profile_main">
             <div class="profile_picture">
@@ -21,7 +21,7 @@
             </div>
             <div class="profile_name">
                 <h1>
-                    {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}'s Profile
+                    {%if user.is_deactivated %}[DEACTIVATED]{% endif %}{{ user.name }}
                 </h1>
             </div>
             <div class="user_buttons">
@@ -30,9 +30,9 @@
                 {% endif %}
                 {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
                     {% if user.is_deactivated %}
-                        <span><button class="primary" id="reactivate-user">Reactivate user</button></span>
+                        <span><button class="primary" id="reactivate-user">Reactivate</button></span>
                     {% else %}
-                        <span><button class="destructive" id="deactivate-user">Deactivate user</button></span>
+                        <span><button class="destructive" id="deactivate-user">Deactivate</button></span>
                     {% endif %}
                 {% endif %}
             </div>

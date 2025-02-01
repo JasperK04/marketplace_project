@@ -10,14 +10,11 @@ hr {
     margin: 0;
 }
 
-.profile_page {
-    margin: 3dvh auto;
-    width: 80dvw;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
-    border-radius: 15px;
-
+.sub-container {
+    border-radius: 10px;
+    
     > .profile_container {
-        padding: 10px 15px;
+        width: 100%;
         
         > .profile_main {
             margin-bottom: 10px;
@@ -53,7 +50,7 @@ hr {
                 }
 
                 > span > button {
-                    width: 11em;
+                    width: 8em;
                 }
             }
 
@@ -62,10 +59,9 @@ hr {
                 text-align: center;
 
                 > h1 {
-                    margin: 0 0 12px 0;
-                    display:flex;
+                    display: flex;
                     justify-content: space-between;
-
+                    font-size: 2.2em;
                 }
             }
         }
@@ -89,9 +85,13 @@ hr {
 }
 
 @media screen and (max-width: 800px) {
-    .profile_page .profile_container .profile_main {
+    .sub-container .profile_container .profile_main {
         flex-direction: column;
         text-align: center;
+
+        > .profile_name h1 {
+            font-size: 2em;
+        }
 
         > .user_buttons {
             align-self: center;
