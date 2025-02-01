@@ -77,11 +77,11 @@
             {% endif %}
     </div>
 
-    {% with messages=get_flashed_messages() %}
+    {% with messages=get_flashed_messages(with_categories=true) %}
         {% if messages %}
-            {% for message in messages %}
-                <div class="flash_message">
-                    <p>{{ message }}</p>
+            {% for category, message in messages %}
+                <div class="flash-message">
+                    <p class="{{category}}">{{ message }}</p>
                 </div>
             {% endfor %}
         {% endif %}

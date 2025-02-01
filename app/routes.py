@@ -6,7 +6,7 @@ from urllib.parse import urlsplit
 import os
 
 
-from app.extensions import db
+from app.extensions import db, login as login_manager
 from app.config import config
 from app.forms import LoginForm, RegistrationForm, ListingForm, EditProfileForm
 from app.models.User import User
@@ -22,6 +22,28 @@ routes = Blueprint("routes", __name__)
 
 def can_view_restricted_pages():
     return current_user.is_authenticated and current_user.is_admin
+
+def normal_path(path):
+    parts = path.strip('/').replace('_', ' ').split('/')
+
+    actions = ['edit', 'delete']
+    action = parts[-1] if parts[-1] in actions else None
+    if action:
+        main_route = parts[0]
+        if main_route.endswith('s'):
+            main_route = main_route[:-1]
+        
+        return f"{action} {main_route}"
+    else:
+        # No action, just return the path in a readable format
+        return ' '.join(part for part in parts)
+
+@login_manager.unauthorized_handler
+def unauthorized():
+    attempted_page = request.path
+    page = normal_path(attempted_page)
+    flash(f'You must be logged in to access \"{page}\".', 'error')
+    return redirect(url_for('routes.login', next=attempted_page))
 
 
 @routes.route("/", methods=["GET"])
@@ -59,15 +81,15 @@ def login():
         return redirect(url_for("routes.index"))
     form = LoginForm()
     if form.validate_on_submit():
+        next_page = request.args.get("next")
         user = db.session.scalar(sa.select(User).where(User.username == form.username.data))
         if user is None or not user.check_password(form.password.data):
-            flash("Invalid username or password")
-            return redirect(url_for("routes.login"))
+            flash("Invalid username or password", "error")
+            return redirect(url_for("routes.login", next=next_page))
         if user.is_deactivated:
-            flash("Account is deactivated")
-            return redirect(url_for("routes.login"))
+            flash("Account is deactivated", "error")
+            return redirect(url_for("routes.login", next=next_page))
         login_user(user, remember=form.remember_me.data)
-        next_page = request.args.get("next")
         if not next_page or urlsplit(next_page).netloc != "":
             next_page = url_for("routes.index")
         return redirect(next_page)
@@ -88,10 +110,10 @@ def register():
     if form.validate_on_submit():
         file = request.files.get("file")
         if db.session.scalar(sa.select(User).where(User.name == form.username.data)):
-            flash("Username already taken")
+            flash("Username already taken", "error")
             return redirect(url_for("register"))
         if db.session.scalar(sa.select(User).where(User.email == form.email.data)):
-            flash("Email address already exists.")
+            flash("Email address already exists.", "error")
             return redirect(url_for("register"))
         user = User().from_dict(
             {
@@ -114,13 +136,14 @@ def register():
             )
             db.session.add(img)
         db.session.commit()
-        flash("Congratulations, you are now a registered user!")
+        flash("Congratulations, you are now a registered user!", "success")
         return redirect(url_for("routes.login"))
     return render_template("register.html", title="Register", form=form)
 
 
 # Profile stuff
 @routes.route("/profile/<user_name>", methods=["GET"])
+@login_required
 def profile_by_name(user_name:str):
     print(user_name)
     user = db.session.scalar(select(User).where(User.username == user_name))
@@ -157,6 +180,7 @@ def profile_by_name(user_name:str):
 
 
 @routes.route("/profile/<int:user_id>", methods=["GET"])
+@login_required
 def profile(user_id:int):
     user = db.get_or_404(User, user_id)
     return profile_by_name(user.username)
@@ -181,7 +205,7 @@ def edit_profile(user_id):
         page = 1
 
     if user.id != current_user.id:
-        flash("You are not allowed to edit this profile.")
+        flash("You are not allowed to edit this profile." "warning")
         return render_template("profile.html", user=user, listings=listings,
                                profile_pic="https://placehold.co/200x200",
                                current_page=page, total_pages=total_pages,
@@ -299,13 +323,13 @@ def add_listing():
     return render_template("add_listing.html", title="Add listing", form=form)
 
 
-@routes.route("/edit/<int:listing_id>", methods=["GET", "POST"])
+@routes.route("/listings/<int:listing_id>/edit", methods=["GET", "POST"])
 @login_required
 def edit_listing(listing_id:int):
     listing = db.get_or_404(Listing, listing_id)
 
     if listing.userID != current_user.id:
-        flash("You are not allowed to edit this listing.")
+        flash("You are not allowed to edit this listing.", "warning")
         return redirect(
             url_for("routes.index")
         )  # this depends on where the edit button/link will be placed
@@ -350,13 +374,13 @@ def edit_listing(listing_id:int):
     return render_template("add_listing.html", title="Edit listing", form=form)
 
 
-@routes.route("/delete_listing/<int:listing_id>", methods=["GET", "POST"])
+@routes.route("/listings/<int:listing_id>/delete", methods=["GET", "POST"])
 @login_required
 def delete_listing(listing_id:int):
     listing = db.get_or_404(Listing, listing_id)
 
     if listing.userID != current_user.id:
-        flash("You are not allowed to delete this listing.")
+        flash("You are not allowed to delete this listing.", "warning")
         return redirect(
             url_for("routes.index")
         )  # this depends on where the edit button/link will be placed
