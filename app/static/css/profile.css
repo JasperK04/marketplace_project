@@ -1,6 +1,4 @@
 @import url(components/paginated_listings.css);
-@import url(components/listing_card.css);
-@import url(colors.css);
 
 hr {
     margin: 2.5dvh 0px;
