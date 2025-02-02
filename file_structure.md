@@ -46,20 +46,24 @@
                     └── twitter.svg
                     └── whatsapp.svg
                 └── 📁user_uploaded
-                    └── 📁listings
-                    └── 📁listings_resized
+                    └── 01ff7da2-fced-4392-9850-461b9c22e1d2_profile.png
+                    └── 6f5e4c5c-068f-4b79-8296-84d974fb9399_profile.png
+                    └── ba34d25e-89f6-40ed-a722-6868011427a6_453.png
+                    └── e5e2206b-3a65-439d-8def-6c312e8da04c_22.png
         └── 📁css
             └── about.css
             └── add_listing.css
             └── base.css
             └── categories.css
             └── category.css
-            └── colors.css
             └── 📁components
                 └── buttons.css
+                └── categories_list.css
+                └── colors.css
                 └── confirm_modal.css
+                └── forms.css
                 └── listing_card.css
-                └── listing_grid.css
+                └── paginated_listings.css
             └── contact.css
             └── edit_profile.css
             └── index.css
@@ -70,6 +74,7 @@
         └── 📁js
             └── activationFunctions.js
             └── confirmModal.js
+            └── fileUpload.js
             └── listing.js
             └── menu.js
             └── profile.js
@@ -80,8 +85,10 @@
         └── categories.html
         └── category.html
         └── 📁components
+            └── categories_list.html
             └── confirm_modal.html
             └── listing_card.html
+            └── paginated_listings.html
         └── contact_us.html
         └── edit_profile.html
         └── errors.html

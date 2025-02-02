@@ -1,9 +1,6 @@
 import uuid
 import os
 import sqlalchemy as sa
-
-import os
-import sqlalchemy as sa
 from PIL import Image as IM
 
 from app.extensions import db
