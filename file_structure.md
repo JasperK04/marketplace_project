@@ -46,10 +46,6 @@
                     └── twitter.svg
                     └── whatsapp.svg
                 └── 📁user_uploaded
-                    └── 01ff7da2-fced-4392-9850-461b9c22e1d2_profile.png
-                    └── 6f5e4c5c-068f-4b79-8296-84d974fb9399_profile.png
-                    └── ba34d25e-89f6-40ed-a722-6868011427a6_453.png
-                    └── e5e2206b-3a65-439d-8def-6c312e8da04c_22.png
         └── 📁css
             └── about.css
             └── add_listing.css
