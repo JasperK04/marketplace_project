@@ -4,17 +4,20 @@ import click
 import sqlalchemy as sa
 from faker import Faker
 
+from app.route_utils import resize_upload_image
+
 from app.extensions import db
 from app.models.User import User
 from app.models.Listing import Listing
 from app.models.Category import Category
+from app.models.Image import Image
 
 cli = Blueprint("cli", __name__)
 
 
 @cli.cli.command("recreate-db")
 @click.option("--users", type=int, default=50, help="Number of users to create.")
-@click.option("--listings", type=int, default=500, help="Number of listings to create.")
+@click.option("--listings", type=int, default=200, help="Number of listings to create.")
 def initialize_database(users: int, listings: int):
     """Drops the current database and creates a new one with faked data."""
     fake = Faker()
@@ -33,6 +36,7 @@ def initialize_database(users: int, listings: int):
                 "speaker",
             ],
             "description": "Electronic devices and gadgets.",
+            "path": "static/assets/images/electronics.jpeg"
         },
         "Clothing": {
             "keywords": [
@@ -48,6 +52,7 @@ def initialize_database(users: int, listings: int):
                 "suit",
             ],
             "description": "Apparel and accessories.",
+            "path": "static/assets/images/clothes.jpeg"
         },
         "Books": {
             "keywords": [
@@ -63,6 +68,7 @@ def initialize_database(users: int, listings: int):
                 "memoir",
             ],
             "description": "Literature and educational materials.",
+            "path": "static/assets/images/books.jpeg"
         },
         "Home & Garden": {
             "keywords": [
@@ -78,6 +84,7 @@ def initialize_database(users: int, listings: int):
                 "shelf",
             ],
             "description": "Furniture and home improvement items.",
+            "path": "static/assets/images/home.jpeg"
         },
         "Fashion & Beauty": {
             "keywords": [
@@ -93,6 +100,7 @@ def initialize_database(users: int, listings: int):
                 "necklace",
             ],
             "description": "Beauty products and fashion accessories.",
+            "path": "static/assets/images/fashion.jpeg"
         },
         "Sport": {
             "keywords": [
@@ -108,6 +116,7 @@ def initialize_database(users: int, listings: int):
                 "sneakers",
             ],
             "description": "Sporting goods and fitness equipment.",
+            "path": "static/assets/images/sport.jpeg"
         },
         "Toys": {
             "keywords": [
@@ -123,6 +132,7 @@ def initialize_database(users: int, listings: int):
                 "remote control car",
             ],
             "description": "Children's toys and games.",
+            "path": "static/assets/images/toys.jpeg"
         },
         "Vehicles": {
             "keywords": [
@@ -138,6 +148,7 @@ def initialize_database(users: int, listings: int):
                 "skateboard",
             ],
             "description": "Various types of vehicles and related accessories.",
+            "path": "static/assets/images/vehicles.jpeg"
         },
         "Music": {
             "keywords": [
@@ -153,6 +164,7 @@ def initialize_database(users: int, listings: int):
                 "trumpet",
             ],
             "description": "Musical instruments and audio equipment.",
+            "path": "static/assets/images/music.jpeg"
         },
         "Other": {
             "keywords": [
@@ -168,6 +180,7 @@ def initialize_database(users: int, listings: int):
                 "unknown item",
             ],
             "description": "Miscellaneous items that do not fit into other categories.",
+            "path": "static/assets/images/other.jpeg"
         },
     }
     adjectives = [
@@ -226,19 +239,28 @@ def initialize_database(users: int, listings: int):
         product = choice(categories[category.name]["keywords"])
         title = f"{choice(adjectives).capitalize()} {product.capitalize()}"
         description = f"{fake.sentence(nb_words=3)} This {product} is {fake.text(max_nb_chars=50).lower()} and perfect for anyone looking to upgrade their {category.name.lower()}."
-
-        db.session.add(
-            Listing().from_dict(
-                {
-                    "title": title,
-                    "description": description,
-                    "price": fake.random_int(min=50, max=10000),
-                    "categoryID": category.id,
-                    "userID": choice(created_users).id,
-                }
-            )
+        user_id = choice(created_users).id
+        new_listing = Listing().from_dict(
+            {
+                "title": title,
+                "description": description,
+                "price": fake.random_int(min=50, max=10000),
+                "categoryID": category.id,
+                "userID": user_id
+            }
         )
 
+        db.session.add(new_listing)
+        db.session.flush()
+        file = "app/static/assets/images/" + category.name.split(" ", -1)[0].lower() + ".png"
+        db.session.add(
+            resize_upload_image(
+                file=file,
+                ratio=(3, 2),
+                size=(600, 400),
+                listing_id=new_listing.id
+            )
+        )
     db.session.commit()
     print("Listings created.")
 
