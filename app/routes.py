@@ -398,24 +398,44 @@ def delete_listing(listing_id:int):
 @routes.route("/categories", methods=["GET"])
 def categories():
     db_categories = db.session.query(Category).all()
+
     listings_per_cat = {
         category.id: {"category": category, "listings": []}
         for category in db_categories
     }
-    # get 10 most recent listings for each category, in a single query
-    for category_id, value in listings_per_cat.items():
-        value["listings"] = [
-            listing.to_dict()
-            for listing in db.session.query(Listing)
-            .filter_by(categoryID=category_id)
-            .order_by(Listing.id.desc())
-            .limit(12)
-            .all()
-        ]
+
+    # Preload all recent listings for all categories
+    all_recent_listings = (
+        db.session.query(Listing)
+        .order_by(Listing.id.desc())
+        .all()
+    )
+
+    # Get all images for these listings in one query
+    listing_ids = [listing.id for listing in all_recent_listings]
+    images = (
+        db.session.query(Image)
+        .filter(Image.listingID.in_(listing_ids))
+        .all()
+    )
+    image_map = {img.listingID: img.filename for img in images}
+
+    # Assign listings to categories and attach image filename
+    for listing in all_recent_listings:
+        cat_id = listing.categoryID
+        if cat_id in listings_per_cat and len(listings_per_cat[cat_id]["listings"]) < 12:
+            listing_dict = listing.to_dict()
+            if listing.id in image_map:
+                listing_dict["filename"] = image_map[listing.id]
+            listings_per_cat[cat_id]["listings"].append(listing_dict)
 
     categories = db.session.query(Category).all()
 
-    return render_template("categories.html", listings_per_cat=listings_per_cat, categories=categories)
+    return render_template(
+        "categories.html",
+        listings_per_cat=listings_per_cat,
+        categories=categories
+    )
 
 
 @routes.route("/categories/<int:category_id>", methods=["GET"])
