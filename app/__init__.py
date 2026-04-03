@@ -1,6 +1,8 @@
 from os import getenv
 
 from flask import Flask
+from sqlalchemy import inspect
+from sqlalchemy.exc import OperationalError
 
 from app.api import api
 from app.cli import cli
@@ -43,8 +45,16 @@ def register_blueprints(app: Flask) -> None:
 
 
 def create_db(app: Flask) -> None:
+    if getenv("FLASK_ENV", "development") != "development":
+        return
+
     with app.app_context():
+        inspector = inspect(db.engine)
+        if inspector.get_table_names():
+            return
+
         try:
             db.create_all()
-        except Exception as e:
-            app.logger.warning("Failed to ensure database tables: %s", e)
+        except OperationalError as exc:
+            if "already exists" not in str(exc).lower():
+                raise
