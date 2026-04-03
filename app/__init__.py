@@ -1,13 +1,14 @@
-from flask import Flask
 from os import getenv
 
-from app.extensions import db, migrate, session, login
-from app.config import config
-from app.routes import routes
+from flask import Flask
+
 from app.api import api
 from app.cli import cli
+from app.config import config
 from app.errors import register_error_handler
+from app.extensions import db, login, migrate, session
 from app.logging import setup_logging
+from app.routes import routes
 
 
 def create_app() -> Flask:
@@ -43,4 +44,7 @@ def register_blueprints(app: Flask) -> None:
 
 def create_db(app: Flask) -> None:
     with app.app_context():
-        db.create_all()
+        try:
+            db.create_all()
+        except Exception as e:
+            app.logger.warning("Failed to ensure database tables: %s", e)
