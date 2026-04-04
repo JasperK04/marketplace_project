@@ -1,7 +1,9 @@
 import os
+
 from dotenv import load_dotenv
 
 load_dotenv()
+
 
 class Config:
     """Base configuration"""
@@ -10,23 +12,23 @@ class Config:
     SESSION_TYPE = "filesystem"
     SESSION_PERMANENT = True
     PICTURE_FOLDER = os.path.abspath("app/static/assets/images/user_uploaded")
-    SQLALCHEMY_DATABASE_URI = "sqlite:///" + os.path.join(
-        os.path.abspath(os.path.dirname(__file__)), "app.db"
-    )
+    FALLBACK_DB_URI = "sqlite:///data/marketplace.db"
+    SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", FALLBACK_DB_URI)
 
 
 class DevelopmentConfig(Config):
     """Development configuration"""
+
     SECRET_KEY = "secret-key"
 
 
 class ProductionConfig(Config):
     """Production configuration"""
 
-    if os.environ.get("SQLALCHEMY_DATABASE_URI") is not None:
-        SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
     if os.environ.get("SECRET_KEY") is None:
-        raise ValueError("SECRET_KEY must be set as an environment variable in production")
+        raise ValueError(
+            "SECRET_KEY must be set as an environment variable in production"
+        )
     SECRET_KEY = os.environ.get("SECRET_KEY")
     if os.environ.get("UPLOAD_FOLDER") is not None:
         UPLOAD_FOLDER = os.environ.get("UPLOAD_FOLDER")

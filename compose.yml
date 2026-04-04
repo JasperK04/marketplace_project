@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=sqlite:////data/recipes.db
+      - DATABASE_URL=sqlite:////data/marketplace.db
     volumes:
       - ./data:/data
 
