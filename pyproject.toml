@@ -25,7 +25,7 @@ dependencies = [
     "pillow==11.1.0",
     "python-dotenv==1.2.1",
     "requests==2.32.3",
-    "sqlalchemy==2.0.44",
+    "sqlalchemy==2.0.45",
     "typing-extensions==4.12.2",
     "werkzeug==3.1.3",
 ]
