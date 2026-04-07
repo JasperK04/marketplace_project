@@ -1,4 +1,6 @@
+import os
 from random import choice, randint
+from typing import cast
 
 import click
 import sqlalchemy as sa
@@ -7,7 +9,6 @@ from flask import Blueprint
 
 from app.extensions import db
 from app.models.Category import Category
-from app.models.Image import Image
 from app.models.Listing import Listing
 from app.models.User import User
 from app.route_utils import resize_upload_image
@@ -200,10 +201,9 @@ def initialize_database(users: int, listings: int):
     db.create_all()
     print("Database created.")
     for category, category_data in categories.items():
+        description = cast(str, category_data["description"])
         db.session.add(
-            Category().from_dict(
-                {"name": category, "description": category_data["description"]}
-            )
+            Category().from_dict({"name": category, "description": description})
         )
     db.session.commit()
     print("Categories created.")
@@ -227,20 +227,31 @@ def initialize_database(users: int, listings: int):
     for new_user in new_users:
         db.session.add(new_user)
 
-    admin = (
-        User()
-        .from_dict(
-            {
-                "username": "jasperkleine",
-                "name": "Jasper Kleine",
-                "email": fake.email(),
-                "password": "jasperkleine123",
-            },
-            new_user=True,
+    admin_username = os.getenv("ADMIN_USERNAME")
+    admin_name = os.getenv("ADMIN_NAME")
+    admin_email = os.getenv("ADMIN_EMAIL", fake.email())
+    admin_password = os.getenv("ADMIN_PASSWORD")
+    if all([admin_username, admin_name, admin_email, admin_password]):
+        admin_username = cast(str, admin_username)
+        admin_name = cast(str, admin_name)
+        admin_email = cast(str, admin_email)
+        admin_password = cast(str, admin_password)
+        admin = (
+            User()
+            .from_dict(
+                {
+                    "username": admin_username,
+                    "name": admin_name,
+                    "email": admin_email,
+                    "password": admin_password,
+                },
+                new_user=True,
+            )
+            .make_admin()
         )
-        .make_admin()
-    )
-    db.session.add(admin)
+        db.session.add(admin)
+    else:
+        print("Admin creation skipped: ADMIN_* env values are incomplete.")
 
     db.session.commit()
     print("Users created.")
@@ -285,10 +296,34 @@ def initialize_database(users: int, listings: int):
 
 
 @cli.cli.command("create-admin")
-@click.option("--username", type=str, prompt="Username", help="Admin username.")
-@click.option("--name", type=str, prompt="Name", help="Admin name.")
-@click.option("--email", type=str, prompt="Email", help="Admin email.")
-@click.option("--password", type=str, prompt="Password", help="Admin password.")
+@click.option(
+    "--username",
+    type=str,
+    default=os.getenv("ADMIN_USERNAME"),
+    prompt=os.getenv("ADMIN_USERNAME") is None,
+    help="Admin username.",
+)
+@click.option(
+    "--name",
+    type=str,
+    default=os.getenv("ADMIN_NAME"),
+    prompt=os.getenv("ADMIN_NAME") is None,
+    help="Admin name.",
+)
+@click.option(
+    "--email",
+    type=str,
+    default=os.getenv("ADMIN_EMAIL"),
+    prompt=os.getenv("ADMIN_EMAIL") is None,
+    help="Admin email.",
+)
+@click.option(
+    "--password",
+    type=str,
+    default=os.getenv("ADMIN_PASSWORD"),
+    prompt=os.getenv("ADMIN_PASSWORD") is None,
+    help="Admin password.",
+)
 def create_admin(username: str, name: str, email: str, password: str):
     if not User.valid_username(username):
         print(
