@@ -5,7 +5,7 @@ from typing import cast
 import click
 import sqlalchemy as sa
 from faker import Faker
-from flask import Blueprint
+from flask import Blueprint, current_app
 
 from app.extensions import db
 from app.models.Category import Category
@@ -196,6 +196,16 @@ def initialize_database(users: int, listings: int):
         "rare",
         "vintage",
     ]
+    session_dir = current_app.config.get("SESSION_FILE_DIR") or os.path.abspath(
+        "flask_session"
+    )
+    if os.path.exists(session_dir):
+        for filename in os.listdir(session_dir):
+            filepath = os.path.join(session_dir, filename)
+            if os.path.isfile(filepath):
+                os.remove(filepath)
+        print("Sessions cleared.")
+
     db.drop_all()
     print("Database dropped.")
     db.create_all()
