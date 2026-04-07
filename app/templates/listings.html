@@ -2,6 +2,10 @@
 {% block styles %}
     <link rel="stylesheet" href="{{ url_for('static', filename='css/listings.css') }}">
 {% endblock %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='js/filterOverlay.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='js/priceRange.js') }}" defer></script>
+{% endblock %}
 {% block title %}
     Listings - Marketplace
 {% endblock %}
@@ -9,6 +13,69 @@
     <div class="sub-container">
         <h1>Listings</h1>
         <p>This page lists all unsold listings.</p>
+        <form class="search-bar" method="get" action="{{ current_page_url }}">
+            <label class="sr-only" for="listing-search">Search listings</label>
+            <input type="search" id="listing-search" name="q" value="{{ search_query }}" placeholder="Search listings">
+            <button class="primary" type="submit">Search</button>
+        </form>
+        <button class="outline filter-trigger" type="button" data-filter-target="listing-filters">
+            Filters
+        </button>
+    </div>
+
+    <div class="filter-overlay" id="listing-filters" aria-hidden="true">
+        <div class="filter-panel" role="dialog" aria-modal="true" aria-labelledby="listing-filters-title">
+            <div class="filter-panel-header">
+                <h2 id="listing-filters-title">Filters</h2>
+                <button class="outline filter-close" type="button" aria-label="Close filters">Close</button>
+            </div>
+            <form class="filters" method="get" action="{{ current_page_url }}">
+                <input type="hidden" name="q" value="{{ search_query }}">
+                <div class="filter-row">
+                    <label for="category">Category</label>
+                    <select id="category" name="category">
+                        <option value="">All categories</option>
+                        {% for category in categories %}
+                            <option value="{{ category.id }}" {% if selected_category == category.id %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-row">
+                    <label for="condition">Condition</label>
+                    <select id="condition" name="condition">
+                        <option value="">Any condition</option>
+                        {% for key, label in condition_labels.items() %}
+                            <option value="{{ key }}" {% if selected_condition == key %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-row price-range">
+                    <div class="price-range-slider" data-min="0" data-max="{{ max_price_limit }}">
+                        <div class="price-range-header">
+                            <span>Price range (€)</span>
+                            <span class="price-range-values">
+                                <span data-price-min>{{ min_price if min_price else 0 }}</span>
+                                -
+                                <span data-price-max>{{ max_price if max_price else max_price_limit }}</span>
+                            </span>
+                        </div>
+                        <div class="price-range-inputs">
+                            <div class="price-range-track">
+                                <div class="price-range-selection"></div>
+                            </div>
+                            <input type="range" class="range-min" name="min_price" min="0" max="{{ max_price_limit }}" step="1" value="{{ min_price if min_price else 0 }}">
+                            <input type="range" class="range-max" name="max_price" min="0" max="{{ max_price_limit }}" step="1" value="{{ max_price if max_price else max_price_limit }}">
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-actions">
+                    <button class="primary" type="submit">Apply Filters</button>
+                    <a class="outline" href="{{ current_page_url }}">Clear</a>
+                </div>
+            </form>
+        </div>
     </div>
 
     <div class="sub-container">

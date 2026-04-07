@@ -1,20 +1,18 @@
-from flask import session
 import sqlalchemy as sa
+from flask import request, session, url_for
 
-from flask import request, url_for
-from app.extensions import db
 from app.api import api
-from app.api.errors import bad_request
 from app.api.auth import token_auth
-
-from app.models.User import User
-from app.models.Listing import Listing
+from app.api.errors import bad_request
+from app.extensions import db
 from app.models.Category import Category
+from app.models.Listing import Listing
+from app.models.User import User
 
 
 @api.route("/listings/<int:id>", methods=["GET"])
 @api.route("/listings/<int:id>/", methods=["GET"])
-def get_listing(id:int):
+def get_listing(id: int):
     return db.get_or_404(Listing, id).to_dict()
 
 
@@ -44,11 +42,16 @@ def create_listing():
         all(field in data for field in fields)  # check required fields
         and (("category" in data) ^ ("categoryID" in data))
     ):  # category XOR categoryID
-        return bad_request(f'must include: {", ".join(fields)} and category')
+        return bad_request(f"must include: {', '.join(fields)} and category")
 
     data["title"] = Listing.normalize_title(data["title"])
     data["price"] = Listing.normalize_price(data["price"])
     data["description"] = Listing.normalize_description(data["description"])
+    if "condition" in data:
+        try:
+            data["condition"] = Listing.normalize_condition(data["condition"])
+        except ValueError:
+            return bad_request("Invalid condition")
 
     if "category" in data:  # get categoryID from category name
         data["category"] = Category.normalize_name(data["category"])
@@ -132,6 +135,11 @@ def change_listing(id: int):
         data["price"] = Listing.normalize_price(data["price"])
     if "description" in data:
         data["description"] = Listing.normalize_description(data["description"])
+    if "condition" in data:
+        try:
+            data["condition"] = Listing.normalize_condition(data["condition"])
+        except ValueError:
+            return bad_request("Invalid condition")
 
     if "category" in data:  # get categoryID from category name
         data["category"] = Category.normalize_name(data["category"])

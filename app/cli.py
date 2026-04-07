@@ -1,16 +1,16 @@
-from random import randint, choice
-from flask import Blueprint
+from random import choice, randint
+
 import click
 import sqlalchemy as sa
 from faker import Faker
-
-from app.route_utils import resize_upload_image
+from flask import Blueprint
 
 from app.extensions import db
-from app.models.User import User
-from app.models.Listing import Listing
 from app.models.Category import Category
 from app.models.Image import Image
+from app.models.Listing import Listing
+from app.models.User import User
+from app.route_utils import resize_upload_image
 
 cli = Blueprint("cli", __name__)
 
@@ -36,7 +36,7 @@ def initialize_database(users: int, listings: int):
                 "speaker",
             ],
             "description": "Electronic devices and gadgets.",
-            "path": "static/assets/images/electronics.jpeg"
+            "path": "static/assets/images/electronics.jpeg",
         },
         "Clothing": {
             "keywords": [
@@ -52,7 +52,7 @@ def initialize_database(users: int, listings: int):
                 "suit",
             ],
             "description": "Apparel and accessories.",
-            "path": "static/assets/images/clothes.jpeg"
+            "path": "static/assets/images/clothes.jpeg",
         },
         "Books": {
             "keywords": [
@@ -68,7 +68,7 @@ def initialize_database(users: int, listings: int):
                 "memoir",
             ],
             "description": "Literature and educational materials.",
-            "path": "static/assets/images/books.jpeg"
+            "path": "static/assets/images/books.jpeg",
         },
         "Home & Garden": {
             "keywords": [
@@ -84,7 +84,7 @@ def initialize_database(users: int, listings: int):
                 "shelf",
             ],
             "description": "Furniture and home improvement items.",
-            "path": "static/assets/images/home.jpeg"
+            "path": "static/assets/images/home.jpeg",
         },
         "Fashion & Beauty": {
             "keywords": [
@@ -100,7 +100,7 @@ def initialize_database(users: int, listings: int):
                 "necklace",
             ],
             "description": "Beauty products and fashion accessories.",
-            "path": "static/assets/images/fashion.jpeg"
+            "path": "static/assets/images/fashion.jpeg",
         },
         "Sport": {
             "keywords": [
@@ -116,7 +116,7 @@ def initialize_database(users: int, listings: int):
                 "sneakers",
             ],
             "description": "Sporting goods and fitness equipment.",
-            "path": "static/assets/images/sport.jpeg"
+            "path": "static/assets/images/sport.jpeg",
         },
         "Toys": {
             "keywords": [
@@ -132,7 +132,7 @@ def initialize_database(users: int, listings: int):
                 "remote control car",
             ],
             "description": "Children's toys and games.",
-            "path": "static/assets/images/toys.jpeg"
+            "path": "static/assets/images/toys.jpeg",
         },
         "Vehicles": {
             "keywords": [
@@ -148,7 +148,7 @@ def initialize_database(users: int, listings: int):
                 "skateboard",
             ],
             "description": "Various types of vehicles and related accessories.",
-            "path": "static/assets/images/vehicles.jpeg"
+            "path": "static/assets/images/vehicles.jpeg",
         },
         "Music": {
             "keywords": [
@@ -164,7 +164,7 @@ def initialize_database(users: int, listings: int):
                 "trumpet",
             ],
             "description": "Musical instruments and audio equipment.",
-            "path": "static/assets/images/music.jpeg"
+            "path": "static/assets/images/music.jpeg",
         },
         "Other": {
             "keywords": [
@@ -180,7 +180,7 @@ def initialize_database(users: int, listings: int):
                 "unknown item",
             ],
             "description": "Miscellaneous items that do not fit into other categories.",
-            "path": "static/assets/images/other.jpeg"
+            "path": "static/assets/images/other.jpeg",
         },
     }
     adjectives = [
@@ -220,12 +220,26 @@ def initialize_database(users: int, listings: int):
             },
             new_user=True,
         )
-        if new_user.email not in [user.email for user in new_users] and new_user.username not in [user.username for user in new_users]:
+        if new_user.email not in [
+            user.email for user in new_users
+        ] and new_user.username not in [user.username for user in new_users]:
             new_users.append(new_user)
     for new_user in new_users:
         db.session.add(new_user)
 
-    admin = User().from_dict({"username": "jasperkleine", "name": "Jasper Kleine", "email": fake.email(), "password": "jasperkleine123"}, new_user=True).make_admin()
+    admin = (
+        User()
+        .from_dict(
+            {
+                "username": "jasperkleine",
+                "name": "Jasper Kleine",
+                "email": fake.email(),
+                "password": "jasperkleine123",
+            },
+            new_user=True,
+        )
+        .make_admin()
+    )
     db.session.add(admin)
 
     db.session.commit()
@@ -240,32 +254,34 @@ def initialize_database(users: int, listings: int):
         title = f"{choice(adjectives).capitalize()} {product.capitalize()}"
         description = f"{fake.sentence(nb_words=3)} This {product} is {fake.text(max_nb_chars=50).lower()} and perfect for anyone looking to upgrade their {category.name.lower()}."
         user_id = choice(created_users).id
+        condition = choice([key for key, _label in Listing.CONDITION_CHOICES])
         new_listing = Listing().from_dict(
             {
                 "title": title,
                 "description": description,
                 "price": fake.random_int(min=50, max=10000),
                 "categoryID": category.id,
-                "userID": user_id
+                "userID": user_id,
+                "condition": condition,
             }
         )
 
         db.session.add(new_listing)
         db.session.flush()
-        file = "app/static/assets/images/" + category.name.split(" ", -1)[0].lower() + ".png"
+        file = (
+            "app/static/assets/images/"
+            + category.name.split(" ", -1)[0].lower()
+            + ".png"
+        )
         db.session.add(
             resize_upload_image(
-                file=file,
-                ratio=(3, 2),
-                size=(600, 400),
-                listing_id=new_listing.id
+                file=file, ratio=(3, 2), size=(600, 400), listing_id=new_listing.id
             )
         )
     db.session.commit()
     print("Listings created.")
 
     print("Database initialized.")
-    
 
 
 @cli.cli.command("create-admin")
@@ -273,28 +289,50 @@ def initialize_database(users: int, listings: int):
 @click.option("--name", type=str, prompt="Name", help="Admin name.")
 @click.option("--email", type=str, prompt="Email", help="Admin email.")
 @click.option("--password", type=str, prompt="Password", help="Admin password.")
-def create_admin(username:str, name:str, email:str, password:str):
+def create_admin(username: str, name: str, email: str, password: str):
     if not User.valid_username(username):
-        print("Username does not meet requirements.\nUsername must only contain alpha-numeric characters.")
+        print(
+            "Username does not meet requirements.\nUsername must only contain alpha-numeric characters."
+        )
         return
-    if db.session.scalar(sa.select(User).where(
-            User.username == username)):
+    if db.session.scalar(sa.select(User).where(User.username == username)):
         print("Username already in use.")
         return
     if len(name) > 70 or len(name) < 1:
-        print("Name does not meet requirements.\nName must be between 1 and 70 characters.")
+        print(
+            "Name does not meet requirements.\nName must be between 1 and 70 characters."
+        )
         return
     if not User.valid_email(email):
         print("This is not a valid email address.")
         return
-    if db.session.scalar(sa.select(User).where(
-            User.email == email)):
+    if db.session.scalar(sa.select(User).where(User.email == email)):
         print("Email address already in use.")
         return
     if not User.valid_password(password):
-        print("Password does not meet requirements\nPassword must be between 15 and 64 characters long.")
+        print(
+            "Password does not meet requirements\nPassword must be between 15 and 64 characters long."
+        )
         return
-    admin = User().from_dict({"username": username, "name": name, "email": email, "password": password}, new_user=True).make_admin()
+    admin = (
+        User()
+        .from_dict(
+            {"username": username, "name": name, "email": email, "password": password},
+            new_user=True,
+        )
+        .make_admin()
+    )
     db.session.add(admin)
     db.session.commit()
-    print("Admin created with id:", admin.id, "username:", username, "name:", admin.name, "email:", admin.email, "password:", password)
+    print(
+        "Admin created with id:",
+        admin.id,
+        "username:",
+        username,
+        "name:",
+        admin.name,
+        "email:",
+        admin.email,
+        "password:",
+        password,
+    )

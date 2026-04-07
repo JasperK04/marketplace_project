@@ -1,12 +1,13 @@
-import uuid
 import os
+import uuid
+
 import sqlalchemy as sa
 from PIL import Image as IM
 
+from app.config import config
 from app.extensions import db
-from app.models.Listing import Listing
 from app.models.Image import Image
-from app.config import config
+from app.models.Listing import Listing
 
 app_config = config[os.getenv("FLASK_ENV", "development")]
 
@@ -15,7 +16,16 @@ from app.config import config
 app_config = config[os.getenv("FLASK_ENV", "development")]
 
 
-def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_page=36):
+def get_open_listings_with_images(
+    by_user=None,
+    by_category=None,
+    search=None,
+    min_price=None,
+    max_price=None,
+    condition=None,
+    page=1,
+    per_page=36,
+):
     # basic normalization
     if per_page >= 600:
         per_page = 600
@@ -24,20 +34,37 @@ def get_open_listings_with_images(by_user=None, by_category=None, page=1, per_pa
         per_page = min(max(per_page, 12), 60)
     else:
         per_page = 12
-    
+
     listings = []
     listings_with_images = (
         db.session.query(Listing, Image.filename)
         .join(
             Image,
-            (Image.listingID == Listing.id), isouter=True,
+            (Image.listingID == Listing.id),
+            isouter=True,
         )
         .filter((Listing.sold == False) & (Listing.is_deactivated == False))
     )
     if by_user:
         listings_with_images = listings_with_images.filter(Listing.userID == by_user)
     if by_category:
-        listings_with_images = listings_with_images.filter(Listing.categoryID == by_category)
+        listings_with_images = listings_with_images.filter(
+            Listing.categoryID == by_category
+        )
+    if condition:
+        condition_value = Listing.normalize_condition(condition)
+        listings_with_images = listings_with_images.filter(
+            Listing.condition >= condition_value
+        )
+    if search:
+        term = f"%{search}%"
+        listings_with_images = listings_with_images.filter(
+            sa.or_(Listing.title.ilike(term), Listing.description.ilike(term))
+        )
+    if min_price is not None:
+        listings_with_images = listings_with_images.filter(Listing.price >= min_price)
+    if max_price is not None:
+        listings_with_images = listings_with_images.filter(Listing.price <= max_price)
 
     total_items = listings_with_images.count()
     total_pages = -(-total_items // per_page)
@@ -75,32 +102,35 @@ def resize_upload_image(file, ratio, size, user_id=None, listing_id=None):
     new_width = max_size * x
     new_height = max_size * y
     start_x = (width - new_width) // 2
-    start_y = (height - new_height) // 2 
+    start_y = (height - new_height) // 2
 
-    # resize the box within to the requested size   
-    img = img.resize(size, resample=1, box=(start_x, start_y, start_x+new_width, start_y+new_height))
+    # resize the box within to the requested size
+    img = img.resize(
+        size,
+        resample=1,
+        box=(start_x, start_y, start_x + new_width, start_y + new_height),
+    )
 
-    filename = f"{uuid.uuid4()}_{f'profile' if user_id else listing_id}.{format.lower()}" #type: ignore
+    filename = (
+        f"{uuid.uuid4()}_{f'profile' if user_id else listing_id}.{format.lower()}"  # type: ignore
+    )
     folder = app_config.PICTURE_FOLDER
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
     img.save(filepath, format)
 
-    assert listing_id or user_id, 'requires a listing_id or user_id'
+    assert listing_id or user_id, "requires a listing_id or user_id"
 
     new_image = Image(
-        filepath=filepath,
-        filename=filename,
-        listingID=listing_id,
-        userID=user_id
+        filepath=filepath, filename=filename, listingID=listing_id, userID=user_id
     )
- 
+
     return new_image
 
 
 def delete_images(listing_id=None, user_id=None):
     # first query the filepaths so the files on disk can be deleted
-    assert listing_id or user_id, 'one or the other is required'
+    assert listing_id or user_id, "one or the other is required"
     if listing_id:
         images = db.session.execute(
             sa.select(Image).where(Image.listingID == listing_id)

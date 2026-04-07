@@ -48,6 +48,7 @@
                     <a href="{{url_for('routes.profile_by_name', user_name=listing.seller.username)}}">{{ listing.seller.name}}</a>
                 </span>
                 &bullet; <span>{{ listing.created_at.strftime('%H:%M, %d %b %Y') }}</span>
+                &bullet; <span>{{ condition_labels.get(listing.condition, "Condition Unspecified") }}</span>
             </div>
         </header>
         <div class="image-and-price">

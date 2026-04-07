@@ -1,8 +1,205 @@
 @import url(components/paginated_listings.css);
 @import url(components/listing_card.css);
 
+.filters {
+    margin-top: 1em;
+    width: 100%;
+    display: grid;
+    gap: 0.75em;
+}
+
+.filter-row {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0.75em;
+    align-items: center;
+    width: 100%;
+}
+
+.filter-row.price-range {
+    grid-template-columns: 1fr;
+    align-items: start;
+}
+
+.price-range-slider {
+    display: grid;
+    gap: 0.75em;
+    width: 100%;
+}
+
+.price-range-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+}
+
+.price-range-values {
+    font-weight: 500;
+}
+
+.price-range-inputs {
+    position: relative;
+    height: 36px;
+}
+
+.price-range-track {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 6px;
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: var(--color-text-secondary);
+    opacity: 0.35;
+}
+
+.price-range-selection {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: inherit;
+    background: var(--color-secondary);
+}
+
+.price-range-inputs input[type="range"] {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    margin: 0;
+    background: transparent;
+    pointer-events: none;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.price-range-inputs input[type="range"]::-webkit-slider-runnable-track {
+    background: transparent;
+}
+
+.price-range-inputs input[type="range"]::-moz-range-track {
+    background: transparent;
+}
+
+.price-range-inputs input[type="range"]::-webkit-slider-thumb {
+    pointer-events: auto;
+}
+
+.price-range-inputs input[type="range"]::-moz-range-thumb {
+    pointer-events: auto;
+}
+
+.filters label {
+    font-weight: 600;
+    text-align: left;
+}
+
+.filters input,
+.filters select {
+    border-radius: 6px;
+    padding: 8px 10px;
+    border: 1px solid var(--color-text-secondary);
+    width: 100%;
+}
+
+.filter-actions {
+    display: flex;
+    gap: 0.5em;
+    justify-content: flex-end;
+    width: 100%;
+}
+
+.filter-actions .outline {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 20px;
+    border-radius: 5px;
+    border: 1px solid var(--color-primary);
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+.filter-actions .outline:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.search-bar {
+    margin-top: 1em;
+    display: flex;
+    gap: 0.5em;
+    width: 100%;
+    max-width: 720px;
+}
+
+.search-bar input {
+    flex: 1;
+    border-radius: 6px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-text-secondary);
+}
+
+.filter-trigger {
+    margin-top: 1em;
+}
+
+.filter-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5em;
+    z-index: 1000;
+}
+
+.filter-overlay.open {
+    display: flex;
+}
+
+.filter-panel {
+    background: var(--color-background);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    width: min(720px, 95vw);
+    max-height: 90vh;
+    overflow: auto;
+    padding: 1.5em;
+}
+
+.filter-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1em;
+    margin-bottom: 0.5em;
+}
+
 @media (max-width: 500px) {
     .listing-container {
         padding: 0.5em;
+    }
+}
+
+@media (max-width: 800px) {
+    .filter-row,
+    .filter-row.price-range {
+        grid-template-columns: 1fr;
+    }
+
+    .filters label {
+        text-align: left;
+    }
+
+    .filter-actions {
+        justify-content: center;
+    }
+
+    .search-bar {
+        flex-direction: column;
     }
 }

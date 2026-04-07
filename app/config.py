@@ -8,11 +8,13 @@ load_dotenv()
 class Config:
     """Base configuration"""
 
+    BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+    DB_PATH = os.path.join(BASE_DIR, "data", "marketplace.db")
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SESSION_TYPE = "filesystem"
     SESSION_PERMANENT = True
     PICTURE_FOLDER = os.path.abspath("app/static/assets/images/user_uploaded")
-    FALLBACK_DB_URI = "sqlite:///data/marketplace.db"
+    FALLBACK_DB_URI = f"sqlite:///{DB_PATH}"
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URL", FALLBACK_DB_URI)
 
 

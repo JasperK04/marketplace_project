@@ -26,6 +26,13 @@
             {% endfor %}
         </div>
         <div>
+            {{ form.condition.label }}<br>
+            {{ form.condition() }}
+            {% for error in form.condition.errors %}
+            <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}
+        </div>
+        <div>
             {{ form.description.label }}<br>
             {{ form.description(size=32) }}
             {% for error in form.description.errors %}

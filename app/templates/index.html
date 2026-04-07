@@ -11,6 +11,11 @@ Marketplace
     <p>Here you can find a variety of listings from different categories. Feel free to browse through the listings
         and
         find what you are looking for.</p>
+    <form class="quick-search" method="get" action="{{ url_for('routes.listings') }}">
+        <label for="q" class="sr-only">Search listings</label>
+        <input type="search" id="q" name="q" placeholder="Search for products">
+        <button class="primary" type="submit">Search</button>
+    </form>
 </div>
     
 <div class="sub-container">
