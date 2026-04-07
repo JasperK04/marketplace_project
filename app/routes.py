@@ -338,7 +338,7 @@ def listings():
         page = 1
 
     max_price_query = sa.select(sa.func.max(Listing.price)).where(
-        (Listing.sold == False) & (Listing.is_deactivated == False)
+        Listing.sold.is_(False), Listing.is_deactivated.is_(False)
     )
     if search_query:
         term = f"%{search_query}%"
@@ -570,7 +570,8 @@ def category(category_id: int):
         page = 1
 
     max_price_query = sa.select(sa.func.max(Listing.price)).where(
-        (Listing.sold == False) & (Listing.is_deactivated == False),
+        Listing.sold.is_(False),
+        Listing.is_deactivated.is_(False),
         Listing.categoryID == category_id,
     )
     if search_query:

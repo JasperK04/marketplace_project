@@ -1,5 +1,6 @@
 import os
 import uuid
+from typing import cast
 
 import sqlalchemy as sa
 from PIL import Image as IM
@@ -8,10 +9,6 @@ from app.config import config
 from app.extensions import db
 from app.models.Image import Image
 from app.models.Listing import Listing
-
-app_config = config[os.getenv("FLASK_ENV", "development")]
-
-from app.config import config
 
 app_config = config[os.getenv("FLASK_ENV", "development")]
 
@@ -43,7 +40,7 @@ def get_open_listings_with_images(
             (Image.listingID == Listing.id),
             isouter=True,
         )
-        .filter((Listing.sold == False) & (Listing.is_deactivated == False))
+        .filter(Listing.sold.is_(False), Listing.is_deactivated.is_(False))
     )
     if by_user:
         listings_with_images = listings_with_images.filter(Listing.userID == by_user)
@@ -89,7 +86,9 @@ def get_open_listings_with_images(
     return listings, per_page, total_pages
 
 
-def resize_upload_image(file, ratio, size, user_id=None, listing_id=None):
+def resize_upload_image(
+    file, ratio, size, user_id: int | None = None, listing_id: int | None = None
+):
     img = IM.open(file)
     format = img.format
 
@@ -111,9 +110,7 @@ def resize_upload_image(file, ratio, size, user_id=None, listing_id=None):
         box=(start_x, start_y, start_x + new_width, start_y + new_height),
     )
 
-    filename = (
-        f"{uuid.uuid4()}_{f'profile' if user_id else listing_id}.{format.lower()}"  # type: ignore
-    )
+    filename = f"{uuid.uuid4()}_{'profile' if user_id else listing_id}.{format.lower()}"  # type: ignore
     folder = app_config.PICTURE_FOLDER
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
@@ -121,9 +118,16 @@ def resize_upload_image(file, ratio, size, user_id=None, listing_id=None):
 
     assert listing_id or user_id, "requires a listing_id or user_id"
 
-    new_image = Image(
-        filepath=filepath, filename=filename, listingID=listing_id, userID=user_id
+    image_data = cast(
+        dict[str, str | int | None],
+        {
+            "filepath": filepath,
+            "filename": filename,
+            "listingID": listing_id,
+            "userID": user_id,
+        },
     )
+    new_image = Image().from_dict(image_data)
 
     return new_image
 

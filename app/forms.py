@@ -1,3 +1,5 @@
+from typing import Any, cast
+
 import sqlalchemy as sa
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileAllowed, FileField
@@ -178,8 +180,8 @@ class ListingForm(FlaskForm):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.category.choices = get_categories()
-        self.condition.choices = Listing.CONDITION_CHOICES
+        self.category.choices = cast(list[Any], get_categories())
+        self.condition.choices = cast(list[Any], Listing.CONDITION_CHOICES)
         if not self.condition.data:
             self.condition.data = Listing.DEFAULT_CONDITION
 

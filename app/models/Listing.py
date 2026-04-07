@@ -52,6 +52,8 @@ class Listing(PaginatedAPIMixin, db.Model):
 
     def to_dict(self):
         seller = db.session.scalar(select(User).where(User.id == self.userID))
+        if seller is None:
+            raise LookupError("Seller not found")
 
         data: dict[
             str, int | dict[str, int | str | None] | str | float | bool | datetime
@@ -90,7 +92,10 @@ class Listing(PaginatedAPIMixin, db.Model):
         ]:
             if field in data:
                 if field == "condition":
-                    setattr(self, field, Listing.normalize_condition(data[field]))
+                    condition_value = data[field]
+                    if isinstance(condition_value, int):
+                        raise ValueError("Invalid condition")
+                    setattr(self, field, Listing.normalize_condition(condition_value))
                 else:
                     setattr(self, field, data[field])
         if not getattr(self, "condition", None):
