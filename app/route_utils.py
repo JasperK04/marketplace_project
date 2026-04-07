@@ -90,7 +90,7 @@ def resize_upload_image(
     file, ratio, size, user_id: int | None = None, listing_id: int | None = None
 ):
     img = IM.open(file)
-    format = img.format
+    format = "webp"
 
     # find the biggest centered box within the uploaded picture
     x, y = ratio
@@ -110,7 +110,7 @@ def resize_upload_image(
         box=(start_x, start_y, start_x + new_width, start_y + new_height),
     )
 
-    filename = f"{uuid.uuid4()}_{'profile' if user_id else listing_id}.{format.lower()}"  # type: ignore
+    filename = f"{uuid.uuid4()}_{'profile' if user_id else listing_id}.{format}"  # type: ignore
     folder = app_config.PICTURE_FOLDER
     os.makedirs(folder, exist_ok=True)
     filepath = os.path.join(folder, filename)
