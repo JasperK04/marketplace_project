@@ -15,8 +15,8 @@ from app.routes import routes
 
 def create_app() -> Flask:
     app = Flask(__name__)
-    enviroment = getenv("FLASK_ENV", "development")
-    app.config.from_object(config[enviroment])
+    environment = getenv("FLASK_ENV", "development")
+    app.config.from_object(config[environment])
 
     register_extensions(app)
     register_blueprints(app)
@@ -24,7 +24,7 @@ def create_app() -> Flask:
 
     create_db(app)
 
-    if enviroment == "production":
+    if environment == "production":
         setup_logging()
 
     return app
@@ -35,7 +35,7 @@ def register_extensions(app: Flask) -> None:
     migrate.init_app(app, db)
     session.init_app(app)
     login.init_app(app)
-    login.login_view = "routes.login"
+    login.login_view = "routes.login"  # type: ignore[assignment]
 
 
 def register_blueprints(app: Flask) -> None:

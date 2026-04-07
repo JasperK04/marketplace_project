@@ -20,12 +20,16 @@ def is_allowed_to_take_admin_action():
     """
     Helper function to check if the user is allowed to take admin actions
     """
-    return (
-        token_auth.current_user() is not None and token_auth.current_user().is_admin
-    ) or (  # type: ignore
-        session.get("_user_id") is not None
-        and User.query.get(session["_user_id"]).is_admin
-    )  # type: ignore
+    token_user = token_auth.current_user()
+    if token_user and token_user.is_admin:  # type: ignore
+        return True
+
+    session_user_id = session.get("_user_id")
+    if session_user_id is None:
+        return False
+
+    session_user = db.session.get(User, session_user_id)
+    return bool(session_user and session_user.is_admin)
 
 
 @admin.route("/users/<int:id>/deactivate", methods=["POST"])

@@ -1,5 +1,6 @@
 import math
 import os
+from typing import cast
 from urllib.parse import urlencode, urlsplit
 
 import sqlalchemy as sa
@@ -116,7 +117,8 @@ def login():
         user = db.session.scalar(
             sa.select(User).where(User.username == form.username.data)
         )
-        if user is None or not user.check_password(form.password.data):
+        password = cast(str, form.password.data)
+        if user is None or not user.check_password(password):
             flash("Invalid username or password", "error")
             return redirect(url_for("routes.login", next=next_page))
         if user.is_deactivated:
@@ -150,10 +152,10 @@ def register():
             return redirect(url_for("register"))
         user = User().from_dict(
             {
-                "username": form.username.data,
-                "name": form.name.data,
-                "email": form.email.data,
-                "password": form.password.data,
+                "username": cast(str, form.username.data),
+                "name": cast(str, form.name.data),
+                "email": cast(str, form.email.data),
+                "password": cast(str, form.password.data),
             },
             new_user=True,
         )
@@ -259,8 +261,8 @@ def edit_profile(user_id):
     form = EditProfileForm(obj=user)
     if form.validate_on_submit():
         file = request.files.get("file")
-        user.about_me = form.about_me.data
-        user.username = form.username.data
+        user.about_me = form.about_me.data or ""
+        user.username = cast(str, form.username.data)
         db.session.add(user)
         db.session.flush()
         if file:
@@ -399,13 +401,20 @@ def add_listing():
             select(Category.id).where(Category.name == form.category.data)
         )
 
+        if cat_id is None:
+            flash("Selected category is invalid.", "error")
+            return render_template("add_listing.html", title="Add listing", form=form)
         new_listing = Listing().from_dict(
             {
-                "title": Listing.normalize_title(form.title.data),
+                "title": Listing.normalize_title(cast(str, form.title.data)),
                 "categoryID": cat_id,
-                "description": Listing.normalize_description(form.description.data),
-                "price": Listing.normalize_price(form.price.data),
-                "condition": Listing.normalize_condition(form.condition.data),
+                "description": Listing.normalize_description(
+                    cast(str, form.description.data)
+                ),
+                "price": Listing.normalize_price(cast(str, form.price.data)),
+                "condition": Listing.normalize_condition(
+                    cast(str, form.condition.data)
+                ),
                 "userID": current_user.id,
             },
             sold=False,
@@ -457,13 +466,21 @@ def edit_listing(listing_id: int):
 
             db.session.add(image)
             db.session.commit()
-        listing.title = Listing.normalize_title(form.title.data)
-        listing.categoryID = db.session.scalar(
+        listing.title = Listing.normalize_title(cast(str, form.title.data))
+        cat_id = db.session.scalar(
             select(Category.id).where(Category.name == form.category.data)
         )
-        listing.description = Listing.normalize_description(form.description.data)
-        listing.price = Listing.normalize_price(form.price.data)
-        listing.condition = Listing.normalize_condition(form.condition.data)
+        if cat_id is None:
+            flash("Selected category is invalid.", "error")
+            return render_template("add_listing.html", title="Edit listing", form=form)
+        listing.categoryID = cat_id
+        listing.description = Listing.normalize_description(
+            cast(str, form.description.data)
+        )
+        listing.price = Listing.normalize_price(cast(str, form.price.data))
+        listing.condition = Listing.normalize_condition(
+            cast(str, form.condition.data)
+        )
         db.session.add(listing)
         db.session.commit()
         return redirect(
