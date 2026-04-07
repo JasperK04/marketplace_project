@@ -1,4 +1,4 @@
-<section class="listing-card">
+<section class="listing-card {% if listing.is_deactivated %}listing-card--deactivated{% endif %}">
     <a href="{{ url_for('routes.listing', listing_id=listing.id) }}">
         <div class="listing-image">
             {% if listing.filename %}

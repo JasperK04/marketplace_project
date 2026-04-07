@@ -107,6 +107,9 @@ def buy_listing(id: int):
     ):  # check if the listing is made by the current user
         return bad_request("You cannot buy your own listing")
 
+    if listing.is_deactivated:
+        return bad_request("Listing is deactivated")
+
     if listing.sold:
         return bad_request("unfortunately for you, this listing was already bought")
 
@@ -127,6 +130,9 @@ def change_listing(id: int):
     data = request.get_json()
     current_user: User = token_auth.current_user()  # type: ignore
     listing = db.get_or_404(Listing, id)
+
+    if listing.sold:
+        return bad_request("Sold listings cannot be edited")
 
     if (
         listing.userID != current_user.id

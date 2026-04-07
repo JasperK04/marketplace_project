@@ -54,6 +54,30 @@
         <h2 id="current_listings">Current Listings</h2>
         {% include 'components/paginated_listings.html' %}
 
+        {% if show_deactivated_listings and deactivated_listings %}
+            <hr/>
+            <h2 id="deactivated_listings">Deactivated Listings</h2>
+            <div class="listing-container">
+                <div class="listings">
+                    {% for listing in deactivated_listings %}
+                        {% include 'components/listing_card.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
+        {% if show_deactivated_listings and sold_listings %}
+            <hr/>
+            <h2 id="sold_listings">Sold Listings</h2>
+            <div class="listing-container">
+                <div class="listings">
+                    {% for listing in sold_listings %}
+                        {% include 'components/listing_card.html' %}
+                    {% endfor %}
+                </div>
+            </div>
+        {% endif %}
+
     </div>
 </div>
 

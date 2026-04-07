@@ -25,12 +25,14 @@
                         {% if current_user.id != listing.seller.id %}
                             {% if listing.sold %}
                                 <button class="disabled" disabled>Sold</button>
-                            {% else %}
+                            {% elif not listing.is_deactivated %}
                                 <button class="primary buy-button" id="buy-listing">Buy</button>
                             {% endif %}
                         {% endif %}
                         {% if current_user.id == listing.seller.id %}
-                            <button class="primary"><a href="{{url_for('routes.edit_listing',listing_id=listing.id)}}">Edit listing</a></button>
+                            {% if not listing.sold %}
+                                <button class="primary"><a href="{{url_for('routes.edit_listing',listing_id=listing.id)}}">Edit listing</a></button>
+                            {% endif %}
                             <button class="destructive"><a href="{{url_for('routes.delete_listing',listing_id=listing.id)}}">Delete listing</a></button>
                         {% endif %}
                         {% if current_user.is_admin %}

@@ -20,6 +20,10 @@ def get_open_listings_with_images(
     min_price=None,
     max_price=None,
     condition=None,
+    include_deactivated=False,
+    include_only_deactivated=False,
+    include_sold=False,
+    include_only_sold=False,
     page=1,
     per_page=36,
 ):
@@ -40,8 +44,19 @@ def get_open_listings_with_images(
             (Image.listingID == Listing.id),
             isouter=True,
         )
-        .filter(Listing.sold.is_(False), Listing.is_deactivated.is_(False))
     )
+    if include_only_sold:
+        listings_with_images = listings_with_images.filter(Listing.sold.is_(True))
+    elif not include_sold:
+        listings_with_images = listings_with_images.filter(Listing.sold.is_(False))
+    if include_only_deactivated:
+        listings_with_images = listings_with_images.filter(
+            Listing.is_deactivated.is_(True)
+        )
+    elif not include_deactivated:
+        listings_with_images = listings_with_images.filter(
+            Listing.is_deactivated.is_(False)
+        )
     if by_user:
         listings_with_images = listings_with_images.filter(Listing.userID == by_user)
     if by_category:
@@ -51,7 +66,7 @@ def get_open_listings_with_images(
     if condition:
         condition_value = Listing.normalize_condition(condition)
         listings_with_images = listings_with_images.filter(
-            Listing.condition >= condition_value
+            Listing.condition == condition_value
         )
     if search:
         term = f"%{search}%"

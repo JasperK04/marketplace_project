@@ -193,8 +193,30 @@ def profile_by_name(user_name: str):
 
     # Fetch listings with pagination
     listings, per_page, total_pages = get_open_listings_with_images(
-        by_user=user.id, page=page, per_page=per_page
+        by_user=user.id,
+        page=page,
+        per_page=per_page,
     )
+    show_deactivated_listings = (
+        current_user.is_authenticated
+        and (current_user.id == user.id or current_user.is_admin)
+    )
+    deactivated_listings = []
+    sold_listings = []
+    if show_deactivated_listings:
+        deactivated_listings, _, _ = get_open_listings_with_images(
+            by_user=user.id,
+            include_only_deactivated=True,
+            page=1,
+            per_page=600,
+        )
+        sold_listings, _, _ = get_open_listings_with_images(
+            by_user=user.id,
+            include_only_sold=True,
+            include_deactivated=True,
+            page=1,
+            per_page=600,
+        )
     current_page_url = url_for("routes.profile", user_id=user.id)
 
     if page > total_pages:
@@ -207,6 +229,9 @@ def profile_by_name(user_name: str):
         user=user,
         profile_pic=profile_pic,
         listings=listings,
+        deactivated_listings=deactivated_listings,
+        sold_listings=sold_listings,
+        show_deactivated_listings=show_deactivated_listings,
         current_page=page,
         total_pages=total_pages,
         per_page=per_page,
@@ -378,7 +403,11 @@ def listing(listing_id: int):
     ).scalar()
     if image:
         listing["filename"] = image.filename
-    if listing["is_deactivated"] and not can_view_restricted_pages():
+    is_owner = (
+        current_user.is_authenticated
+        and current_user.id == listing["seller"]["id"]
+    )
+    if listing["is_deactivated"] and not (can_view_restricted_pages() or is_owner):
         return redirect(url_for("routes.listings"))
     return render_template(
         "listing.html",
@@ -442,6 +471,10 @@ def edit_listing(listing_id: int):
             url_for("routes.index")
         )  # this depends on where the edit button/link will be placed
 
+    if listing.sold:
+        flash("Sold listings cannot be edited.", "warning")
+        return redirect(url_for("routes.listing", listing_id=listing_id))
+
     form = ListingForm(obj=listing)
 
     if not form.validate_on_submit():
@@ -478,9 +511,7 @@ def edit_listing(listing_id: int):
             cast(str, form.description.data)
         )
         listing.price = Listing.normalize_price(cast(str, form.price.data))
-        listing.condition = Listing.normalize_condition(
-            cast(str, form.condition.data)
-        )
+        listing.condition = Listing.normalize_condition(cast(str, form.condition.data))
         db.session.add(listing)
         db.session.commit()
         return redirect(

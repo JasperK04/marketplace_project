@@ -2,15 +2,15 @@
 This module contains the admin routes for the API
 """
 
-from flask import Blueprint, request, session, url_for
 import sqlalchemy as sa
-from app.extensions import db
+from flask import Blueprint, request, session, url_for
+
 from app.api import api
 from app.api.auth import token_auth
-from app.api.errors import bad_request, unauthorized, not_found
-from app.models.User import User
+from app.api.errors import bad_request, not_found, unauthorized
+from app.extensions import db
 from app.models.Listing import Listing
-
+from app.models.User import User
 
 admin = Blueprint("admin", __name__)
 api.register_blueprint(admin, url_prefix="/admin")
@@ -59,10 +59,11 @@ def deactivate_user(id: int):
     db.session.commit()
     return user.to_dict()
 
+
 @admin.route("/users/<username>/deactivate", methods=["POST"])
 @admin.route("/users/<username>/deactivate/", methods=["POST"])
 @token_auth.login_required(optional=True)  # type: ignore
-def deactivate_user_by_username(username:str):
+def deactivate_user_by_username(username: str):
     """
     Deactivates a user account by username
 
@@ -110,7 +111,7 @@ def reactivate_user(id: int):
 @admin.route("/users/<username>/reactivate", methods=["POST"])
 @admin.route("/users/<username>/reactivate/", methods=["POST"])
 @token_auth.login_required(optional=True)  # type: ignore
-def reactivate_user_by_username(username:str):
+def reactivate_user_by_username(username: str):
     """
     Reactivates the user account with username `username`
 
@@ -157,22 +158,26 @@ def create_user():
 
     data = request.get_json()
     if not all(name in data for name in ["username", "name", "email", "password"]):
-        return bad_request('must include an username, a name, email and a password')
-    data['email'] = data['email'].lower()
-    if not User.valid_username(data['username']):
-        return bad_request('Username does not meet requirements.\nUsername must only contain alpha-numeric characters.')
-    if db.session.scalar(sa.select(User).where(
-            User.username == data['username'])):
-        return bad_request('Username already in use')
+        return bad_request("must include an username, a name, email and a password")
+    data["email"] = data["email"].lower()
+    if not User.valid_username(data["username"]):
+        return bad_request(
+            "Username does not meet requirements.\nUsername must only contain alpha-numeric characters."
+        )
+    if db.session.scalar(sa.select(User).where(User.username == data["username"])):
+        return bad_request("Username already in use")
     if len(data["name"]) > 70 or len(data["name"]) < 1:
-        return bad_request('Name does not meet requirements.\nName must be between 1 and 70 characters.')
-    if not User.valid_email(data['email']):
-        return bad_request('This is not a valid email address')
-    if db.session.scalar(sa.select(User).where(
-            User.email == data['email'])):
-        return bad_request('Email address already in use')
-    if not User.valid_password(data['password']):
-        return bad_request('Password does not meet requirements\nPassword must be between 15 and 64 characters long.')
+        return bad_request(
+            "Name does not meet requirements.\nName must be between 1 and 70 characters."
+        )
+    if not User.valid_email(data["email"]):
+        return bad_request("This is not a valid email address")
+    if db.session.scalar(sa.select(User).where(User.email == data["email"])):
+        return bad_request("Email address already in use")
+    if not User.valid_password(data["password"]):
+        return bad_request(
+            "Password does not meet requirements\nPassword must be between 15 and 64 characters long."
+        )
     user = User().from_dict(data, new_user=True).make_admin()
     db.session.add(user)
     db.session.commit()

@@ -12,6 +12,7 @@
     }
 
     .listing-image {
+        position: relative;
 
         > img {
             display: block;
@@ -21,6 +22,20 @@
             height: 100%;
             object-fit: contain;
         }
+    }
+
+    .listing-status {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background-color: var(--color-destructive);
+        color: #fff;
+        font-size: 0.75em;
+        font-weight: 700;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
     }
 
     .listing-content {
@@ -53,6 +68,14 @@
         > .listing-price {
             text-align: right;
         }
+    }
+}
+
+.listing-card--deactivated {
+    opacity: 0.7;
+
+    .listing-content {
+        background-color: var(--color-disabled);
     }
 }
 
