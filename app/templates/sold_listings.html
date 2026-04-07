@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block styles %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/listings.css') }}">
+{% endblock %}
+{% block title %}
+    Sold Listings - Marketplace
+{% endblock %}
+{% block content %}
+    <div class="sub-container">
+        <h1>Sold Listings</h1>
+        <p>Admin-only list of sold listings.</p>
+    </div>
+
+    <div class="sub-container">
+        {% include 'components/paginated_listings.html' %}
+    </div>
+{% endblock %}

@@ -37,13 +37,10 @@ def get_open_listings_with_images(
         per_page = 12
 
     listings = []
-    listings_with_images = (
-        db.session.query(Listing, Image.filename)
-        .join(
-            Image,
-            (Image.listingID == Listing.id),
-            isouter=True,
-        )
+    listings_with_images = db.session.query(Listing, Image.filename).join(
+        Image,
+        (Image.listingID == Listing.id),
+        isouter=True,
     )
     if include_only_sold:
         listings_with_images = listings_with_images.filter(Listing.sold.is_(True))

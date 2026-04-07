@@ -253,6 +253,37 @@ body {
     }
 }
 
+.user-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1em;
+    width: 100%;
+}
+
+.user-card {
+    padding: 1em;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5em;
+}
+
+.user-card .outline {
+    align-self: flex-start;
+}
+
+.user-name {
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+
+.user-meta {
+    color: var(--color-text-secondary);
+    font-size: 0.95rem;
+}
+
 @media (max-width: 500px) {
     .container {
         margin: 2dvh 2.5dvh;

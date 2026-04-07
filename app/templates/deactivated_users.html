@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %}
+    Deactivated Users - Marketplace
+{% endblock %}
+{% block content %}
+    <div class="sub-container">
+        <h1>Deactivated Users</h1>
+        <p>Admin-only list of deactivated accounts.</p>
+        {% if users %}
+            <div class="user-list">
+                {% for user in users %}
+                    <div class="user-card">
+                        <div class="user-name">{{ user.name }}</div>
+                        <div class="user-meta">@{{ user.username }} &bullet; {{ user.email }}</div>
+                        <a class="outline" href="{{ url_for('routes.profile', user_id=user.id) }}">View Profile</a>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No deactivated users found.</p>
+        {% endif %}
+    </div>
+{% endblock %}

@@ -95,7 +95,7 @@ def reactivate_user(id: int):
     """
     Reactivates the user account with id `id`
 
-    Note that this does not reactivate the listings of the user
+    Note that this also reactivates the listings of the user
     """
     if not is_allowed_to_take_admin_action():
         return unauthorized("You do not have permission to perform this action")
@@ -103,6 +103,14 @@ def reactivate_user(id: int):
     if user is None:
         return not_found("User not found")
     user.reactivate()
+    user_listings = (
+        db.session.execute(sa.select(Listing).where(Listing.userID == id))
+        .scalars()
+        .all()
+    )
+    for listing in user_listings:
+        listing.reactivate()
+        db.session.add(listing)
     db.session.add(user)
     db.session.commit()
     return user.to_dict()
@@ -115,7 +123,7 @@ def reactivate_user_by_username(username: str):
     """
     Reactivates the user account with username `username`
 
-    Note that this does not reactivate the listings of the user
+    Note that this also reactivates the listings of the user
     """
     if not is_allowed_to_take_admin_action():
         return unauthorized("You do not have permission to perform this action")
@@ -123,6 +131,14 @@ def reactivate_user_by_username(username: str):
     if user is None:
         return not_found("User not found")
     user.reactivate()
+    user_listings = (
+        db.session.execute(sa.select(Listing).where(Listing.userID == user.id))
+        .scalars()
+        .all()
+    )
+    for listing in user_listings:
+        listing.reactivate()
+        db.session.add(listing)
     db.session.add(user)
     db.session.commit()
     return user.to_dict()

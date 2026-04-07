@@ -31,6 +31,13 @@ def can_view_restricted_pages():
     return current_user.is_authenticated and current_user.is_admin
 
 
+def require_admin():
+    if not can_view_restricted_pages():
+        flash("You do not have permission to view this page.", "error")
+        return False
+    return True
+
+
 def normal_path(path):
     parts = path.strip("/").replace("_", " ").split("/")
 
@@ -197,9 +204,8 @@ def profile_by_name(user_name: str):
         page=page,
         per_page=per_page,
     )
-    show_deactivated_listings = (
-        current_user.is_authenticated
-        and (current_user.id == user.id or current_user.is_admin)
+    show_deactivated_listings = current_user.is_authenticated and (
+        current_user.id == user.id or current_user.is_admin
     )
     deactivated_listings = []
     sold_listings = []
@@ -404,8 +410,7 @@ def listing(listing_id: int):
     if image:
         listing["filename"] = image.filename
     is_owner = (
-        current_user.is_authenticated
-        and current_user.id == listing["seller"]["id"]
+        current_user.is_authenticated and current_user.id == listing["seller"]["id"]
     )
     if listing["is_deactivated"] and not (can_view_restricted_pages() or is_owner):
         return redirect(url_for("routes.listings"))
@@ -660,6 +665,77 @@ def category_name(category_name: str):  # pylint: disable=redefined-outer-name
     if cat is None:
         return redirect(url_for("routes.index"))
     return category(cat.id)
+
+
+@routes.route("/deactivated/users", methods=["GET"])
+@login_required
+def deactivated_users():
+    if not require_admin():
+        return redirect(url_for("routes.index"))
+    users = (
+        db.session.execute(sa.select(User).where(User.is_deactivated.is_(True)))
+        .scalars()
+        .all()
+    )
+    return render_template("deactivated_users.html", users=users)
+
+
+@routes.route("/deactivated/listings", methods=["GET"])
+@login_required
+def deactivated_listings():
+    if not require_admin():
+        return redirect(url_for("routes.index"))
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 36, type=int)
+    listings, per_page, total_pages = get_open_listings_with_images(
+        include_only_deactivated=True,
+        include_sold=True,
+        page=page,
+        per_page=per_page,
+    )
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
+    return render_template(
+        "deactivated_listings.html",
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=url_for("routes.deactivated_listings"),
+        filter_params={},
+        query_string="",
+    )
+
+
+@routes.route("/sold/listings", methods=["GET"])
+@login_required
+def sold_listings():
+    if not require_admin():
+        return redirect(url_for("routes.index"))
+    page = request.args.get("page", 1, type=int)
+    per_page = request.args.get("per_page", 36, type=int)
+    listings, per_page, total_pages = get_open_listings_with_images(
+        include_only_sold=True,
+        include_deactivated=True,
+        page=page,
+        per_page=per_page,
+    )
+    if page > total_pages:
+        page = total_pages
+    elif page < 1:
+        page = 1
+    return render_template(
+        "sold_listings.html",
+        listings=listings,
+        current_page=page,
+        total_pages=total_pages,
+        per_page=per_page,
+        current_page_url=url_for("routes.sold_listings"),
+        filter_params={},
+        query_string="",
+    )
 
 
 # about/contact us

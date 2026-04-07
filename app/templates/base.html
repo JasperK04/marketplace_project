@@ -29,6 +29,11 @@
                 <div class="links">
                     <a href="{{ url_for('routes.listings') }}">Listings</a>
                     <a href="{{ url_for('routes.categories') }}">Categories</a>
+                    {% if current_user.is_authenticated and current_user.is_admin %}
+                        <a href="{{ url_for('routes.deactivated_users') }}">Deactivated Users</a>
+                        <a href="{{ url_for('routes.deactivated_listings') }}">Deactivated Listings</a>
+                        <a href="{{ url_for('routes.sold_listings') }}">Sold Listings</a>
+                    {% endif %}
                 </div>
 
                 <div class="new-listing">
@@ -67,6 +72,11 @@
     <div id="vertical-menu">
             <a href="{{ url_for('routes.listings') }}">Listings</a>
             <a href="{{ url_for('routes.categories') }}">Categories</a>
+            {% if current_user.is_authenticated and current_user.is_admin %}
+                <a href="{{ url_for('routes.deactivated_users') }}">Deactivated Users</a>
+                <a href="{{ url_for('routes.deactivated_listings') }}">Deactivated Listings</a>
+                <a href="{{ url_for('routes.sold_listings') }}">Sold Listings</a>
+            {% endif %}
             <a class="btn" href="{{ url_for('routes.add_listing')}}">Add listing</a>
             {% if current_user.is_anonymous %}
                 <a class="btn" href="{{ url_for('routes.login') }}">Login</a>
