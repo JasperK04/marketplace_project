@@ -36,6 +36,8 @@ def create_listing():
     fields = ["title", "price", "description"]
     data = request.get_json()
     current_user: User = token_auth.current_user()  # type: ignore
+    if current_user.is_deactivated:
+        return bad_request("Account is deactivated")
     data["userID"] = current_user.id
 
     if not (
@@ -95,6 +97,8 @@ def buy_listing(id: int):
         current_user = db.session.get(User, session["_user_id"])
     if current_user is None:
         return bad_request("You must be logged in to buy a listing")
+    if current_user.is_deactivated:
+        return bad_request("Account is deactivated")
 
     listing = db.get_or_404(Listing, id)
 

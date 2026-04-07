@@ -388,6 +388,9 @@ def listing(listing_id: int):
 @routes.route("/add_listing", methods=["GET", "POST"])
 @login_required
 def add_listing():
+    if current_user.is_deactivated:
+        flash("Your account is deactivated. You cannot create listings.", "error")
+        return redirect(url_for("routes.index"))
     form = ListingForm()
     form.submit.label.text = "Add listing"
     if form.validate_on_submit():
