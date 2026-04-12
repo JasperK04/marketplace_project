@@ -335,22 +335,7 @@ def edit_profile(user_id):
             )
             db.session.add(image)
         db.session.commit()
-
-        profile_pic = db.session.execute(
-            sa.select(Image).where(Image.userID == current_user.id)
-        ).scalar()
-        return render_template(
-            "profile.html",
-            listings=listings,
-            current_page=page,
-            total_pages=total_pages,
-            per_page=per_page,
-            current_page_url=current_page_url,
-            filter_params={},
-            query_string="",
-            profile_pic=profile_pic,
-            user=user,
-        )
+        return redirect(url_for("routes.profile", user_id=user.id))
 
     return render_template("edit_profile.html", user=user, form=form)
 
@@ -439,7 +424,7 @@ def listing(listing_id: int):
         sa.select(Image).where((Image.listingID == listing_id))
     ).scalar()
     if image:
-        listing["filename"] = image.filename
+        listing["image_id"] = image.id
     is_owner = (
         current_user.is_authenticated and current_user.id == listing["seller"]["id"]
     )
@@ -608,7 +593,7 @@ def categories():
     # Get all images for these listings in one query
     listing_ids = [listing.id for listing in all_recent_listings]
     images = db.session.query(Image).filter(Image.listingID.in_(listing_ids)).all()
-    image_map = {img.listingID: img.filename for img in images}
+    image_map = {img.listingID: img.id for img in images}
 
     # Assign listings to categories and attach image filename
     for listing in all_recent_listings:
@@ -619,7 +604,7 @@ def categories():
         ):
             listing_dict = listing.to_dict()
             if listing.id in image_map:
-                listing_dict["filename"] = image_map[listing.id]
+                listing_dict["image_id"] = image_map[listing.id]
             listings_per_cat[cat_id]["listings"].append(listing_dict)
 
     categories = db.session.query(Category).all()
