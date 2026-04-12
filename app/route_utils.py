@@ -37,7 +37,8 @@ def get_open_listings_with_images(
         per_page = 12
 
     listings = []
-    listings_with_images = db.session.query(Listing, Image.filename).join(
+    # include Image.id and filename so templates can request the binary route
+    listings_with_images = db.session.query(Listing, Image.id, Image.filename).join(
         Image,
         (Image.listingID == Listing.id),
         isouter=True,
@@ -87,13 +88,16 @@ def get_open_listings_with_images(
     start = (page - 1) * per_page
     listings_with_images = listings_with_images.offset(start).limit(per_page).all()
 
-    for listing, filename in listings_with_images:
-        if filename:
-            listing = listing.to_dict()
+    for row in listings_with_images:
+        # row is (Listing, image_id, filename) when Image exists, otherwise (Listing, None, None)
+        listing_obj = row[0]
+        image_id = row[1]
+        filename = row[2]
+        listing = listing_obj.to_dict()
+        if image_id:
+            listing["image_id"] = image_id
             listing["filename"] = filename
-            listings.append(listing)
-        else:
-            listings.append(listing.to_dict())
+        listings.append(listing)
 
     return listings, per_page, total_pages
 
@@ -123,17 +127,20 @@ def resize_upload_image(
     )
 
     filename = f"{uuid.uuid4()}_{'profile' if user_id else listing_id}.{format}"  # type: ignore
-    folder = app_config.PICTURE_FOLDER
-    os.makedirs(folder, exist_ok=True)
-    filepath = os.path.join(folder, filename)
-    img.save(filepath, format)
+
+    # save to bytes in webp format
+    from io import BytesIO
+
+    buf = BytesIO()
+    img.save(buf, format=format)
+    img_bytes = buf.getvalue()
 
     assert listing_id or user_id, "requires a listing_id or user_id"
 
     image_data = cast(
         dict[str, str | int | None],
         {
-            "filepath": filepath,
+            "data": img_bytes,
             "filename": filename,
             "listingID": listing_id,
             "userID": user_id,
@@ -152,17 +159,13 @@ def delete_images(listing_id=None, user_id=None):
             sa.select(Image).where(Image.listingID == listing_id)
         ).scalars()
         for image in images:
-            if image and os.path.exists(image.filepath):
-                os.remove(image.filepath)
-                # then delete images in database
-                db.session.delete(image)
-                db.session.commit()
+            # delete image record from DB (legacy on-disk files were handled during migration)
+            db.session.delete(image)
+            db.session.commit()
     else:
         image = db.session.execute(
             sa.select(Image).where(Image.userID == user_id)
         ).scalar()
-        if image and os.path.exists(image.filepath):
-            os.remove(image.filepath)
-            # then delete image in database
+        if image:
             db.session.delete(image)
             db.session.commit()

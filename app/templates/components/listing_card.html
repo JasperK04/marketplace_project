@@ -1,9 +1,9 @@
 <section class="listing-card {% if listing.is_deactivated %}listing-card--deactivated{% endif %}">
     <a href="{{ url_for('routes.listing', listing_id=listing.id) }}">
         <div class="listing-image">
-            {% if listing.filename %}
+            {% if listing.image_id %}
                 <img
-                    src="{{url_for('static',filename='assets/images/user_uploaded/'+ listing.filename)}}"
+                    src="{{url_for('routes.image', image_id=listing.image_id)}}"
                     alt="{{ listing.title }}">
             {% else %}
                 <img src="https://placehold.co/300x200" alt="">

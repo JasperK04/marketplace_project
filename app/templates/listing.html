@@ -55,9 +55,9 @@
         </header>
         <div class="image-and-price">
             <div class="image">
-                {% if listing.filename %}
+                {% if listing.image_id %}
                     <img class="listing-image"
-                        src="{{url_for('static',filename='assets/images/user_uploaded/'+ listing.filename)}}"
+                        src="{{url_for('routes.image', image_id=listing.image_id)}}"
                         alt="{{ listing.title }}">
                 {% else %}
                     <img src="https://placehold.co/600x400" alt="{{ listing.title }}">

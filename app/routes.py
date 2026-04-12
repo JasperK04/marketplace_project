@@ -260,6 +260,21 @@ def profile_by_name(user_name: str):
     )
 
 
+@routes.route("/images/<int:image_id>", methods=["GET"])
+def image(image_id: int):
+    img = db.get_or_404(Image, image_id)
+    if getattr(img, "data", None):
+        from flask import Response
+
+        return Response(img.data, mimetype="image/webp")
+    # fallback: if filename exists and file on disk, serve via static
+    if getattr(img, "filename", None):
+        return redirect(
+            url_for("static", filename="assets/images/user_uploaded/" + img.filename)
+        )
+    return ("", 404)
+
+
 @routes.route("/profile/<int:user_id>", methods=["GET"])
 @login_required
 def profile(user_id: int):

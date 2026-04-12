@@ -10,7 +10,6 @@ services:
       - DATABASE_URL=sqlite:////data/marketplace.db
     volumes:
       - ./data:/data
-      - ./app/static/assets/images/user_uploaded:/app/static/assets/images/user_uploaded
     restart: unless-stopped
 
 networks:

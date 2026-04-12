@@ -32,12 +32,18 @@ def backup_database():
 
 @cli.cli.command("restore")
 def restore_database():
-    """Restores backup.db to marketplace.db."""
     env = os.getenv("FLASK_ENV", "development")
     app_config = config[env]
     db_path = app_config.DB_PATH
     backup_path = os.path.join(os.path.dirname(db_path), "backup.db")
+
+    db.session.remove()
+    db.engine.dispose()
+
     shutil.copy2(backup_path, db_path)
+
+    db.engine.dispose()
+
     print(f"Database restored: {backup_path} -> {db_path}")
 
 
@@ -50,15 +56,8 @@ def initialize_database(users: int, listings: int):
 
     # Delete only images linked to listings or profiles
     images = db.session.query(Image).all()
-    deleted_count = 0
     for image in images:
-        if image.filepath and os.path.isfile(image.filepath):
-            try:
-                os.remove(image.filepath)
-                deleted_count += 1
-                db.session.delete(image)
-            except Exception as e:
-                print(f"Failed to delete {image.filepath}: {e}")
+        db.session.delete(image)
     db.session.commit()
 
     categories: dict[str, dict[str, list[str] | str]] = {
