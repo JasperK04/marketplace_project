@@ -4,6 +4,7 @@ from flask import Flask
 from sqlalchemy import inspect
 from sqlalchemy.exc import OperationalError
 
+from app.api import api
 from app.cli import cli
 from app.config import config
 from app.errors import register_error_handler
@@ -39,6 +40,7 @@ def register_extensions(app: Flask) -> None:
 
 def register_blueprints(app: Flask) -> None:
     app.register_blueprint(routes)
+    app.register_blueprint(api, url_prefix="/api")
     app.register_blueprint(cli)
 
 
