@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="{{url_for('static', filename='css/base.css')}}">
     <link rel="stylesheet" href="{{url_for('static', filename='css/components/colors.css')}}">
     <script src="{{url_for('static', filename='js/menu.js')}}" defer></script>
+    <script src="{{url_for('static', filename='js/adminMenu.js')}}" defer></script>
     {% block styles %}
     {% endblock %}
     {% block scripts %}
@@ -30,9 +31,14 @@
                     <a href="{{ url_for('routes.listings') }}">Listings</a>
                     <a href="{{ url_for('routes.categories') }}">Categories</a>
                     {% if current_user.is_authenticated and current_user.is_admin %}
-                        <a href="{{ url_for('routes.deactivated_users') }}">Deactivated Users</a>
-                        <a href="{{ url_for('routes.deactivated_listings') }}">Deactivated Listings</a>
-                        <a href="{{ url_for('routes.sold_listings') }}">Sold Listings</a>
+                        <div class="admin-menu">
+                            <button type="button" class="admin-btn" aria-haspopup="true" aria-expanded="false">Admin ▾</button>
+                            <div class="admin-dropdown" role="menu">
+                                <a role="menuitem" href="{{ url_for('routes.deactivated_users') }}">Deactivated Users</a>
+                                <a role="menuitem" href="{{ url_for('routes.deactivated_listings') }}">Deactivated Listings</a>
+                                <a role="menuitem" href="{{ url_for('routes.sold_listings') }}">Sold Listings</a>
+                            </div>
+                        </div>
                     {% endif %}
                 </div>
 

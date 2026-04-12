@@ -58,10 +58,65 @@ body {
 
         .links {
             display: flex;
-            justify-content: space-evenly;
+            justify-content: flex-start;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             max-height: 12dvh;
+            flex-wrap: nowrap;
+            overflow: visible;
+        }
+
+        .links a {
+            white-space: nowrap;
+        }
+
+        .admin-menu {
+            position: relative;
+        }
+
+        .admin-btn {
+            background: transparent;
+            border: none;
+            color: var(--color-background);
+            font-weight: bold;
+            cursor: pointer;
+            padding: 10px 5px;
+        }
+
+        .admin-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 6px);
+            left: 0;
+            min-width: 180px;
+            background-color: var(--color-tertiary);
+            border-radius: 6px;
+            box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+            z-index: 50;
+            padding: 6px 0;
+            flex-direction: column;
+        }
+
+        .admin-dropdown a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--color-background);
+            text-decoration: none;
+            white-space: nowrap;
+        }
+
+        .admin-dropdown a:hover {
+            background-color: var(--color-quaternary);
+        }
+
+        .admin-menu:hover .admin-dropdown,
+        .admin-menu:focus-within .admin-dropdown {
+            display: flex;
+        }
+
+        /* when toggled via JS */
+        .admin-menu.open .admin-dropdown {
+            display: flex;
         }
 
         .new_listing a {
