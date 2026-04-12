@@ -255,3 +255,22 @@ form {
         background-color: var(--color-primary);
     }
 }
+
+/* Alert boxes */
+.alert {
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 10px 0 18px 0;
+    position: relative;
+    font-size: 0.95rem;
+}
+.alert-info {
+    background-color: #eef7ff;
+    border: 1px solid #bfe3ff;
+    color: #08435a;
+}
+.alert-warning {
+    background-color: #fff4e5;
+    border: 1px solid #ffd89b;
+    color: #6b3e00;
+}

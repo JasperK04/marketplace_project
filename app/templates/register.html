@@ -9,6 +9,9 @@
 
 {% block content %}
 <h1>Register</h1>
+<div class="alert alert-warning">
+    <strong>Important:</strong> The database is reset daily. Any accounts or listings created will be removed during the daily reset.
+</div>
 <form id="register_form" action="" method="post" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
     <div>
@@ -52,6 +55,9 @@
         {% for error in form.file.errors %}
         <span style="color: red;">[{{ error }}]</span>
         {% endfor %}
+    </div>
+    <div>
+        <label class="checkbox">{{ form.is_admin(class='checkbox_input') }} <span class="checkbox_label">Register as admin</span></label>
     </div>
     <div>{{ form.submit() }}</div>
 </form>

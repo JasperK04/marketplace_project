@@ -9,6 +9,9 @@
 
 {% block content %}
     <h1>{{ title }}</h1>
+    <div class="alert alert-info">
+        <strong>Notice:</strong> The database is reset daily. Listings you add will be removed during the daily reset.
+    </div>
     <form method="post" action="" enctype="multipart/form-data">
     {{ form.hidden_tag() }}
         <div>

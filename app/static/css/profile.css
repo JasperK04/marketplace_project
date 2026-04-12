@@ -28,10 +28,15 @@ hr {
 
             > .user_buttons {
                 align-self: flex-start;
+                display: flex;
+                gap: 8px;
+                align-items: center;
 
                 > a {
-                    display: block;
-                    width: 5em;
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    min-width: 5em;
                     background-color: var(--color-tertiary);
                     color: var(--color-background);
                     padding: 8px 15px;
@@ -40,15 +45,22 @@ hr {
                     text-align: center;
                     font-weight: bold;
                     transition: background-color 0.2s;
-                    text-decoration: none;
                 }
-        
+
                 > a:hover {
                     background-color: var(--color-quaternary);
                 }
 
-                > span > button {
-                    width: 8em;
+                > span > button,
+                > form > button {
+                    min-width: 8em;
+                    padding: 8px 12px;
+                    border-radius: 5px;
+                    border: none;
+                    background-color: var(--color-tertiary);
+                    color: var(--color-background);
+                    font-weight: bold;
+                    cursor: pointer;
                 }
             }
 

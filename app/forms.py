@@ -100,6 +100,12 @@ class RegistrationForm(FlaskForm):
     )
     submit = SubmitField("Register", render_kw={"class": "submit"})
 
+    is_admin = BooleanField(
+        "Register as admin",
+        render_kw={"class": "checkbox_input"},
+        default=False,
+    )
+
     def validate_email(self, email):
         user = db.session.scalar(sa.select(User).where(User.email == email.data))
         if user is not None:
@@ -221,3 +227,13 @@ class EditProfileForm(FlaskForm):
         },
     )
     submit = SubmitField("Save Changes", render_kw={"class": "submit"})
+
+    is_admin = BooleanField(
+        "Admin",
+        render_kw={"class": "checkbox_input"},
+        default=False,
+    )
+
+
+class ToggleAdminForm(FlaskForm):
+    submit = SubmitField("Toggle Admin", render_kw={"class": "submit"})

@@ -11,7 +11,13 @@ from sqlalchemy import select
 from app.config import config
 from app.extensions import db
 from app.extensions import login as login_manager
-from app.forms import EditProfileForm, ListingForm, LoginForm, RegistrationForm
+from app.forms import (
+    EditProfileForm,
+    ListingForm,
+    LoginForm,
+    RegistrationForm,
+    ToggleAdminForm,
+)
 from app.models.Category import Category
 from app.models.Image import Image
 from app.models.Listing import Listing
@@ -166,6 +172,8 @@ def register():
             },
             new_user=True,
         )
+        if getattr(form, "is_admin", None) and form.is_admin.data:
+            user.make_admin()
         db.session.add(user)
         db.session.flush()
 
@@ -230,6 +238,10 @@ def profile_by_name(user_name: str):
     elif page < 1:
         page = 1
 
+    toggle_admin_form = None
+    if current_user.is_authenticated and current_user.id == user.id:
+        toggle_admin_form = ToggleAdminForm()
+
     return render_template(
         "profile.html",
         user=user,
@@ -244,6 +256,7 @@ def profile_by_name(user_name: str):
         current_page_url=current_page_url,
         filter_params={},
         query_string="",
+        toggle_admin_form=toggle_admin_form,
     )
 
 
@@ -294,6 +307,9 @@ def edit_profile(user_id):
         file = request.files.get("file")
         user.about_me = form.about_me.data or ""
         user.username = cast(str, form.username.data)
+        # allow user to toggle their admin status
+        if getattr(form, "is_admin", None) is not None:
+            user.is_admin = bool(form.is_admin.data)
         db.session.add(user)
         db.session.flush()
         if file:
@@ -463,6 +479,22 @@ def add_listing():
         db.session.commit()
         return redirect(url_for("routes.index"))
     return render_template("add_listing.html", title="Add listing", form=form)
+
+
+@routes.route("/profile/<int:user_id>/toggle_admin", methods=["POST"])
+@login_required
+def toggle_admin(user_id: int):
+    user = db.get_or_404(User, user_id)
+    if current_user.id != user.id:
+        flash("You cannot change another user's admin status.", "error")
+        return redirect(url_for("routes.profile", user_id=user.id))
+    form = ToggleAdminForm()
+    if form.validate_on_submit():
+        user.is_admin = not bool(user.is_admin)
+        db.session.add(user)
+        db.session.commit()
+        flash("Admin status updated.", "success")
+    return redirect(url_for("routes.profile", user_id=user.id))
 
 
 @routes.route("/listings/<int:listing_id>/edit", methods=["GET", "POST"])

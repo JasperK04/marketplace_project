@@ -27,6 +27,12 @@
             <div class="user_buttons">
                 {% if user.id == current_user.id %}
                     <a href="{{ url_for('routes.edit_profile', user_id=user.id) }}">Edit Profile</a>
+                    {% if toggle_admin_form %}
+                        <form method="post" action="{{ url_for('routes.toggle_admin', user_id=user.id) }}" style="display:inline-block; margin-left:8px;">
+                            {{ toggle_admin_form.hidden_tag() }}
+                            <button class="btn" type="submit">{% if user.is_admin %}Revoke Admin{% else %}Make Admin{% endif %}</button>
+                        </form>
+                    {% endif %}
                 {% endif %}
                 {% if current_user.is_authenticated and current_user.is_admin and current_user.id != user.id %}
                     {% if user.is_deactivated %}
