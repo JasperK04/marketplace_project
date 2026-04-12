@@ -23,3 +23,6 @@ app/static/assets/images/user_uploaded/
 
 # logs
 logs/
+
+# github agents
+.github/agents/

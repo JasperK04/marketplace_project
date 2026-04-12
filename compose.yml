@@ -11,6 +11,7 @@ services:
     volumes:
       - ./data:/data
       - ./app/static/assets/images/user_uploaded:/app/static/assets/images/user_uploaded
+    restart: unless-stopped
 
 networks:
   jasper:

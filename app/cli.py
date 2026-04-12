@@ -1,4 +1,5 @@
 import os
+import shutil
 from random import choice, randint
 from typing import cast
 
@@ -7,13 +8,37 @@ import sqlalchemy as sa
 from faker import Faker
 from flask import Blueprint, current_app
 
+from app.config import config
 from app.extensions import db
 from app.models.Category import Category
+from app.models.Image import Image
 from app.models.Listing import Listing
 from app.models.User import User
 from app.route_utils import resize_upload_image
 
 cli = Blueprint("cli", __name__)
+
+
+@cli.cli.command("backup")
+def backup_database():
+    """Creates a backup of marketplace.db as backup.db."""
+    env = os.getenv("FLASK_ENV", "development")
+    app_config = config[env]
+    db_path = app_config.DB_PATH
+    backup_path = os.path.join(os.path.dirname(db_path), "backup.db")
+    shutil.copy2(db_path, backup_path)
+    print(f"Database backed up: {db_path} -> {backup_path}")
+
+
+@cli.cli.command("restore")
+def restore_database():
+    """Restores backup.db to marketplace.db."""
+    env = os.getenv("FLASK_ENV", "development")
+    app_config = config[env]
+    db_path = app_config.DB_PATH
+    backup_path = os.path.join(os.path.dirname(db_path), "backup.db")
+    shutil.copy2(backup_path, db_path)
+    print(f"Database restored: {backup_path} -> {db_path}")
 
 
 @cli.cli.command("recreate-db")
@@ -22,6 +47,20 @@ cli = Blueprint("cli", __name__)
 def initialize_database(users: int, listings: int):
     """Drops the current database and creates a new one with faked data."""
     fake = Faker()
+
+    # Delete only images linked to listings or profiles
+    images = db.session.query(Image).all()
+    deleted_count = 0
+    for image in images:
+        if image.filepath and os.path.isfile(image.filepath):
+            try:
+                os.remove(image.filepath)
+                deleted_count += 1
+                db.session.delete(image)
+            except Exception as e:
+                print(f"Failed to delete {image.filepath}: {e}")
+    db.session.commit()
+
     categories: dict[str, dict[str, list[str] | str]] = {
         "Electronics": {
             "keywords": [
