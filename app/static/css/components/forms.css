@@ -263,6 +263,7 @@ form {
     margin: 10px 0 18px 0;
     position: relative;
     font-size: 0.95rem;
+    max-width: 600px;
 }
 .alert-info {
     background-color: #eef7ff;

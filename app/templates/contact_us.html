@@ -2,7 +2,12 @@
 {% block styles %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/contact.css') }}">
 {% endblock %}
+{% block scripts %}
+{% endblock %}
 {% block content %}
+    <div class="alert alert-info">
+        <strong>Notice:</strong> Contact information is for demonstration purposes only. Please do not attempt to contact us using the provided email or phone number, as they do not exist.
+    </div>
     <div class="content">
         <div class="content-container intro">
             <h1>Contact us</h1>
