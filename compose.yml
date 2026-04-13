@@ -7,7 +7,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=sqlite:////data/marketplace.db
+      - DATABASE_URL=sqlite:////app/data/marketplace.db
     volumes:
       - ./data:/app/data
     restart: unless-stopped
