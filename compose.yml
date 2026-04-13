@@ -9,7 +9,7 @@ services:
     environment:
       - DATABASE_URL=sqlite:////data/marketplace.db
     volumes:
-      - ./data:/data
+      - ./data:/app/data
     restart: unless-stopped
 
 networks:
