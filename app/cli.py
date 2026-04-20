@@ -1,7 +1,9 @@
 import os
 import shutil
+from datetime import datetime
 from random import choice, randint
 from typing import cast
+from zoneinfo import ZoneInfo
 
 import click
 import sqlalchemy as sa
@@ -27,7 +29,9 @@ def backup_database():
     db_path = app_config.DB_PATH
     backup_path = os.path.join(os.path.dirname(db_path), "backup.db")
     shutil.copy2(db_path, backup_path)
-    print(f"Database backed up: {db_path} -> {backup_path}")
+
+    now = datetime.now(ZoneInfo("Europe/Amsterdam")).strftime("%d-%m-%Y %H:%M:%S")
+    print(f"Database backed up ({now}): {db_path} -> {backup_path}")
 
 
 @cli.cli.command("restore")
@@ -44,7 +48,8 @@ def restore_database():
 
     db.engine.dispose()
 
-    print(f"Database restored: {backup_path} -> {db_path}")
+    now = datetime.now(ZoneInfo("Europe/Amsterdam")).strftime("%d-%m-%Y %H:%M:%S")
+    print(f"Database restored ({now}): {backup_path} -> {db_path}")
 
 
 @cli.cli.command("recreate-db")
